@@ -11,9 +11,11 @@ DESTDIR = $$IDE_APP_PATH
 TEMPLATE = app
 SOURCES += main.cpp \
     liteapp.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    aboutpluginsdialog.cpp
 HEADERS += liteapp.h \
-    mainwindow.h
+    mainwindow.h \
+    aboutpluginsdialog.h
 
 RESOURCES += liteapp.qrc
 

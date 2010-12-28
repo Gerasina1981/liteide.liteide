@@ -10,6 +10,7 @@ class MainWindow : public QMainWindow, public IEditorEvent
 {
     Q_OBJECT
 public:
+    friend class LiteApp;
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
 protected:
@@ -18,11 +19,10 @@ private slots:
     void saveFile();
     void newFile();
     void openFile();
-    void undo();
-    void redo();
     void about();
     void editTabChanged(int index);
     void editTabClose(int index);
+    void aboutPlugins();
 public:
     void addWorkspacePane(QWidget *w, const QString &name);
     void addOutputPage(QWidget *w, const QString &name);
@@ -42,6 +42,7 @@ private:
     QMenu   *fileMenu;
     QMenu   *editMenu;
     QMenu   *viewMenu;
+    QMenu   *toolMenu;
     QMenu   *helpMenu;
     QAction *newFileAct;
     QAction *openFileAct;
@@ -52,6 +53,7 @@ private:
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
+    QAction *aboutPluginsAct;
 
     IEditor *activeEditor;
     LiteApp *liteApp;

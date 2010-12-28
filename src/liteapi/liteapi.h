@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QIcon>
+#include <QMenu>
+#include <QSettings>
+#include <QProcess>
 
 class IContext
 {
@@ -19,6 +22,8 @@ public:
     virtual QIcon icon() const = 0;
     virtual void save() = 0;
     virtual bool close() = 0;
+    virtual void reload() = 0;
+    virtual void activeEditor(QAction *undoAct, QAction *redoAct) = 0;
 };
 
 class IEditorFactory
@@ -37,6 +42,13 @@ public:
     virtual void fireDocumentChanged(IEditor *edit, bool b) = 0;
 };
 
+class IProcess
+{
+public:
+    virtual ~IProcess() {}
+    virtual QProcess *process() = 0;
+};
+
 class IApplication
 {
 public:
@@ -45,6 +57,11 @@ public:
     virtual void addOutputPane(QWidget *w, const QString &name) = 0;
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
     virtual IEditorEvent *editorEvent() = 0;
+    virtual QSettings *settings() = 0;
+    virtual QMenu *viewMenu() = 0;
+    virtual QMenu *editMenu() = 0;
+    virtual QMenu *toolMenu() = 0;
+    virtual IEditor *activeEditor() = 0;
 };
 
 class IPlugin
@@ -53,6 +70,8 @@ public:
     virtual ~IPlugin() {}
     virtual void install(IApplication *app) = 0;
     virtual void uninstall() = 0;
+    virtual QString name() const = 0;
+    virtual QString info() const = 0;
 };
 
 Q_DECLARE_INTERFACE(IPlugin,"lite.IPlugin/1.0")

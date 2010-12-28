@@ -6,7 +6,12 @@
 
 LiteApp::LiteApp()
 {
-  mainWindow = new MainWindow(this);
+    mainWindow = new MainWindow(this);
+    mainSettings = new QSettings(QSettings::IniFormat,QSettings::UserScope,"liteide","liteapp",this);
+}
+
+LiteApp::~LiteApp()
+{
 }
 
 void LiteApp::slotClose()
@@ -34,6 +39,32 @@ IEditorEvent *LiteApp::editorEvent()
 {
     return mainWindow;
 }
+
+QSettings *LiteApp::settings()
+{
+    return mainSettings;
+}
+
+QMenu *LiteApp::editMenu()
+{
+    return mainWindow->editMenu;
+}
+
+QMenu *LiteApp::viewMenu()
+{
+    return mainWindow->viewMenu;
+}
+
+QMenu *LiteApp::toolMenu()
+{
+    return mainWindow->toolMenu;
+}
+
+IEditor *LiteApp::activeEditor()
+{
+    return mainWindow->activeEditor;
+}
+
 
 void LiteApp::loadPlugins(const QString &dir)
 {

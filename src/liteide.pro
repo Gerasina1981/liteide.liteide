@@ -1,4 +1,3 @@
-#version check qt
 include (liteide.pri)
 
 TEMPLATE  = subdirs

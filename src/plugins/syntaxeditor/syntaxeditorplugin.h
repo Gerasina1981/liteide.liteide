@@ -21,22 +21,33 @@ public:
     virtual QIcon icon() const;
     virtual void save();
     virtual bool close();
+    virtual void reload();
+    virtual void activeEditor(QAction *undoAct, QAction *redoAct);
 public slots:
+    void setUndoEnabled(bool);
+    void setRedoEnabled(bool);
     void  modificationChanged(bool);    
 public:
+    bool undoEnable;
+    bool redoEnable;
     SyntaxEditor *editor;
     IEditorEvent *event;
 };
 
 class EditorFactoryImpl : public QObject, public IEditorFactory
 {
+    Q_OBJECT
 public:
     EditorFactoryImpl(QObject *parent, IApplication *app);
     virtual QStringList fileTypes();
     virtual QString openTypes();
     virtual IEditor *create(const QString &fileName);
+protected slots:
+    void config();
 protected:
     IApplication *liteApp;
+    QAction *configAct;
+    QFont    editorFont;
 };
 
 
@@ -48,6 +59,9 @@ public:
     SyntaxEditorPlugin();
     virtual void install(IApplication *app);
     virtual void uninstall();
+    virtual QString name() const;
+    virtual QString info() const;
+protected:
     IApplication *liteApp;
 };
 

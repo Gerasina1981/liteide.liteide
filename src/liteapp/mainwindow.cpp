@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "liteapp.h"
+#include "aboutpluginsdialog.h"
 
 #include <QApplication>
 #include <QAction>
@@ -76,12 +77,12 @@ void MainWindow::createActions()
     undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
     undoAct->setShortcuts(QKeySequence::Undo);
     undoAct->setStatusTip(tr("Undo the last editing action"));
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+    //connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
 
     redoAct = new QAction(QIcon(":/images/redo.png"), tr("&Redo"), this);
     redoAct->setShortcuts(QKeySequence::Redo);
     redoAct->setStatusTip(tr("Redo the last editing action"));
-    connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
+    //connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
@@ -95,6 +96,10 @@ void MainWindow::createActions()
     aboutQtAct = new QAction(tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
+    aboutPluginsAct = new QAction(tr("About Plugins..."),this);
+    aboutPluginsAct->setStatusTip(tr("Show the plugins"));
+    connect(aboutPluginsAct,SIGNAL(triggered()),this, SLOT(aboutPlugins()));
 }
 
 void MainWindow::createMenus()
@@ -115,11 +120,15 @@ void MainWindow::createMenus()
 
     viewMenu = menuBar()->addMenu(tr("&View"));
 
+    toolMenu = menuBar()->addMenu(tr("&Tools"));
+
     menuBar()->addSeparator();
+
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
+    helpMenu->addAction(aboutPluginsAct);
 }
 
 void MainWindow::createToolBars()
@@ -182,6 +191,8 @@ void MainWindow::editTabChanged(int index)
         return;
     }
     activeEditor = ed;
+
+    activeEditor->activeEditor(undoAct,redoAct);
     //connect(this,SLOT(undo()),ed,SLOT(undo()));
 }
 
@@ -243,16 +254,6 @@ void MainWindow::openFile()
     }
 }
 
-void MainWindow::undo()
-{
-
-}
-
-void MainWindow::redo()
-{
-
-}
-
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About LiteIDE"),
@@ -266,4 +267,15 @@ void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
     if (index >= 0) {
         editTabWidget->setTabText(index, b ? edit->name()+"[*]" : edit->name());
     }
+}
+
+void MainWindow::aboutPlugins()
+{
+    AboutPluginsDialog dlg(this);
+    dlg.resize(400,300);
+    foreach (IPlugin *p, liteApp->plugins) {
+        dlg.addPluginInfo(p->name(),p->info());
+    }
+
+    dlg.exec();
 }

@@ -2,6 +2,7 @@
 #define GOLANGEDITOR_H
 
 #include <QPlainTextEdit>
+#include <QTextEdit>
 
 class SyntaxEditor : public QPlainTextEdit
 {
@@ -9,6 +10,7 @@ class SyntaxEditor : public QPlainTextEdit
 public:
     SyntaxEditor();
     void newFile();
+    void reload();
     QString currentText() { return curText; }
     static SyntaxEditor *openFile(const QString &fileName);
     bool loadFile(const QString &fileName);
@@ -20,9 +22,6 @@ public:
 
  protected:
      void closeEvent(QCloseEvent *event);
-
- private slots:
-     void documentWasModified();
 
  private:
      bool maybeSave();

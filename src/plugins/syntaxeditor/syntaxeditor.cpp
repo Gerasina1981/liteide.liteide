@@ -9,7 +9,23 @@ SyntaxEditor::SyntaxEditor()
     setLineWrapMode(QPlainTextEdit::NoWrap);
 
     isUntitled = true;
-    this->setTabStopWidth(font().pointSize()*4);
+}
+
+void SyntaxEditor::reload()
+{
+    QFile file(curFile);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("LiteIDE"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(curFile)
+                             .arg(file.errorString()));
+        return;
+    }
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    setPlainText(codec->toUnicode(file.readAll()));
+    QApplication::restoreOverrideCursor();
 }
 
 void SyntaxEditor::newFile()
@@ -20,9 +36,6 @@ void SyntaxEditor::newFile()
     curFile = tr("document%1.go").arg(sequenceNumber++);
     curText = curFile + "[*]";
     setWindowTitle(curText);
-
-    connect(document(), SIGNAL(contentsChanged()),
-            this, SLOT(documentWasModified()));
 }
 
 SyntaxEditor *SyntaxEditor::openFile(const QString &fileName)
@@ -41,7 +54,7 @@ bool SyntaxEditor::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("MDI"),
+        QMessageBox::warning(this, tr("LiteIDE"),
                              tr("Cannot read file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -51,13 +64,9 @@ bool SyntaxEditor::loadFile(const QString &fileName)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     setPlainText(codec->toUnicode(file.readAll()));
-    qDebug() << "load" << fileName << file.readAll();
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
-
-    connect(document(), SIGNAL(contentsChanged()),
-            this, SLOT(documentWasModified()));
 
     return true;
 }
@@ -85,7 +94,7 @@ bool SyntaxEditor::saveFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("MDI"),
+        QMessageBox::warning(this, tr("LiteIDE"),
                              tr("Cannot write file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -114,16 +123,11 @@ void SyntaxEditor::closeEvent(QCloseEvent *event)
     }
 }
 
-void SyntaxEditor::documentWasModified()
-{
-    setWindowModified(document()->isModified());
-}
-
 bool SyntaxEditor::maybeSave()
 {
     if (document()->isModified()) {
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::warning(this, tr("MDI"),
+        ret = QMessageBox::warning(this, tr("LiteIDE"),
                      tr("'%1' has been modified.\n"
                         "Do you want to save your changes?")
                      .arg(userFriendlyCurrentFile()),
@@ -144,7 +148,6 @@ void SyntaxEditor::setCurrentFile(const QString &fileName)
     document()->setModified(false);
     setWindowModified(false);
     curText = userFriendlyCurrentFile();
-    setWindowTitle(userFriendlyCurrentFile() + "[*]");
 }
 
 QString SyntaxEditor::strippedName(const QString &fullFileName)
