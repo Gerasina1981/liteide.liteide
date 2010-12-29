@@ -2,7 +2,8 @@
 #define LITEAPP_H
 
 #include "mainwindow.h"
-#include "../liteapi/liteapi.h"
+#include "../api/iplugin.h"
+#include "../api/iapp.h"
 
 class LiteApp : public QObject, public IApplication
 {

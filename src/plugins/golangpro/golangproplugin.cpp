@@ -3,22 +3,38 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QDebug>
+#include <QPlainTextEdit>
+#include <QTextCodec>
 
 GolangProPlugin::GolangProPlugin()
+{
+}
+
+void GolangProPlugin::createActions()
 {
     gofmtAct = new QAction(tr("gofmt\tAlt+F8"),this);
     gofmtAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F8));
     gofmtAct->setStatusTip(tr("Format go file"));
 
     connect(gofmtAct,SIGNAL(triggered()),this,SLOT(gofmt()));
+    liteApp->toolMenu()->addAction(gofmtAct);
 }
+
+void GolangProPlugin::createOutput()
+{
+    gofmtOutputEdit = new QPlainTextEdit;
+    gofmtOutputEdit->setReadOnly(true);
+    liteApp->addOutputPane(gofmtOutputEdit,tr("gofmt"));
+}
+
 
 void GolangProPlugin::install(IApplication *app)
 {
     liteApp = app;
-    liteApp->toolMenu()->addAction(gofmtAct);
     gofmtCmd = liteApp->settings()->value("golangpro/gofmt","c:\\go\\bin\\gofmt.exe").toString();
-}
+    createActions();
+    createOutput();
+ }
 
 void GolangProPlugin::uninstall()
 {
@@ -38,7 +54,6 @@ QString GolangProPlugin::info() const
 
 Q_EXPORT_PLUGIN(GolangProPlugin)
 
-
 void GolangProPlugin::gofmt()
 {
     IEditor *ed = liteApp->activeEditor();
@@ -54,8 +69,8 @@ void GolangProPlugin::gofmt()
     }
 
     ed->save();
-
-    int code = QProcess::execute(gofmtCmd, QStringList() << "-w=true" << path);
-    if (code == 0)
-        ed->reload();
+    connect(&gofmtProcess,SIGNAL(outputText(QString,bool)),gofmtOutputEdit,SLOT(appendPlainText(QString)));
+    connect(&gofmtProcess,SIGNAL(processSuccess()),ed,SLOT(reload()));
+    gofmtProcess.start(tr("gofmt"),gofmtCmd,
+                       QStringList() << "-w=true" << path);
 }

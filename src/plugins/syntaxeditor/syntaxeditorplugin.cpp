@@ -4,7 +4,7 @@
 
 #include <QFileInfo>
 
-EditorImpl::EditorImpl(QObject *parent) : QObject(parent), undoEnable(false), redoEnable(false)
+EditorImpl::EditorImpl(QObject *parent) : IEditor(parent), undoEnable(false), redoEnable(false)
 {
 }
 

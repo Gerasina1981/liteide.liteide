@@ -2,6 +2,7 @@
 # Project created by QtCreator 2010-12-27T22:25:39
 # -------------------------------------------------
 include (../../liteide.pri)
+include (../../api/api.pri)
 
 TARGET = syntaxeditor
 

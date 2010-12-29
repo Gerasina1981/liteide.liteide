@@ -2,14 +2,16 @@
 #define GOLANGEDITORPLUGIN_H
 
 #include "syntaxeditor_global.h"
-#include "../../liteapi/liteapi.h"
+#include "../../api/iplugin.h"
+#include "../../api/iapp.h"
+#include "../../api/ieditor.h"
 
 #include <QObject>
 #include <QtPlugin>
 #include <QMap>
 #include "syntaxeditor.h"
 
-class EditorImpl : public QObject, public IEditor
+class EditorImpl : public IEditor
 {
     Q_OBJECT
 public:

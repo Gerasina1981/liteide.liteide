@@ -2,7 +2,9 @@
 #define PROJECTPLUGIN_H
 
 #include "project_global.h"
-#include "../../liteapi/liteapi.h"
+#include "../../api/iplugin.h"
+#include "../../api/iapp.h"
+#include "../../api/iproject.h"
 
 #include <QObject>
 #include <QtPlugin>

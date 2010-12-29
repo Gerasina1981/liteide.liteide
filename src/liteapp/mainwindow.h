@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QMap>
-#include "../liteapi/liteapi.h"
+#include "../api/ieditor.h"
 
 class LiteApp;
 class MainWindow : public QMainWindow, public IEditorEvent
