@@ -5,11 +5,12 @@
 #include "../../api/iplugin.h"
 #include "../../api/iapp.h"
 #include "../../api/iproject.h"
+#include "projectfile.h"
 
 #include <QObject>
 #include <QtPlugin>
 #include <QAction>
-
+/*
 class ProjectFile : public IProject
 {
 public:
@@ -21,6 +22,7 @@ public:
     QString _fullPath;
     QStringList _files;
 };
+*/
 
 class PROJECTSHARED_EXPORT ProjectPlugin : public QObject, public IPlugin
 {
@@ -33,16 +35,9 @@ public:
     virtual void uninstall();
     virtual QString name() const;
     virtual QString info() const;
-    void createActions();
 protected:
     IApplication *liteApp;
-    QAction *newProjectAct;
-    QAction *openProjectAct;
-    QAction *closeProjectAct;
-private slots:
-    void closeProject();
-    void openProject();
-    void newProject();
+
 };
 
 #endif // PROJECTPLUGIN_H

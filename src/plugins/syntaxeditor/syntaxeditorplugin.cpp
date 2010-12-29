@@ -85,12 +85,12 @@ EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
 
 QStringList EditorFactoryImpl::fileTypes()
 {
-    return QStringList() << "go";
+    return QStringList() << "go" << "h" << "cpp" << "pro";
 }
 
 QString EditorFactoryImpl::openTypes()
 {
-    return QObject::tr("Go Files (*.go)");
+    return QObject::tr("Go Files (*.go);;(All Files (*.*)");
 }
 
 void EditorFactoryImpl::config()

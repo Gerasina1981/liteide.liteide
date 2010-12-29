@@ -45,6 +45,11 @@ QSettings *LiteApp::settings()
     return mainSettings;
 }
 
+QWidget *LiteApp::main()
+{
+    return mainWindow;
+}
+
 QMenu *LiteApp::fileMenu()
 {
     return mainWindow->fileMenu;
@@ -105,17 +110,25 @@ QString LiteApp::openFileTypes() const
     return types.join(";;");
 }
 
-IEditor *LiteApp::openFile(const QString &fileName)
+bool LiteApp::openFile(const QString &fileName)
 {
+    foreach (IEditor *ed, mainWindow->editors.values()) {
+        if (ed->fullPath() == fileName) {
+            mainWindow->editTabWidget->setCurrentWidget(ed->widget());
+            return true;
+        }
+    }
+
     QString fileExt = QFileInfo(fileName).suffix();
     foreach(IEditorFactory *factory, editorFactorys) {
         if (factory->fileTypes().contains(fileExt)) {
             IEditor *ed = factory->create(fileName);
             if (ed) {
-                return ed;
+                mainWindow->addEditor(ed);
+                return true;
             }
         }
     }
-    return NULL;
+    return false;
 }
 

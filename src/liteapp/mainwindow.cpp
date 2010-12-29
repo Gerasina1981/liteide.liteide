@@ -247,10 +247,7 @@ void MainWindow::openFile()
 
     if (!fileName.isEmpty()) {
         path = QFileInfo(fileName).absolutePath();
-        IEditor *editor = liteApp->openFile(fileName);
-        if (editor) {
-            addEditor(editor);
-        }
+        liteApp->openFile(fileName);
     }
 }
 

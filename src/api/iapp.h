@@ -16,8 +16,10 @@ public:
     virtual void addWorkspacePane(QWidget *w, const QString &name) = 0;
     virtual void addOutputPane(QWidget *w, const QString &name) = 0;
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
+    virtual bool openFile(const QString &fileName) = 0;
     virtual IEditorEvent *editorEvent() = 0;
     virtual QSettings *settings() = 0;
+    virtual QWidget *main() = 0;
     virtual QMenu *fileMenu() = 0;
     virtual QMenu *viewMenu() = 0;
     virtual QMenu *editMenu() = 0;

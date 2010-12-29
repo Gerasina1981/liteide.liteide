@@ -21,11 +21,12 @@ public:
     virtual QMenu *editMenu();
     virtual QMenu *viewMenu();
     virtual QMenu *toolMenu();
+    virtual QWidget *main();
     virtual IEditor *activeEditor();
     void loadPlugins(const QString &dir);
     void installPlugins();
     void uninstallPlugins();
-    IEditor *openFile(const QString &fileName);
+    bool openFile(const QString &fileName);
     QString openFileTypes() const;
 public:
     QSettings  *mainSettings;
