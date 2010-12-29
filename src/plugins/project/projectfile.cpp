@@ -43,12 +43,13 @@ bool ProjectFile::openProject(const QString &fileName)
     context.clear();
     foreach(QString line, list) {
         QStringList v = line.split(QRegExp("\\+="),QString::SkipEmptyParts);
-        if (v.isEmpty()) {
+        if (v.count() == 1) {
             v = line.split(QRegExp("="),QString::SkipEmptyParts);
             if (v.count() == 2) {
-                QStringList v2 = v.at(1).split("",QString::SkipEmptyParts);
-                if (!v2.isEmpty())
+                QStringList v2 = v.at(1).split(" ",QString::SkipEmptyParts);
+                if (!v2.isEmpty()) {
                     context[v.at(0).trimmed()] = v2;
+                }
             }
         } else if (v.count() == 2) {
             QStringList v2 = v.at(1).split(" ",QString::SkipEmptyParts);
@@ -68,6 +69,11 @@ void ProjectFile::close()
 QStringList ProjectFile::values(const QString &key)
 {
     return context.value(key);
+}
+
+QStringList ProjectFile::goFiles()
+{
+    return values("GOFILES");
 }
 
 QStringList ProjectFile::headerFiles()

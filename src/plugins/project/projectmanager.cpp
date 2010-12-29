@@ -87,32 +87,31 @@ void ProjectManager::appendProject(ProjectFile *file)
     item->setData(file->filePath(),Qt::UserRole+2);
 
     QStandardItem *pro = new QStandardItem(file->fileName());
-    pro->setData(ItemPro);
+    pro->setData(ItemProFile);
     item->appendRow(pro);
 
-    QStringList headers = file->headerFiles();
-    if (!headers.isEmpty()) {
-        QStandardItem *h = new QStandardItem(tr("Headers"));
-        h->setData(ItemFolder);
-        item->appendRow(h);
-        foreach(QString v, headers) {
-            QStandardItem *i = new QStandardItem(v);
-            i->setData(ItemHeader);
-            h->appendRow(i);
+    QMap<QString,QString> fileMap;
+    fileMap.insert("GOFILES",tr("Gofiles"));
+    fileMap.insert("HEADERS",tr("Headers"));
+    fileMap.insert("SOURCES",tr("Sources"));
+
+    QMapIterator<QString,QString> i(fileMap);
+    while(i.hasNext()) {
+        i.next();
+        QStringList files = file->values(i.key());
+        if (!files.isEmpty()) {
+            QStandardItem *folder = new QStandardItem(i.value());
+            folder->setData(ItemFolder);
+            item->appendRow(folder);
+            foreach(QString v, files) {
+                QStandardItem *fileItem = new QStandardItem(v);
+                fileItem->setData(ItemFile);
+                folder->appendRow(fileItem);
+            }
         }
     }
-    QStringList sources = file->sourceFiles();
-    if (!sources.isEmpty()) {
-        QStandardItem *s = new QStandardItem(tr("Sources"));
-        s->setData(ItemFolder);
-        item->appendRow(s);
-        foreach(QString v, sources) {
-            QStandardItem *i = new QStandardItem(v);
-            i->setData(ItemSource);
-            s->appendRow(i);
-        }
-    }
-    tree->expand(model->indexFromItem(item));
+
+    tree->expand(model->indexFromItem(item));    
 }
 
 void ProjectManager::doubleClickedTree(const QModelIndex  &index)
@@ -125,7 +124,7 @@ void ProjectManager::doubleClickedTree(const QModelIndex  &index)
     if (!ok)
         return;
 
-    if (type != ItemPro && type != ItemHeader && type != ItemSource)
+    if (type != ItemProFile && type != ItemFile)
         return;
 
     QString fileName = item->text();
@@ -149,7 +148,6 @@ void ProjectManager::doubleClickedTree(const QModelIndex  &index)
     foreach(ProjectFile *file, proFiles) {
         if (file->filePath() == proFilePath) {
             QString filePath = QFileInfo(QDir(file->projectPath()),fileName).absoluteFilePath();
-            qDebug() << filePath;
             liteApp->openFile(filePath);
             return;
         }

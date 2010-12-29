@@ -10,6 +10,7 @@ class ProjectFile : public QObject
 public:
     QStringList sourceFiles();
     QStringList headerFiles();
+    QStringList goFiles();
     void close();
     ProjectFile(QObject *parent = 0);
     QString projectName() const;
@@ -18,9 +19,8 @@ public:
     QString fileName() const;
 public:
     bool openProject(const QString &fileName);
-private:
     QStringList values(const QString &key);
-private:
+public:
     QMap<QString,QStringList>   context;
     QString _filePath;
 };

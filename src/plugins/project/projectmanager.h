@@ -14,10 +14,8 @@ class ProjectManager : public QWidget
     Q_OBJECT
     enum ITEM_TYPE{
         ItemRoot = 1,
-        ItemPro,
-        ItemHeader,
-        ItemSource,
         ItemFolder,
+        ItemProFile,
         ItemFile,
     };
 public:
