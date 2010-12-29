@@ -49,6 +49,15 @@ public:
     virtual QProcess *process() = 0;
 };
 
+class IProject
+{
+public:
+    virtual ~IProject() {}
+    virtual QString name() const = 0;
+    virtual QString fullPath() const = 0;
+    virtual QStringList files() const = 0;
+};
+
 class IApplication
 {
 public:
@@ -58,6 +67,7 @@ public:
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
     virtual IEditorEvent *editorEvent() = 0;
     virtual QSettings *settings() = 0;
+    virtual QMenu *fileMenu() = 0;
     virtual QMenu *viewMenu() = 0;
     virtual QMenu *editMenu() = 0;
     virtual QMenu *toolMenu() = 0;

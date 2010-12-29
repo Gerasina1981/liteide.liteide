@@ -51,7 +51,7 @@ protected:
 };
 
 
-class SYNTAXEDITORSHARED_EXPORT SyntaxEditorPlugin : public QObject, public IPlugin
+class /*SYNTAXEDITORSHARED_EXPORT*/ SyntaxEditorPlugin : public QObject, public IPlugin
 {
     Q_OBJECT
     Q_INTERFACES(IPlugin)

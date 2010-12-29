@@ -16,6 +16,7 @@ public:
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual IEditorEvent *editorEvent();
     virtual QSettings *settings();
+    virtual QMenu *fileMenu();
     virtual QMenu *editMenu();
     virtual QMenu *viewMenu();
     virtual QMenu *toolMenu();

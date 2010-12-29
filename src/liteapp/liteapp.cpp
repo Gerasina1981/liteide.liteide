@@ -45,6 +45,11 @@ QSettings *LiteApp::settings()
     return mainSettings;
 }
 
+QMenu *LiteApp::fileMenu()
+{
+    return mainWindow->fileMenu;
+}
+
 QMenu *LiteApp::editMenu()
 {
     return mainWindow->editMenu;
