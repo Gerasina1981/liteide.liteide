@@ -55,7 +55,7 @@ void GolangProPlugin::gofmt()
 
     ed->save();
 
-    QProcess::execute(gofmtCmd, QStringList() << "-w" << path);
-
-    ed->reload();
+    int code = QProcess::execute(gofmtCmd, QStringList() << "-w=true" << path);
+    if (code == 0)
+        ed->reload();
 }
