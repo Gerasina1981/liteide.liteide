@@ -16,7 +16,7 @@ class EditorImpl : public IEditor
     Q_OBJECT
 public:
     EditorImpl(QObject *parent);
-    virtual ~EditorImpl() {}
+    virtual ~EditorImpl();
     virtual QWidget *widget() const;
     virtual QString fileName() const;
     virtual QString filePath() const;
@@ -41,6 +41,7 @@ class EditorFactoryImpl : public QObject, public IEditorFactory
     Q_OBJECT
 public:
     EditorFactoryImpl(QObject *parent, IApplication *app);
+    ~EditorFactoryImpl();
     virtual QStringList fileTypes();
     virtual QString editorTypeFilter();
     virtual IEditor *create(const QString &fileName);

@@ -1,6 +1,8 @@
 #include "buildgoplguin.h"
 #include "buildgolang.h"
 
+#include <QDebug>
+
 BuildgoPlguin::BuildgoPlguin() : build(NULL)
 {
 }

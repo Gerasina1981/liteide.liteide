@@ -12,12 +12,7 @@ LiteApp::LiteApp()
 
 LiteApp::~LiteApp()
 {
-}
-
-void LiteApp::slotClose()
-{
-    uninstallPlugins();
-    plugins.clear();
+    qDeleteAll(plugins);
 }
 
 QDockWidget * LiteApp::addWorkspacePane(QWidget *w, const QString &name)
@@ -143,13 +138,6 @@ void LiteApp::installPlugins()
 {
     foreach(IPlugin *p, plugins) {
         p->install(this);
-    }
-}
-
-void LiteApp::uninstallPlugins()
-{
-    foreach(IPlugin *p, plugins) {
-        p->uninstall();
     }
 }
 

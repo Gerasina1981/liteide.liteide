@@ -8,16 +8,11 @@
 #include <QFileDialog>
 #include <QDebug>
 
-ProjectPlugin::ProjectPlugin()
-{
-}
-
 void ProjectPlugin::install(IApplication *app)
 {
     if (!app)
         return;
-    liteApp = app;
-    new ProjectManager(app);
+    manager = new ProjectManager(app);
 }
 
 void ProjectPlugin::uninstall()

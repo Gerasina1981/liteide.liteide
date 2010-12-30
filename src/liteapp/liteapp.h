@@ -38,7 +38,6 @@ public:
     virtual QWidget *main();
     void loadPlugins(const QString &dir);
     void installPlugins();
-    void uninstallPlugins();
     QString editorTypeFilter() const;
     QString projectTypeFilter() const;
 public:
@@ -48,8 +47,6 @@ public:
     QList<IBuild*>   buildList;
     QList<IEditorFactory*> editorFactorys;
     QList<IProjectFactory*> projectFactorys;
-private slots:
-    void slotClose();
 };
 
 #endif // LITEAPP_H

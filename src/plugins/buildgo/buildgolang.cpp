@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QDir>
+#include <QDebug>
 
 BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     liteApp(app), QObject(parent)

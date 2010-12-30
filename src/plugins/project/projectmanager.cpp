@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QVariant>
+#include <QDebug>
 
 ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
     liteApp(app), QWidget(parent)
@@ -30,6 +31,12 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
     parentDock = liteApp->addWorkspacePane(this,"Projects");
     parentDock->hide();
 }
+
+ProjectManager::~ProjectManager()
+{
+//    qDebug() << "~";
+}
+
 void ProjectManager::createActions()
 {
     newProjectAct = new QAction(tr("New Project"),this);

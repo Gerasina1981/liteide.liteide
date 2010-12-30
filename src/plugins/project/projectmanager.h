@@ -28,6 +28,7 @@ public:
 
     void appendProject(ProjectFile *file);
     explicit ProjectManager(IApplication *app, QWidget *parent = 0);
+    ~ProjectManager();
     void createActions();
 private slots:
     void doubleClickedTree(const QModelIndex  &index);

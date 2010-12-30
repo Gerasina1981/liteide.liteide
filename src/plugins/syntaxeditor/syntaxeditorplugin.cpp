@@ -3,9 +3,15 @@
 #include "configdialog.h"
 
 #include <QFileInfo>
+#include <QDebug>
 
 EditorImpl::EditorImpl(QObject *parent) : IEditor(parent), undoEnable(false), redoEnable(false)
 {
+}
+
+EditorImpl::~EditorImpl()
+{
+    qDebug() << "~EditorImpl";
 }
 
 void EditorImpl::setUndoEnabled(bool b)
@@ -81,6 +87,11 @@ EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
 
     editorFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
     editorFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
+}
+
+EditorFactoryImpl::~EditorFactoryImpl()
+{
+    qDebug() << "~EditorFactoryImpl";
 }
 
 QStringList EditorFactoryImpl::fileTypes()
