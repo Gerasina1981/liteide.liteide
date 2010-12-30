@@ -96,6 +96,8 @@ IProject *ProjectManager::loadProject(const QString &filePath)
         ProjectFile * file = new ProjectFile(this);
         if (file->open(filePath)) {
             appendProject(file);
+            liteApp->projectEvent()->fireProjectChanged(file);
+            return file;
         } else {
             delete file;
         }

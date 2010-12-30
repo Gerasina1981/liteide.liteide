@@ -21,6 +21,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void buildProject();
     void saveFile();
     void newFile();
     void openFile();
@@ -49,6 +50,7 @@ private:
     QMenu   *editMenu;
     QMenu   *viewMenu;
     QMenu   *buildMenu;
+    QMenu   *buildListMenu;
     QMenu   *toolMenu;
     QMenu   *helpMenu;
 
@@ -72,8 +74,11 @@ private:
 
     IEditor *activeEditor;
     IProject *activeProject;
+    IBuild   *activeBuild;
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
+public slots:
+    void selectBuild();
 };
 
 #endif // MAINWINDOW_H

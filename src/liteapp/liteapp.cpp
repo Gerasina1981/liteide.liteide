@@ -173,3 +173,13 @@ IEditor *LiteApp::loadEditor(const QString &fileName)
     return NULL;
 }
 
+
+IBuild *LiteApp::selectBuild(const QString &name)
+{
+    foreach(IBuild *build, buildList) {
+        if (build->buildName() == name) {
+            return build;
+        }
+    }
+    return NULL;
+}

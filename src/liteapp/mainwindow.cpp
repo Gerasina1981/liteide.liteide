@@ -16,7 +16,8 @@
 #include <QCloseEvent>
 #include <QDebug>
 
-MainWindow::MainWindow(LiteApp *app) : liteApp(app), activeEditor(NULL)
+MainWindow::MainWindow(LiteApp *app) :
+        liteApp(app), activeEditor(NULL), activeProject(NULL), activeBuild(NULL)
 {
     this->setAttribute(Qt::WA_DeleteOnClose);
     resize(640,480);
@@ -95,6 +96,7 @@ void MainWindow::createActions()
     buildProjectAct = new QAction(tr("Build Project\tCtrl+B"),this);
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     buildProjectAct->setStatusTip(tr("Build Project"));
+    connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
 
     runAct = new QAction(tr("Run"),this);
     runAct->setStatusTip(tr("Run project or file"));
@@ -138,9 +140,10 @@ void MainWindow::createMenus()
     viewMenu = menuBar()->addMenu(tr("&View"));
 
     buildMenu = menuBar()->addMenu(tr("&Build"));
+    buildListMenu = buildMenu->addMenu("&Select Build");
 
-    buildMenu->addAction(buildProjectAct);
     buildMenu->addSeparator();
+    buildMenu->addAction(buildProjectAct);
     buildMenu->addAction(runAct);
 
     toolMenu = menuBar()->addMenu(tr("&Tools"));
@@ -322,5 +325,24 @@ void MainWindow::aboutPlugins()
 void MainWindow::appendBuild(IBuild *build)
 {
     QAction *act = buildActGroup->addAction(build->buildName());
-    buildMenu->addAction(act);
+    connect(act,SIGNAL(triggered()),this,SLOT(selectBuild()));
+    act->setCheckable(true);
+    buildListMenu->addAction(act);
+}
+
+void MainWindow::selectBuild()
+{
+    QAction *act = buildActGroup->checkedAction();
+    activeBuild = liteApp->selectBuild(act->text());
+}
+
+void MainWindow::buildProject()
+{
+    if (!activeBuild)
+        return;
+    if (activeProject) {
+        activeBuild->buildProject(activeProject);
+    } else if(activeEditor) {
+        activeBuild->buildEditor(activeEditor);
+    }
 }

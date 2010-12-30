@@ -12,6 +12,7 @@ class LiteApp : public QObject, public IApplication
     Q_OBJECT
 
 public:
+    IBuild *selectBuild(const QString &name);
     LiteApp();
     ~LiteApp();
     virtual void addWorkspacePane(QWidget *w, const QString &name);

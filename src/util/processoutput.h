@@ -17,6 +17,10 @@ public:
         connect(&process,SIGNAL(finished(int,QProcess::ExitStatus)),this,SIGNAL(processFinished(int,QProcess::ExitStatus)));
         connect(&process,SIGNAL(error(QProcess::ProcessError)),this,SIGNAL(processError(QProcess::ProcessError)));
     }
+    void setWorkingDirectory(const QString &dir)
+    {
+        process.setWorkingDirectory(dir);
+    }
 
     void start(const QString &name, const QString &program, const QStringList &arguments, QProcess::OpenMode mode = QProcess::ReadWrite)
     {
@@ -49,12 +53,10 @@ private slots:
         if (code == 0 && status == QProcess::NormalExit) {
             emit processSuccess();
         }
-        disconnect();
     }
     void error(QProcess::ProcessError code)
     {
         emit outputText(tr("---- %1 error").arg(taskName),false);
-        disconnect();
     }
 signals:
     void outputText(const QString &text, bool standardError);

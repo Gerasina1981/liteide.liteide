@@ -5,6 +5,7 @@
 #-------------------------------------------------
 include (../../liteide.pri)
 include (../../api/api.pri)
+include (../../util/util.pri)
 
 TARGET = buildgo
 TEMPLATE = lib
