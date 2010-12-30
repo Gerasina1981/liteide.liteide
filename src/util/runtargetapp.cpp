@@ -3,6 +3,8 @@
 #include "../api/ieditor.h"
 
 #include <QFileInfo>
+#include <QDir>
+#include <QDebug>
 
 RunTargetApp::RunTargetApp(IApplication *app, QObject *parent)
     : liteApp(app), QObject(parent)
@@ -24,8 +26,8 @@ void RunTargetApp::runProject(IProject *proj)
     target = QFileInfo(target).baseName();
     QString projDir = QFileInfo(proj->filePath()).absolutePath();
     process.setWorkingDirectory(projDir);
-
-    process.start(target+".exe");
+    target = QFileInfo(QDir(projDir),target+".exe").absoluteFilePath();
+    process.start(target);
 }
 
 void RunTargetApp::runEditor(IEditor *edit)
