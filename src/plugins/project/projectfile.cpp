@@ -9,6 +9,11 @@ ProjectFile::ProjectFile(QObject *parent) :
 {
 }
 
+ProjectFile::~ProjectFile()
+{
+    qDebug() << "~ProjectFile";
+}
+
 QString ProjectFile::displayName() const
 {
     return QFileInfo(_filePath).completeBaseName();

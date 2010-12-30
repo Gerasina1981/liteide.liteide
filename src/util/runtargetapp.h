@@ -21,6 +21,7 @@ private slots:
     void error(QProcess::ProcessError code);
     void finished(int code);
 private:
+    QString target;
     IApplication *liteApp;
     QProcess process;
 };

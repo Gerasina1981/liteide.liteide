@@ -104,7 +104,7 @@ void MainWindow::createActions()
 
     buildActGroup = new QActionGroup(this);
 
-    buildProjectAct = new QAction(tr("Build Project\tCtrl+B"),this);
+    buildProjectAct = new QAction(QIcon(":/images/build.png"),tr("Build Project\tCtrl+B"),this);
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     buildProjectAct->setStatusTip(tr("Build Project"));
     connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
@@ -115,7 +115,7 @@ void MainWindow::createActions()
     connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
 
 
-    runTargetAct = new QAction(tr("Run"),this);
+    runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
     runTargetAct->setStatusTip(tr("Run project or file"));
     connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
 
@@ -188,6 +188,10 @@ void MainWindow::createToolBars()
     editToolBar = addToolBar(tr("Edit"));
     editToolBar->addAction(undoAct);
     editToolBar->addAction(redoAct);
+
+    buildToolBar = addToolBar(tr("Build"));
+    buildToolBar->addAction(buildProjectAct);
+    buildToolBar->addAction(runTargetAct);
 }
 
 void MainWindow::createStatusBar()

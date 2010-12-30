@@ -31,11 +31,17 @@ public:
     ~ProjectManager();
     void createActions();
 private slots:
+    void reloadProject();
+    void showProjectMenu(QPoint pt);
     void doubleClickedTree(const QModelIndex  &index);
     void closeProject();
     void openProject();
     void newProject();
 protected:
+    QString reloadProjectPath;
+    QModelIndex reloadProjectIndex;
+    QMenu   *projectMenu;
+    QAction *reloadProjectAct;
     QDockWidget *parentDock;
     QAction *newProjectAct;
     QAction *openProjectAct;

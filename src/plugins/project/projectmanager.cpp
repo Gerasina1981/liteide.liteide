@@ -19,13 +19,18 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
     tree->setModel(model);
     tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tree->setHeaderHidden(true);
+    tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tree,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(doubleClickedTree(QModelIndex)));
+    connect(tree,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(showProjectMenu(QPoint)));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(tree);
     layout->setMargin(0);
 
     setLayout(layout);
+
+    reloadProjectAct = new QAction(tr("Reload Project"),this);
+    connect(reloadProjectAct,SIGNAL(triggered()),this,SLOT(reloadProject()));
 
     liteApp->addProjectFactory(this);
     parentDock = liteApp->addWorkspacePane(this,"Projects");
@@ -35,6 +40,7 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 ProjectManager::~ProjectManager()
 {
 //    qDebug() << "~";
+    qDeleteAll(proFiles);
 }
 
 void ProjectManager::createActions()
@@ -97,9 +103,16 @@ QStringList ProjectManager::projectKeys() const
 
 IProject *ProjectManager::loadProject(const QString &filePath)
 {
+    foreach(ProjectFile *file, proFiles ) {
+        if (file->filePath() == filePath) {
+            liteApp->projectEvent()->fireProjectChanged(file);
+            return file;
+        }
+    }
+
     QString ext = QFileInfo(filePath).suffix();
     if (ext.toLower() == "pro") {
-        ProjectFile * file = new ProjectFile(this);
+        ProjectFile * file = new ProjectFile;//(this);
         if (file->open(filePath)) {
             appendProject(file);
             liteApp->projectEvent()->fireProjectChanged(file);
@@ -147,7 +160,7 @@ void ProjectManager::appendProject(ProjectFile *file)
                 folder->appendRow(fileItem);
             }
         }
-    }
+    }   
 
     tree->expand(model->indexFromItem(item));    
 }
@@ -190,4 +203,41 @@ void ProjectManager::doubleClickedTree(const QModelIndex  &index)
             return;
         }
     }
+}
+
+void ProjectManager::showProjectMenu(QPoint pos)
+{
+    QMenu * menu = new QMenu(this);
+    QModelIndex index = tree->indexAt(pos);
+    if (!index.isValid())
+        return;
+    QStandardItem *item = model->itemFromIndex(index);
+    bool ok;
+    if (item->data().toInt(&ok) != ItemRoot)
+        return;
+    reloadProjectIndex = index;
+    reloadProjectPath = item->data(Qt::UserRole+2).toString();
+
+    menu->addAction(reloadProjectAct);
+    menu->popup(tree->mapToGlobal(pos));
+}
+
+void ProjectManager::reloadProject()
+{
+   if (reloadProjectPath.isEmpty())
+       return;
+
+   foreach(ProjectFile *file, proFiles) {
+       if (file->filePath() == reloadProjectPath) {
+         //  QString filePath = QFileInfo(QDir(file->projectPath()),fileName).absoluteFilePath();
+         //  liteApp->loadEditor(filePath);
+           model->removeRow(reloadProjectIndex.row());
+           proFiles.removeOne(file);
+           delete file;
+           this->loadProject(reloadProjectPath);
+           break;
+       }
+   }
+
+   reloadProjectPath.clear();
 }

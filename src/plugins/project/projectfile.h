@@ -16,6 +16,7 @@ public:
     virtual void close();
     QString projectPath() const;
     ProjectFile(QObject *parent = 0);
+    virtual ~ProjectFile();
     virtual QString displayName() const;
     virtual QString filePath() const;
     virtual QString fileName() const;

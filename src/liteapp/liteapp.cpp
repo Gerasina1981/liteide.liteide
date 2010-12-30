@@ -139,6 +139,10 @@ void LiteApp::installPlugins()
     foreach(IPlugin *p, plugins) {
         p->install(this);
     }
+    if (!buildList.empty()) {
+        mainWindow->activeBuild = buildList.at(0);
+        mainWindow->activeBuild->setActive();
+    }
 }
 
 QString LiteApp::projectTypeFilter() const
