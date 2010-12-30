@@ -9,7 +9,7 @@ class IBuild
 {
 public:
     virtual ~IBuild() {}
-    virtual QString buildName() = 0;
+    virtual QString buildName() const = 0;
     virtual bool buildProject(IProject *proj) = 0;
     virtual bool buildEditor(IEditor *edit) = 0;
 };

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 include (../../liteide.pri)
-include (../../api/liteapi.pri)
+include (../../api/api.pri)
 
 TARGET = buildgo
 TEMPLATE = lib
@@ -13,9 +13,11 @@ DESTDIR = $$IDE_PLGUINS_PATH
 
 DEFINES += BUILDGO_LIBRARY
 
-SOURCES += buildgoplguin.cpp
+SOURCES += buildgoplguin.cpp \
+    buildgolang.cpp
 
 HEADERS += buildgoplguin.h\
-        buildgo_global.h
+        buildgo_global.h \
+    buildgolang.h
 
 INSTALLS += target
