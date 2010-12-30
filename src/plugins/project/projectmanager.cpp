@@ -26,8 +26,9 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 
     setLayout(layout);
 
-    createActions();
+  //  createActions();
 
+    liteApp->addProjectFactory(this);
     liteApp->addWorkspacePane(this,"Projects");
 }
 void ProjectManager::createActions()
@@ -67,7 +68,7 @@ void ProjectManager::openProject()
         return;
 
     ProjectFile * file = new ProjectFile(this);
-    if (file->openProject(fileName)) {
+    if (file->open(fileName)) {
         appendProject(file);
     } else {
         delete file;
@@ -78,10 +79,35 @@ void ProjectManager::closeProject()
 {
 }
 
+QString ProjectManager::projectTypeFilter() const
+{
+    return tr("Project files (*.pro)");
+}
+
+QStringList ProjectManager::projectKeys() const
+{
+    return QStringList() << "pro";
+}
+
+IProject *ProjectManager::loadProject(const QString &filePath)
+{
+    QString ext = QFileInfo(filePath).suffix();
+    if (ext.toLower() == "pro") {
+        ProjectFile * file = new ProjectFile(this);
+        if (file->open(filePath)) {
+            appendProject(file);
+        } else {
+            delete file;
+        }
+    }
+    return NULL;
+}
+
+
 void ProjectManager::appendProject(ProjectFile *file)
 {
     proFiles.append(file);
-    QStandardItem *item = new QStandardItem(file->projectName());
+    QStandardItem *item = new QStandardItem(file->displayName());
     model->appendRow(item);
     item->setData(ItemRoot);
     item->setData(file->filePath(),Qt::UserRole+2);
@@ -148,7 +174,7 @@ void ProjectManager::doubleClickedTree(const QModelIndex  &index)
     foreach(ProjectFile *file, proFiles) {
         if (file->filePath() == proFilePath) {
             QString filePath = QFileInfo(QDir(file->projectPath()),fileName).absoluteFilePath();
-            liteApp->openFile(filePath);
+            liteApp->loadEditor(filePath);
             return;
         }
     }

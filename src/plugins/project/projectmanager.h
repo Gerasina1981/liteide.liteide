@@ -5,13 +5,15 @@
 #include <QList>
 #include "projectfile.h"
 #include "../../api/iapp.h"
+#include "../../api/iproject.h"
 #include <QModelIndex>
 
 class QTreeView;
 class QStandardItemModel;
-class ProjectManager : public QWidget
+class ProjectManager : public QWidget, public IProjectFactory
 {
     Q_OBJECT
+public:
     enum ITEM_TYPE{
         ItemRoot = 1,
         ItemFolder,
@@ -19,6 +21,10 @@ class ProjectManager : public QWidget
         ItemFile,
     };
 public:
+    virtual QStringList projectKeys() const;
+    virtual QString projectTypeFilter() const;
+    virtual IProject *loadProject(const QString &filePath);
+
     void appendProject(ProjectFile *file);
     explicit ProjectManager(IApplication *app, QWidget *parent = 0);
     void createActions();

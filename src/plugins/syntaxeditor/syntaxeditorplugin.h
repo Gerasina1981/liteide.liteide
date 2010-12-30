@@ -18,8 +18,8 @@ public:
     EditorImpl(QObject *parent);
     virtual ~EditorImpl() {}
     virtual QWidget *widget() const;
-    virtual QString name() const;
-    virtual QString fullPath() const;
+    virtual QString fileName() const;
+    virtual QString filePath() const;
     virtual QIcon icon() const;
     virtual void save();
     virtual bool close();
@@ -42,7 +42,7 @@ class EditorFactoryImpl : public QObject, public IEditorFactory
 public:
     EditorFactoryImpl(QObject *parent, IApplication *app);
     virtual QStringList fileTypes();
-    virtual QString openTypes();
+    virtual QString editorTypeFilter();
     virtual IEditor *create(const QString &fileName);
 protected slots:
     void config();

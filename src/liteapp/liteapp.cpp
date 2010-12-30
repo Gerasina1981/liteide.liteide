@@ -35,7 +35,28 @@ void LiteApp::addEditorFactory(IEditorFactory *editFactory)
     editorFactorys.append(editFactory);
 }
 
+void LiteApp::addProjectFactory(IProjectFactory *projFactory)
+{
+    projectFactorys.append(projFactory);
+}
+
+IProject *LiteApp::loadProject(const QString &fileName)
+{
+    QString ext = QFileInfo(fileName).suffix();
+    foreach(IProjectFactory *factory, projectFactorys) {
+        if (factory->projectKeys().contains(ext)) {
+            return factory->loadProject(fileName);
+        }
+    }
+    return NULL;
+}
+
 IEditorEvent *LiteApp::editorEvent()
+{
+    return mainWindow;
+}
+
+IProjectEvent *LiteApp::projectEvent()
 {
     return mainWindow;
 }
@@ -75,6 +96,11 @@ IEditor *LiteApp::activeEditor()
     return mainWindow->activeEditor;
 }
 
+IProject *LiteApp::activeProject()
+{
+    return mainWindow->activeProject;
+}
+
 
 void LiteApp::loadPlugins(const QString &dir)
 {
@@ -101,21 +127,30 @@ void LiteApp::uninstallPlugins()
     }
 }
 
-QString LiteApp::openFileTypes() const
+QString LiteApp::projectTypeFilter() const
 {
     QStringList types;
-    foreach(IEditorFactory *factory, editorFactorys) {
-        types.append(factory->openTypes());
+    foreach(IProjectFactory *factory, projectFactorys) {
+        types.append(factory->projectTypeFilter());
     }
     return types.join(";;");
 }
 
-bool LiteApp::openFile(const QString &fileName)
+QString LiteApp::editorTypeFilter() const
+{
+    QStringList types;
+    foreach(IEditorFactory *factory, editorFactorys) {
+        types.append(factory->editorTypeFilter());
+    }
+    return types.join(";;");
+}
+
+IEditor *LiteApp::loadEditor(const QString &fileName)
 {
     foreach (IEditor *ed, mainWindow->editors.values()) {
-        if (ed->fullPath() == fileName) {
+        if (ed->filePath() == fileName) {
             mainWindow->editTabWidget->setCurrentWidget(ed->widget());
-            return true;
+            return ed;
         }
     }
 
@@ -125,10 +160,10 @@ bool LiteApp::openFile(const QString &fileName)
             IEditor *ed = factory->create(fileName);
             if (ed) {
                 mainWindow->addEditor(ed);
-                return true;
+                return ed;
             }
         }
     }
-    return false;
+    return NULL;
 }
 

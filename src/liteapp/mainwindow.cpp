@@ -59,6 +59,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createActions()
 {
+    openProjectAct = new QAction(QIcon(":/images/open.png"), tr("&Open Project"),this);
+    openProjectAct->setShortcuts(QKeySequence::Open);
+    openProjectAct->setStatusTip(tr("Open Project"));
+    connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
+
     newFileAct = new QAction(QIcon(":/images/new.png"), tr("&New File"),this);
     newFileAct->setShortcuts(QKeySequence::New);
     newFileAct->setStatusTip(tr("Create a new file"));
@@ -84,6 +89,13 @@ void MainWindow::createActions()
     redoAct->setStatusTip(tr("Redo the last editing action"));
     //connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
+    buildProjectAct = new QAction(tr("Build Project\tCtrl+B"),this);
+    buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    buildProjectAct->setStatusTip(tr("Build Project"));
+
+    runAct = new QAction(tr("Run"),this);
+    runAct->setStatusTip(tr("Run project or file"));
+
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
@@ -106,8 +118,10 @@ void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
 
-    fileMenu->addAction(newFileAct);
+    fileMenu->addAction(openProjectAct);
+    fileMenu->addSeparator();
 
+    fileMenu->addAction(newFileAct);
     fileMenu->addAction(saveFileAct);
     fileMenu->addAction(openFileAct);
     fileMenu->addSeparator();
@@ -119,6 +133,11 @@ void MainWindow::createMenus()
     editMenu->addAction(redoAct);
 
     viewMenu = menuBar()->addMenu(tr("&View"));
+
+    buildMenu = menuBar()->addMenu(tr("&Build"));
+    buildMenu->addAction(buildProjectAct);
+    buildMenu->addSeparator();
+    buildMenu->addAction(runAct);
 
     toolMenu = menuBar()->addMenu(tr("&Tools"));
 
@@ -199,7 +218,7 @@ void MainWindow::editTabChanged(int index)
 void MainWindow::addEditor(IEditor *editor)
 {
     editors.insert(editor->widget(),editor);
-    int index = editTabWidget->addTab(editor->widget(),editor->icon(),editor->name());
+    int index = editTabWidget->addTab(editor->widget(),editor->icon(),editor->fileName());
     editTabWidget->setCurrentIndex(index);
 }
 
@@ -237,17 +256,31 @@ void MainWindow::newFile()
 
 }
 
+void MainWindow::openProject()
+{
+    static QString path;
+    QString fileName;
+
+    fileName = QFileDialog::getOpenFileName(this,
+           tr("Open Project"), path, liteApp->projectTypeFilter());
+
+    if (!fileName.isEmpty()) {
+        path = QFileInfo(fileName).absolutePath();
+        liteApp->loadProject(fileName);
+    }
+}
+
 void MainWindow::openFile()
 {
     static QString path;
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(this,
-           tr("Open File"), path, liteApp->openFileTypes());
+           tr("Open File"), path, liteApp->editorTypeFilter());
 
     if (!fileName.isEmpty()) {
         path = QFileInfo(fileName).absolutePath();
-        liteApp->openFile(fileName);
+        liteApp->loadEditor(fileName);
     }
 }
 
@@ -262,8 +295,13 @@ void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
 {
     int index = editTabWidget->indexOf(edit->widget());
     if (index >= 0) {
-        editTabWidget->setTabText(index, b ? edit->name()+"[*]" : edit->name());
+        editTabWidget->setTabText(index, b ? edit->fileName()+"[*]" : edit->fileName());
     }
+}
+
+void MainWindow::fireProjectChanged(IProject *project)
+{
+    activeProject = project;
 }
 
 void MainWindow::aboutPlugins()

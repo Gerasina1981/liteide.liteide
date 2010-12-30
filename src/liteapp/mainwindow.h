@@ -4,21 +4,24 @@
 #include <QMainWindow>
 #include <QMap>
 #include "../api/ieditor.h"
+#include "../api/iproject.h"
 
 class LiteApp;
-class MainWindow : public QMainWindow, public IEditorEvent
+class MainWindow : public QMainWindow, public IEditorEvent, public IProjectEvent
 {
     Q_OBJECT
 public:
     friend class LiteApp;
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
+    virtual void fireProjectChanged(IProject *project);
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
     void saveFile();
     void newFile();
     void openFile();
+    void openProject();
     void about();
     void editTabChanged(int index);
     void editTabClose(int index);
@@ -42,20 +45,29 @@ private:
     QMenu   *fileMenu;
     QMenu   *editMenu;
     QMenu   *viewMenu;
+    QMenu   *buildMenu;
     QMenu   *toolMenu;
     QMenu   *helpMenu;
+
+    QAction *openProjectAct;
     QAction *newFileAct;
     QAction *openFileAct;
     QAction *saveFileAct;
     QAction *closeFileAct;
     QAction *undoAct;
     QAction *redoAct;
+
+    QAction *buildProjectAct;
+    QAction *runAct;
+    QAction *debugAct;
+
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
     IEditor *activeEditor;
+    IProject *activeProject;
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
 };

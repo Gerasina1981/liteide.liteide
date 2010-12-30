@@ -19,12 +19,12 @@ void EditorImpl::setRedoEnabled(bool b)
 }
 
 
-QString EditorImpl::name() const
+QString EditorImpl::fileName() const
 {
     return editor->currentText();
 }
 
-QString EditorImpl::fullPath() const
+QString EditorImpl::filePath() const
 {
     return editor->currentFile();
 }
@@ -88,7 +88,7 @@ QStringList EditorFactoryImpl::fileTypes()
     return QStringList() << "go" << "h" << "cpp" << "pro";
 }
 
-QString EditorFactoryImpl::openTypes()
+QString EditorFactoryImpl::editorTypeFilter()
 {
     return QObject::tr("Go Files (*.go);;(All Files (*.*)");
 }

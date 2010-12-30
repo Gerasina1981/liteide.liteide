@@ -60,7 +60,7 @@ void GolangProPlugin::gofmt()
     if (!ed) {
         return;
     }
-    const QString & path = ed->fullPath();
+    const QString & path = ed->filePath();
     if (path.isEmpty()) {
         return;
     }

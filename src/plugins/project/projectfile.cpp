@@ -9,7 +9,7 @@ ProjectFile::ProjectFile(QObject *parent) :
 {
 }
 
-QString ProjectFile::projectName() const
+QString ProjectFile::displayName() const
 {
     return QFileInfo(_filePath).completeBaseName();
 }
@@ -29,8 +29,12 @@ QString ProjectFile::filePath() const
     return _filePath;
 }
 
+void ProjectFile::close()
+{
+    context.clear();
+}
 
-bool ProjectFile::openProject(const QString &fileName)
+bool ProjectFile::open(const QString &fileName)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadWrite | QIODevice::Text);
@@ -60,10 +64,6 @@ bool ProjectFile::openProject(const QString &fileName)
     file.close();
     _filePath = fileName;
     return !context.isEmpty();
-}
-
-void ProjectFile::close()
-{
 }
 
 QStringList ProjectFile::values(const QString &key)

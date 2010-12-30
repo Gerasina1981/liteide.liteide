@@ -11,8 +11,8 @@ public:
     IEditor(QObject *parent) : QObject(parent)
     {
     }
-    virtual QString name() const = 0;
-    virtual QString fullPath() const = 0;
+    virtual QString fileName() const = 0;
+    virtual QString filePath() const = 0;
     virtual QWidget *widget() const = 0;
     virtual QIcon icon() const = 0;
 public slots:
@@ -27,7 +27,7 @@ class IEditorFactory
 public:
     virtual  ~IEditorFactory() {}
     virtual QStringList fileTypes() = 0;
-    virtual QString openTypes() = 0;
+    virtual QString editorTypeFilter() = 0;
     virtual IEditor *create(const QString &fileName) = 0;
 };
 
