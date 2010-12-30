@@ -5,6 +5,7 @@
 #include "../api/iplugin.h"
 #include "../api/iapp.h"
 #include "../api/iproject.h"
+#include "../api/ibuild.h"
 
 class LiteApp : public QObject, public IApplication
 {
@@ -17,6 +18,7 @@ public:
     virtual void addOutputPane(QWidget *w, const QString &name);
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
+    virtual void addBuild(IBuild *build);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
     virtual IEditorEvent *editorEvent();
@@ -38,6 +40,7 @@ public:
     QSettings  *mainSettings;
     MainWindow * mainWindow;
     QList<IPlugin*> plugins;
+    QList<IBuild*>   buildList;
     QList<IEditorFactory*> editorFactorys;
     QList<IProjectFactory*> projectFactorys;
 private slots:

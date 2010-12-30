@@ -5,13 +5,16 @@
 #include <QMap>
 #include "../api/ieditor.h"
 #include "../api/iproject.h"
+#include "../api/ibuild.h"
 
 class LiteApp;
+class QActionGroup;
 class MainWindow : public QMainWindow, public IEditorEvent, public IProjectEvent
 {
     Q_OBJECT
 public:
     friend class LiteApp;
+    void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireProjectChanged(IProject *project);
@@ -57,6 +60,7 @@ private:
     QAction *undoAct;
     QAction *redoAct;
 
+    QActionGroup *buildActGroup;
     QAction *buildProjectAct;
     QAction *runAct;
     QAction *debugAct;

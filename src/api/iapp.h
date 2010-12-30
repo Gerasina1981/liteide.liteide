@@ -11,6 +11,7 @@ class IEditor;
 class IProject;
 class IProjectFactory;
 class IProjectEvent;
+class IBuild;
 
 class IApplication
 {
@@ -20,6 +21,7 @@ public:
     virtual void addOutputPane(QWidget *w, const QString &name) = 0;
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
     virtual void addProjectFactory(IProjectFactory *projFactory) = 0;
+    virtual void addBuild(IBuild *build) = 0;
     virtual IProject *loadProject(const QString &fileName) = 0;
     virtual IEditor *loadEditor(const QString &fileName) = 0;
     virtual IEditorEvent *editorEvent() = 0;

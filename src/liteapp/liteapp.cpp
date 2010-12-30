@@ -40,6 +40,12 @@ void LiteApp::addProjectFactory(IProjectFactory *projFactory)
     projectFactorys.append(projFactory);
 }
 
+void LiteApp::addBuild(IBuild *build)
+{
+    buildList.append(build);
+    mainWindow->appendBuild(build);
+}
+
 IProject *LiteApp::loadProject(const QString &fileName)
 {
     QString ext = QFileInfo(fileName).suffix();

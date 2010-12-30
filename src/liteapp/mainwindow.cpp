@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QAction>
+#include <QActionGroup>
 #include <QIcon>
 #include <QMenuBar>
 #include <QToolBar>
@@ -89,6 +90,8 @@ void MainWindow::createActions()
     redoAct->setStatusTip(tr("Redo the last editing action"));
     //connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
+    buildActGroup = new QActionGroup(this);
+
     buildProjectAct = new QAction(tr("Build Project\tCtrl+B"),this);
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     buildProjectAct->setStatusTip(tr("Build Project"));
@@ -135,6 +138,7 @@ void MainWindow::createMenus()
     viewMenu = menuBar()->addMenu(tr("&View"));
 
     buildMenu = menuBar()->addMenu(tr("&Build"));
+
     buildMenu->addAction(buildProjectAct);
     buildMenu->addSeparator();
     buildMenu->addAction(runAct);
@@ -313,4 +317,10 @@ void MainWindow::aboutPlugins()
     }
 
     dlg.exec();
+}
+
+void MainWindow::appendBuild(IBuild *build)
+{
+    QAction *act = buildActGroup->addAction(build->buildName());
+    buildMenu->addAction(act);
 }
