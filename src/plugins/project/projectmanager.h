@@ -2,6 +2,7 @@
 #define PROJECTMANAGER_H
 
 #include <QWidget>
+#include <QDockWidget>
 #include <QList>
 #include "projectfile.h"
 #include "../../api/iapp.h"
@@ -34,6 +35,7 @@ private slots:
     void openProject();
     void newProject();
 protected:
+    QDockWidget *parentDock;
     QAction *newProjectAct;
     QAction *openProjectAct;
     QAction *closeProjectAct;

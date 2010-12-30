@@ -3,12 +3,27 @@
 #include <QFileInfo>
 #include <QDir>
 
-BuildGolang::BuildGolang(QObject *parent) :
-    QObject(parent)
+BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
+    liteApp(app), QObject(parent)
 {
-    connect(&process8g,SIGNAL(outputText(QString,bool)),this,SLOT(outputText(QString)));
-    connect(&process8l,SIGNAL(outputText(QString,bool)),this,SLOT(outputText(QString)));
-    connect(&process8g,SIGNAL(processSuccess()),this,SLOT(linkProject()));
+    runTarget = new RunTargetApp(app);
+    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdout()));
+    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readStderr()));
+    connect(&process,SIGNAL(started()),this,SLOT(started()));
+    connect(&process,SIGNAL(finished(int)),this,SLOT(finished(int)));
+    connect(&process,SIGNAL(error(QProcess::ProcessError)),this,SLOT(error(QProcess::ProcessError)));
+}
+
+BuildGolang::~BuildGolang()
+{
+    if (runTarget) {
+        delete runTarget;
+    }
+}
+
+void BuildGolang::setActive()
+{
+    liteApp->setRunTarget(runTarget);
 }
 
 QString BuildGolang::buildName() const
@@ -18,8 +33,12 @@ QString BuildGolang::buildName() const
 
 bool BuildGolang::buildProject(IProject *proj)
 {
-    if (proj->values("GOFILES").isEmpty())
+    if (proj->values("GOFILES").isEmpty()) {
+        liteApp->buildEvent()->fireBuildStoped(0);
         return false;
+    }
+
+    liteApp->buildEvent()->fireBuildOutput("\nbuild project "+proj->displayName(),false);
 
     QStringList val = proj->values("TARGET");
     if (!val.isEmpty())
@@ -29,28 +48,73 @@ bool BuildGolang::buildProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
 
+    build8g = true;
+    build8l = false;
+
     QString projDir = QFileInfo(proj->filePath()).absolutePath();
-    process8l.setWorkingDirectory(projDir);
-    process8g.setWorkingDirectory(projDir);
+    process.setWorkingDirectory(projDir);
+
     QStringList args;
     args << "-o" << target+"_go_.8" << proj->values("GOFILES").join(" ");
-    process8g.start(tr("8g build"),"c:\\go\\bin\\8g.exe",args);
+    liteApp->buildEvent()->fireBuildOutput("8g "+args.join(" "),false);
+    process.start("c:\\go\\bin\\8g.exe",args);
     return true;
 }
 
 bool BuildGolang::buildEditor(IEditor *edit)
 {
-    return true;
+    return false;
 }
 
-void BuildGolang::outputText(const QString &text)
+void BuildGolang::cancelBuild()
 {
-    qDebug() << text;
+    build8g = false;
+    if (process.state() == QProcess::Starting) {
+        process.waitForStarted(3000);
+    } else if (process.state() == process.Running) {
+        process.waitForFinished(3000);
+    }
 }
 
-void BuildGolang::linkProject()
+void BuildGolang::finished(int code)
 {
-    QStringList args;
-    args << "-o" << target+".exe" << target+"_go_.8";
-    process8l.start(tr("8l link"),"c:\\go\\bin\\8l.exe",args);
+    if (build8g == true) {
+        build8g = false;
+        liteApp->buildEvent()->fireBuildOutput("--- 8g ended! ---",false);
+        if (code == 0) {
+            build8l = true;
+            QStringList args;
+            args << "-o" << target+".exe" << target+"_go_.8";
+            liteApp->buildEvent()->fireBuildOutput("8l "+args.join(" "),false);
+            process.start("c:\\go\\bin\\8l.exe",args);
+            return;
+        }
+    } else if (build8l == true) {
+        build8l = false;
+        liteApp->buildEvent()->fireBuildOutput("--- 8l ended !",false);
+    }
+    liteApp->buildEvent()->fireBuildStoped(code == 0);
+}
+
+void BuildGolang::error(QProcess::ProcessError code)
+{
+    liteApp->buildEvent()->fireBuildStoped(false);
+}
+
+void BuildGolang::readStdout()
+{
+    QString text = process.readAllStandardOutput();
+    liteApp->buildEvent()->fireBuildOutput(text,false);
+}
+void BuildGolang::readStderr()
+{
+    QString text = process.readAllStandardError();
+    liteApp->buildEvent()->fireBuildOutput(text,true);
+}
+
+void BuildGolang::started()
+{
+    if (build8g) {
+        liteApp->buildEvent()->fireBuildStarted();
+    }
 }

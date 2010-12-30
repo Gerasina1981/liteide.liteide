@@ -26,10 +26,9 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 
     setLayout(layout);
 
-  //  createActions();
-
     liteApp->addProjectFactory(this);
-    liteApp->addWorkspacePane(this,"Projects");
+    parentDock = liteApp->addWorkspacePane(this,"Projects");
+    parentDock->hide();
 }
 void ProjectManager::createActions()
 {
@@ -108,6 +107,10 @@ IProject *ProjectManager::loadProject(const QString &filePath)
 
 void ProjectManager::appendProject(ProjectFile *file)
 {
+    if (parentDock->isHidden()) {
+        parentDock->show();
+    }
+
     proFiles.append(file);
     QStandardItem *item = new QStandardItem(file->displayName());
     model->appendRow(item);

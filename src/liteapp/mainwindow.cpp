@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "liteapp.h"
 #include "aboutpluginsdialog.h"
+#include "../util/texteditoutput.h"
 
 #include <QApplication>
 #include <QAction>
@@ -15,18 +16,27 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QDebug>
+#include <QVBoxLayout>
+#include <QTextEdit>
+#include <QTextCharFormat>
+#include <QTextCodec>
 
 MainWindow::MainWindow(LiteApp *app) :
-        liteApp(app), activeEditor(NULL), activeProject(NULL), activeBuild(NULL)
+        liteApp(app),
+        activeEditor(NULL),
+        activeProject(NULL),
+        activeBuild(NULL),
+        activeRunTarget(NULL)
 {
     this->setAttribute(Qt::WA_DeleteOnClose);
-    resize(640,480);
 
     editTabWidget = new QTabWidget;
     editTabWidget->setDocumentMode(true);
     editTabWidget->setTabsClosable(true);
 
+
     setCentralWidget(editTabWidget);
+    editTabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
 
     connect(editTabWidget,SIGNAL(currentChanged(int)),this,SLOT(editTabChanged(int)));
     connect(editTabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(editTabClose(int)));
@@ -38,7 +48,8 @@ MainWindow::MainWindow(LiteApp *app) :
     createDockWindows();
     createOutputWidget();
 
-    setUnifiedTitleAndToolBarOnMac(true);
+    resize(640,480);
+    //setUnifiedTitleAndToolBarOnMac(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -98,8 +109,15 @@ void MainWindow::createActions()
     buildProjectAct->setStatusTip(tr("Build Project"));
     connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
 
-    runAct = new QAction(tr("Run"),this);
-    runAct->setStatusTip(tr("Run project or file"));
+    cancelBuildAct = new QAction(tr("Cancel Build"),this);
+ //   cancelBuildAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
+    connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
+
+
+    runTargetAct = new QAction(tr("Run"),this);
+    runTargetAct->setStatusTip(tr("Run project or file"));
+    connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
 
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
@@ -144,7 +162,10 @@ void MainWindow::createMenus()
 
     buildMenu->addSeparator();
     buildMenu->addAction(buildProjectAct);
-    buildMenu->addAction(runAct);
+    buildMenu->addSeparator();
+    buildMenu->addAction(cancelBuildAct);
+    buildMenu->addSeparator();
+    buildMenu->addAction(runTargetAct);
 
     toolMenu = menuBar()->addMenu(tr("&Tools"));
 
@@ -174,13 +195,14 @@ void MainWindow::createStatusBar()
     statusBar()->showMessage(tr("Ready"));
 }
 
-void MainWindow::addWorkspacePane(QWidget *w, const QString &name)
+QDockWidget *MainWindow::addWorkspacePane(QWidget *w, const QString &name)
 {
     QDockWidget *dock = new QDockWidget(name, this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     dock->setWidget(w);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     viewMenu->addAction(dock->toggleViewAction());
+    return dock;
 }
 
 void MainWindow::editTabClose(int index)
@@ -241,14 +263,22 @@ void MainWindow::createDockWindows()
 
 void MainWindow::createOutputWidget()
 {
-    outputTabWidget = new QTabWidget;
-    QDockWidget *dock = new QDockWidget(tr("Output"), this);
-    dock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    dock->setFeatures(QDockWidget::DockWidgetClosable);
-    dock->setWidget(outputTabWidget);
-    addDockWidget(Qt::BottomDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
+    outputDock = new QDockWidget(tr("Output"), this);
+    outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+    outputDock->setFeatures(QDockWidget::DockWidgetClosable);
+    viewMenu->addAction(outputDock->toggleViewAction());
+    addDockWidget(Qt::BottomDockWidgetArea, outputDock);
 
+    outputTabWidget = new QTabWidget;
+    outputTabWidget->setTabPosition(QTabWidget::South);
+
+    buildOutputEdit = new QTextEdit(this);
+    outputTabWidget->addTab(buildOutputEdit,tr("Build Output"));
+
+    runTargetOutputEdit = new QTextEdit(this);
+    outputTabWidget->addTab(runTargetOutputEdit,tr("Application Output"));
+
+    outputDock->setWidget(outputTabWidget);
 }
 
 void MainWindow::saveFile()
@@ -311,6 +341,71 @@ void MainWindow::fireProjectChanged(IProject *project)
     activeProject = project;
 }
 
+void MainWindow::fireBuildStarted()
+{
+    buildProjectAct->setEnabled(false);
+    cancelBuildAct->setEnabled(true);
+}
+
+void MainWindow::fireBuildStoped(bool success)
+{
+    buildProjectAct->setEnabled(true);
+    cancelBuildAct->setEnabled(false);
+    fireBuildOutput(QString("build exit %1 !")
+                    .arg(success? tr("normal") : tr("error")),
+                    !success);
+}
+
+void MainWindow::fireBuildOutput(const QString &text, bool stdError)
+{
+    if (outputDock->isHidden()) {
+        outputDock->show();
+    }
+    if (outputTabWidget->currentWidget() != buildOutputEdit)
+        outputTabWidget->setCurrentWidget(buildOutputEdit);
+
+    QTextCharFormat fmt;
+    if (stdError)
+        fmt.setForeground(Qt::red);
+    else
+        fmt.setForeground(Qt::black);
+    buildOutputEdit->setCurrentCharFormat(fmt);
+    buildOutputEdit->append(text);
+}
+
+void MainWindow::fireRunTargetStarted()
+{
+
+}
+
+void MainWindow::fireRunTargetStoped(bool success)
+{
+
+}
+
+void MainWindow::fireRunTargetOutput(const QByteArray &text, bool stdError)
+{
+    if (outputDock->isHidden()) {
+        outputDock->show();
+    }
+    if (outputTabWidget->currentWidget() != runTargetOutputEdit)
+        outputTabWidget->setCurrentWidget(runTargetOutputEdit);
+
+    QTextCharFormat fmt;
+    if (stdError)
+        fmt.setForeground(Qt::red);
+    else
+        fmt.setForeground(Qt::black);
+
+    //QTextCodec::fromUnicode()
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+
+    runTargetOutputEdit->setCurrentCharFormat(fmt);
+    runTargetOutputEdit->append(codec->toUnicode(text));
+}
+
+
+
 void MainWindow::aboutPlugins()
 {
     AboutPluginsDialog dlg(this);
@@ -338,11 +433,34 @@ void MainWindow::selectBuild()
 
 void MainWindow::buildProject()
 {
-    if (!activeBuild)
+    if (!activeBuild) {
         return;
+    }
+
     if (activeProject) {
         activeBuild->buildProject(activeProject);
     } else if(activeEditor) {
         activeBuild->buildEditor(activeEditor);
+    }
+}
+
+void MainWindow::cancelBuild()
+{
+    if (!activeBuild) {
+        return;
+    }
+    activeBuild->cancelBuild();
+}
+
+void MainWindow::runTarget()
+{
+    if (!activeRunTarget) {
+        return;
+    }
+    if (activeProject) {
+        activeRunTarget->runProject(activeProject);
+    }
+    else if (activeEditor) {
+        activeRunTarget->runEditor(activeEditor);
     }
 }

@@ -20,9 +20,9 @@ void LiteApp::slotClose()
     plugins.clear();
 }
 
-void LiteApp::addWorkspacePane(QWidget *w, const QString &name)
+QDockWidget * LiteApp::addWorkspacePane(QWidget *w, const QString &name)
 {
-    mainWindow->addWorkspacePane(w,name);
+    return mainWindow->addWorkspacePane(w,name);
 }
 
 void LiteApp::addOutputPane(QWidget *w, const QString &name)
@@ -67,6 +67,11 @@ IProjectEvent *LiteApp::projectEvent()
     return mainWindow;
 }
 
+IBuildEvent *LiteApp::buildEvent()
+{
+    return mainWindow;
+}
+
 QSettings *LiteApp::settings()
 {
     return mainSettings;
@@ -105,6 +110,21 @@ IEditor *LiteApp::activeEditor()
 IProject *LiteApp::activeProject()
 {
     return mainWindow->activeProject;
+}
+
+IRunTarget *LiteApp::activeRunTarget()
+{
+    return mainWindow->activeRunTarget;
+}
+
+void LiteApp::setRunTarget(IRunTarget *runTarget)
+{
+    mainWindow->activeRunTarget = runTarget;
+}
+
+IRunTargetEvent *LiteApp::runTargetEvent()
+{
+    return mainWindow;
 }
 
 
@@ -178,6 +198,7 @@ IBuild *LiteApp::selectBuild(const QString &name)
 {
     foreach(IBuild *build, buildList) {
         if (build->buildName() == name) {
+            build->setActive();
             return build;
         }
     }

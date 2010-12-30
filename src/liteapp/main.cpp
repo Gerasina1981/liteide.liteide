@@ -12,9 +12,10 @@ int main(int argc, char *argv[])
 
     QFileInfo info;
     info.setFile(QDir(a.applicationDirPath()),"plugins");
-    app.mainWindow->show();
     app.loadPlugins(info.absoluteFilePath());
     app.installPlugins();
+
+    app.mainWindow->show();
 
     return a.exec();
 }

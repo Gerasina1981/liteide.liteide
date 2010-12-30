@@ -2,14 +2,20 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTextEdit>
 #include <QMap>
 #include "../api/ieditor.h"
 #include "../api/iproject.h"
 #include "../api/ibuild.h"
+#include "../api/iruntarget.h"
 
 class LiteApp;
 class QActionGroup;
-class MainWindow : public QMainWindow, public IEditorEvent, public IProjectEvent
+class MainWindow : public QMainWindow,
+        public IEditorEvent,
+        public IProjectEvent,
+        public IBuildEvent,
+        public IRunTargetEvent
 {
     Q_OBJECT
 public:
@@ -18,9 +24,17 @@ public:
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireProjectChanged(IProject *project);
+    virtual void fireBuildStarted();
+    virtual void fireBuildStoped(bool success);
+    virtual void fireBuildOutput(const QString &text, bool stdError);
+    virtual void fireRunTargetStarted();
+    virtual void fireRunTargetStoped(bool success);
+    virtual void fireRunTargetOutput(const QByteArray &text, bool stdError);
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void runTarget();
+    void cancelBuild();
     void buildProject();
     void saveFile();
     void newFile();
@@ -31,7 +45,7 @@ private slots:
     void editTabClose(int index);
     void aboutPlugins();
 public:
-    void addWorkspacePane(QWidget *w, const QString &name);
+    QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
     void addOutputPage(QWidget *w, const QString &name);
     void addEditor(IEditor *ed);
 private:
@@ -42,8 +56,10 @@ private:
     void createDockWindows();
     void createOutputWidget();
 
+    QDockWidget *outputDock;
     QTabWidget *editTabWidget;
     QTabWidget *outputTabWidget;
+
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
     QMenu   *fileMenu;
@@ -64,7 +80,8 @@ private:
 
     QActionGroup *buildActGroup;
     QAction *buildProjectAct;
-    QAction *runAct;
+    QAction *cancelBuildAct;
+    QAction *runTargetAct;
     QAction *debugAct;
 
     QAction *aboutAct;
@@ -72,9 +89,13 @@ private:
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
+    QTextEdit   *buildOutputEdit;
+    QTextEdit   *runTargetOutputEdit;
+
     IEditor *activeEditor;
     IProject *activeProject;
     IBuild   *activeBuild;
+    IRunTarget *activeRunTarget;
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
 public slots:

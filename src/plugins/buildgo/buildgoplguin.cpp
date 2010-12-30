@@ -1,13 +1,22 @@
 #include "buildgoplguin.h"
 #include "buildgolang.h"
 
-BuildgoPlguin::BuildgoPlguin()
+BuildgoPlguin::BuildgoPlguin() : build(NULL)
 {
 }
 
+BuildgoPlguin::~BuildgoPlguin()
+{
+    if (build) {
+        delete build;
+    }
+}
+
+
 void BuildgoPlguin::install(IApplication *app)
 {
-    app->addBuild(new BuildGolang);
+    build = new BuildGolang(app);
+    app->addBuild(build);
 }
 
 void BuildgoPlguin::uninstall()

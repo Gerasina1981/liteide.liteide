@@ -1,7 +1,9 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-12-27T19:44:39
 # -------------------------------------------------
-include(../liteide.pri)
+include (../liteide.pri)
+include (../api/api.pri)
+include (../util/util.pri)
 
 TARGET = $$IDE_APP_TARGET
 #CONFIG += app
