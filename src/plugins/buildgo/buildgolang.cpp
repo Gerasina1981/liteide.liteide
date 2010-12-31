@@ -56,7 +56,7 @@ bool BuildGolang::buildProject(IProject *proj)
     process.setWorkingDirectory(projDir);
 
     QStringList args;
-    args << "-o" << target+"_go_.8" << proj->values("GOFILES").join(" ");
+    args << "-o" << target+"_go_.8" << proj->values("GOFILES");
     liteApp->buildEvent()->fireBuildOutput("8g "+args.join(" "),false);
     process.start("c:\\go\\bin\\8g.exe",args);
     return true;
