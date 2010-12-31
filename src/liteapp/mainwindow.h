@@ -101,6 +101,7 @@ private:
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
 public slots:
+    void saveAll();
     void selectBuild();
 };
 

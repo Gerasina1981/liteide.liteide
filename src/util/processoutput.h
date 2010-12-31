@@ -53,7 +53,7 @@ private slots:
         if (code == 0 && status == QProcess::NormalExit) {
             emit processSuccess();
         }
-    }
+     }
     void error(QProcess::ProcessError code)
     {
         emit outputText(tr("---- %1 error").arg(taskName),false);

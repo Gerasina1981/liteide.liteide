@@ -69,6 +69,7 @@ void GolangProPlugin::gofmt()
     }
 
     ed->save();
+    gofmtProcess.disconnect();
     connect(&gofmtProcess,SIGNAL(outputText(QString,bool)),gofmtOutputEdit,SLOT(appendPlainText(QString)));
     connect(&gofmtProcess,SIGNAL(processSuccess()),ed,SLOT(reload()));
     gofmtProcess.start(tr("gofmt"),gofmtCmd,

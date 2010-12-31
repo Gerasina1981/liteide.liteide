@@ -441,6 +441,8 @@ void MainWindow::buildProject()
         return;
     }
 
+    saveAll();
+
     if (activeProject) {
         activeBuild->buildProject(activeProject);
     } else if(activeEditor) {
@@ -466,5 +468,12 @@ void MainWindow::runTarget()
     }
     else if (activeEditor) {
         activeRunTarget->runEditor(activeEditor);
+    }
+}
+
+void MainWindow::saveAll()
+{
+    foreach(IEditor *ed, editors) {
+        ed->save();
     }
 }
