@@ -125,21 +125,21 @@ IProject *ProjectManager::loadProject(const QString &filePath)
 }
 
 
-void ProjectManager::appendProject(ProjectFile *file)
+void ProjectManager::appendProject(ProjectFile *pro)
 {
     if (parentDock->isHidden()) {
         parentDock->show();
     }
 
-    proFiles.append(file);
-    QStandardItem *item = new QStandardItem(file->displayName());
-    model->appendRow(item);
-    item->setData(ItemRoot);
-    item->setData(file->filePath(),Qt::UserRole+2);
+    proFiles.append(pro);
+    QStandardItem *root = new QStandardItem(pro->displayName());
+    model->appendRow(root);
+    root->setData(ItemRoot);
+    root->setData(pro->filePath(),Qt::UserRole+2);
 
-    QStandardItem *pro = new QStandardItem(file->fileName());
-    pro->setData(ItemProFile);
-    item->appendRow(pro);
+    QStandardItem *item = new QStandardItem(pro->fileName());
+    item->setData(ItemProFile);
+    root->appendRow(item);
 
     QMap<QString,QString> fileMap;
     fileMap.insert("GOFILES",tr("Gofiles"));
@@ -149,20 +149,35 @@ void ProjectManager::appendProject(ProjectFile *file)
     QMapIterator<QString,QString> i(fileMap);
     while(i.hasNext()) {
         i.next();
-        QStringList files = file->values(i.key());
+        QStringList files = pro->values(i.key());
         if (!files.isEmpty()) {
             QStandardItem *folder = new QStandardItem(i.value());
             folder->setData(ItemFolder);
-            item->appendRow(folder);
-            foreach(QString v, files) {
-                QStandardItem *fileItem = new QStandardItem(v);
+            root->appendRow(folder);
+            foreach(QString file, files) {
+                QStandardItem *fileItem = new QStandardItem(file);
                 fileItem->setData(ItemFile);
                 folder->appendRow(fileItem);
             }
         }
     }   
 
-    tree->expand(model->indexFromItem(item));    
+    QStringList paks = pro->values("GOPACK");
+    foreach (QString pak,paks) {
+        QStringList files = pro->values(pak);
+        if (!files.isEmpty()) {
+            QStandardItem *folder = new QStandardItem("package "+pak);
+            folder->setData(ItemFolder);
+            root->appendRow(folder);
+            foreach(QString file, files) {
+                QStandardItem *fileItem = new QStandardItem(file);
+                fileItem->setData(ItemFile);
+                folder->appendRow(fileItem);
+            }
+        }
+    }
+
+    tree->expand(model->indexFromItem(root));
 }
 
 void ProjectManager::doubleClickedTree(const QModelIndex  &index)
