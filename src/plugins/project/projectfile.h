@@ -14,6 +14,7 @@ public:
     QStringList headerFiles();
     QStringList goFiles();
     virtual void close();
+    virtual bool reload();
     QString projectPath() const;
     ProjectFile(QObject *parent = 0);
     virtual ~ProjectFile();

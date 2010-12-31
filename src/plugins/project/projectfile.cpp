@@ -34,6 +34,11 @@ QString ProjectFile::filePath() const
     return _filePath;
 }
 
+bool ProjectFile::reload()
+{
+    return open(_filePath);
+}
+
 void ProjectFile::close()
 {
     context.clear();

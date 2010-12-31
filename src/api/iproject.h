@@ -12,7 +12,8 @@ public:
     virtual QString filePath() const = 0;
     virtual QString fileName() const = 0;
     virtual QStringList values(const QString &key) = 0;
-    virtual bool open(const QString &filePath) = 0;
+    virtual bool reload() = 0;
+    virtual bool open(const QString &filePath) = 0;    
     virtual void close() = 0;
 };
 
