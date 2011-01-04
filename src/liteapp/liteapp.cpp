@@ -196,3 +196,10 @@ IBuild *LiteApp::selectBuild(const QString &name)
     }
     return NULL;
 }
+
+void LiteApp::closeProject()
+{
+    if (mainWindow->activeProject)
+        mainWindow->activeProject->close();
+    mainWindow->activeProject = NULL;
+}

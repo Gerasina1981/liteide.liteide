@@ -5,7 +5,8 @@
 #include <QFileInfo>
 #include <QDebug>
 
-EditorImpl::EditorImpl(QObject *parent) : IEditor(parent), undoEnable(false), redoEnable(false)
+EditorImpl::EditorImpl(IApplication *app, QObject *parent)
+    : liteApp(app), IEditor(parent), undoEnable(false), redoEnable(false)
 {
 }
 
@@ -46,7 +47,9 @@ QIcon EditorImpl::icon() const
 
 void EditorImpl::save()
 {
-    editor->save();
+    if (editor->save()) {
+        liteApp->editorEvent()->fireDocumentSave(this);
+    }
 }
 
 bool EditorImpl::close()
@@ -130,7 +133,7 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
     if (ext.toLower() == "go") {
         new GolangHighlighter(ed->document());
     }
-    EditorImpl *impl = new EditorImpl(this);
+    EditorImpl *impl = new EditorImpl(liteApp,this);
     ed->setFont(editorFont);
     ed->setTabStopWidth(editorFont.pointSize()*4);
     impl->editor = ed;

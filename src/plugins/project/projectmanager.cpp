@@ -12,7 +12,7 @@
 #include <QDebug>
 
 ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
-    liteApp(app), QWidget(parent)
+    liteApp(app), QWidget(parent), project(NULL)
 {
     tree = new QTreeView;
     model = new QStandardItemModel;
@@ -29,9 +29,6 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 
     setLayout(layout);
 
-    reloadProjectAct = new QAction(tr("Reload Project"),this);
-    connect(reloadProjectAct,SIGNAL(triggered()),this,SLOT(reloadProject()));
-
     liteApp->addProjectFactory(this);
     parentDock = liteApp->addWorkspacePane(this,"Projects");
     parentDock->hide();
@@ -40,7 +37,6 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 ProjectManager::~ProjectManager()
 {
 //    qDebug() << "~";
-    qDeleteAll(proFiles);
 }
 
 void ProjectManager::createActions()
@@ -71,26 +67,6 @@ void ProjectManager::newProject()
     }
 }
 
-void ProjectManager::openProject()
-{
-    QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open File"),
-                                                    "",
-                                                    tr("project (*.pro)"));
-    if (fileName.isEmpty())
-        return;
-
-    ProjectFile * file = new ProjectFile(this);
-    if (file->open(fileName)) {
-        appendProject(file);
-    } else {
-        delete file;
-    }
-}
-
-void ProjectManager::closeProject()
-{
-}
-
 QString ProjectManager::projectTypeFilter() const
 {
     return tr("Project files (*.pro)");
@@ -103,20 +79,22 @@ QStringList ProjectManager::projectKeys() const
 
 IProject *ProjectManager::loadProject(const QString &filePath)
 {
-    foreach(ProjectFile *file, proFiles ) {
-        if (file->filePath() == filePath) {
-            liteApp->projectEvent()->fireProjectChanged(file);
-            return file;
-        }
+    if (project && project->filePath() == filePath) {
+        this->reloadProject();
+        return project;
     }
 
     QString ext = QFileInfo(filePath).suffix();
     if (ext.toLower() == "pro") {
-        ProjectFile * file = new ProjectFile;//(this);
+        ProjectFile * file = new ProjectFile(this);
         if (file->open(filePath)) {
-            appendProject(file);
-            liteApp->projectEvent()->fireProjectChanged(file);
-            return file;
+            closeProject();
+            project = file;
+            connect(project,SIGNAL(closeProject()),this,SLOT(closeProject()));
+            connect(project,SIGNAL(reloadProject()),this,SLOT(reloadProject()));
+            resetProjectTree();
+            liteApp->projectEvent()->fireProjectChanged(project);
+            return project;
         } else {
             delete file;
         }
@@ -125,19 +103,21 @@ IProject *ProjectManager::loadProject(const QString &filePath)
 }
 
 
-void ProjectManager::appendProject(ProjectFile *pro)
+void ProjectManager::resetProjectTree()
 {
     if (parentDock->isHidden()) {
         parentDock->show();
     }
 
-    proFiles.append(pro);
-    QStandardItem *root = new QStandardItem(pro->displayName());
+
+    model->clear();
+
+    QStandardItem *root = new QStandardItem(project->displayName());
     model->appendRow(root);
     root->setData(ItemRoot);
-    root->setData(pro->filePath(),Qt::UserRole+2);
+    root->setData(project->filePath(),Qt::UserRole+2);
 
-    QStandardItem *item = new QStandardItem(pro->fileName());
+    QStandardItem *item = new QStandardItem(project->fileName());
     item->setData(ItemProFile);
     root->appendRow(item);
 
@@ -149,7 +129,7 @@ void ProjectManager::appendProject(ProjectFile *pro)
     QMapIterator<QString,QString> i(fileMap);
     while(i.hasNext()) {
         i.next();
-        QStringList files = pro->values(i.key());
+        QStringList files = project->values(i.key());
         if (!files.isEmpty()) {
             QStandardItem *folder = new QStandardItem(i.value());
             folder->setData(ItemFolder);
@@ -162,9 +142,9 @@ void ProjectManager::appendProject(ProjectFile *pro)
         }
     }   
 
-    QStringList paks = pro->values("PACKAGE");
+    QStringList paks = project->values("PACKAGE");
     foreach (QString pak,paks) {
-        QStringList files = pro->values(pak);
+        QStringList files = project->values(pak);
         if (!files.isEmpty()) {
             QStandardItem *folder = new QStandardItem("package "+pak);
             folder->setData(ItemFolder);
@@ -177,7 +157,7 @@ void ProjectManager::appendProject(ProjectFile *pro)
         }
     }
 
-    tree->expand(model->indexFromItem(root));
+    tree->expandAll();//(model->indexFromItem(root));
 }
 
 void ProjectManager::doubleClickedTree(const QModelIndex  &index)
@@ -209,19 +189,14 @@ void ProjectManager::doubleClickedTree(const QModelIndex  &index)
     }
     if (!find)
         return;
-    QString proFilePath = root.data(Qt::UserRole+2).toString();
 
-    foreach(ProjectFile *file, proFiles) {
-        if (file->filePath() == proFilePath) {
-            QString filePath = QFileInfo(QDir(file->projectPath()),fileName).absoluteFilePath();
-            liteApp->loadEditor(filePath);
-            return;
-        }
-    }
+    QString filePath = QFileInfo(QDir(project->projectPath()),fileName).absoluteFilePath();
+    liteApp->loadEditor(filePath);
 }
 
 void ProjectManager::showProjectMenu(QPoint pos)
 {
+    return;
     QMenu * menu = new QMenu(this);
     QModelIndex index = tree->indexAt(pos);
     if (!index.isValid())
@@ -233,26 +208,22 @@ void ProjectManager::showProjectMenu(QPoint pos)
     reloadProjectIndex = index;
     reloadProjectPath = item->data(Qt::UserRole+2).toString();
 
-    menu->addAction(reloadProjectAct);
     menu->popup(tree->mapToGlobal(pos));
 }
 
 void ProjectManager::reloadProject()
 {
-   if (reloadProjectPath.isEmpty())
-       return;
+    if (project) {
+         resetProjectTree();
+    }
+}
 
-   foreach(ProjectFile *file, proFiles) {
-       if (file->filePath() == reloadProjectPath) {
-         //  QString filePath = QFileInfo(QDir(file->projectPath()),fileName).absoluteFilePath();
-         //  liteApp->loadEditor(filePath);
-           model->removeRow(reloadProjectIndex.row());
-           proFiles.removeOne(file);
-           delete file;
-           this->loadProject(reloadProjectPath);
-           break;
-       }
-   }
-
-   reloadProjectPath.clear();
+void ProjectManager::closeProject()
+{
+    model->clear();
+    if (project) {
+        project->deleteLater();
+    }
+    project = NULL;
+    liteApp->projectEvent()->fireProjectChanged(NULL);
 }

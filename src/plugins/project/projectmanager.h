@@ -26,7 +26,7 @@ public:
     virtual QString projectTypeFilter() const;
     virtual IProject *loadProject(const QString &filePath);
 
-    void appendProject(ProjectFile *file);
+    void resetProjectTree();
     explicit ProjectManager(IApplication *app, QWidget *parent = 0);
     ~ProjectManager();
     void createActions();
@@ -35,20 +35,18 @@ private slots:
     void showProjectMenu(QPoint pt);
     void doubleClickedTree(const QModelIndex  &index);
     void closeProject();
-    void openProject();
     void newProject();
 protected:
     QString reloadProjectPath;
     QModelIndex reloadProjectIndex;
     QMenu   *projectMenu;
-    QAction *reloadProjectAct;
     QDockWidget *parentDock;
     QAction *newProjectAct;
     QAction *openProjectAct;
     QAction *closeProjectAct;
     QStandardItemModel  *model;
     QTreeView            *tree;
-    QList<ProjectFile*> proFiles;
+    ProjectFile         *project;
     IApplication *liteApp;
 };
 

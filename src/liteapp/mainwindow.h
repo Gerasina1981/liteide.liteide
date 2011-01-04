@@ -24,6 +24,7 @@ public:
     void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
+    virtual void fireDocumentSave(IEditor *edit);
     virtual void fireProjectChanged(IProject *project);
     virtual void fireBuildStarted();
     virtual void fireBuildStoped(bool success);
@@ -34,6 +35,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void closeProject();
     void buildFile();
     void runTarget();
     void cancelBuild();
@@ -77,6 +79,7 @@ private:
     QMenu   *helpMenu;
 
     QAction *openProjectAct;
+    QAction *closeProjectAct;
     QAction *newFileAct;
     QAction *openFileAct;
     QAction *saveFileAct;

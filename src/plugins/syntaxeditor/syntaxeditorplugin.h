@@ -15,7 +15,7 @@ class EditorImpl : public IEditor
 {
     Q_OBJECT
 public:
-    EditorImpl(QObject *parent);
+    EditorImpl(IApplication *app,QObject *parent = 0);
     virtual ~EditorImpl();
     virtual QWidget *widget() const;
     virtual QString fileName() const;
@@ -34,6 +34,7 @@ public:
     bool redoEnable;
     SyntaxEditor *editor;
     IEditorEvent *event;
+    IApplication *liteApp;
 };
 
 class EditorFactoryImpl : public QObject, public IEditorFactory

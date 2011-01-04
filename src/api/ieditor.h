@@ -36,6 +36,7 @@ class IEditorEvent
 public:
     virtual ~IEditorEvent() {}
     virtual void fireDocumentChanged(IEditor *edit, bool b) = 0;
+    virtual void fireDocumentSave(IEditor *edit) = 0;
 };
 
 

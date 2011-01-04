@@ -36,11 +36,14 @@ QString ProjectFile::filePath() const
 
 bool ProjectFile::reload()
 {
-    return open(_filePath);
+    bool b = open(_filePath);
+    emit reloadProject();
+    return b;
 }
 
 void ProjectFile::close()
 {
+    emit closeProject();
     context.clear();
 }
 

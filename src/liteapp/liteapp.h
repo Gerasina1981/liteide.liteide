@@ -12,6 +12,7 @@ class LiteApp : public QObject, public IApplication
     Q_OBJECT
 
 public:
+    void closeProject();
     IBuild *selectBuild(const QString &name);
     LiteApp();
     ~LiteApp();

@@ -81,6 +81,12 @@ void MainWindow::createActions()
     openProjectAct->setStatusTip(tr("Open Project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
+    closeProjectAct = new QAction(QIcon(":/images/close.png"), tr("&Close Project"),this);
+    //closeProjectAct->setShortcuts(QKeySequence::Open);
+    closeProjectAct->setStatusTip(tr("Close Project"));
+    connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(closeProject()));
+
+
     newFileAct = new QAction(QIcon(":/images/new.png"), tr("&New File"),this);
     newFileAct->setShortcuts(QKeySequence::New);
     newFileAct->setStatusTip(tr("Create a new file"));
@@ -151,6 +157,7 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu(tr("&File"));
 
     fileMenu->addAction(openProjectAct);
+    fileMenu->addAction(closeProjectAct);
     fileMenu->addSeparator();
 
     fileMenu->addAction(newFileAct);
@@ -349,6 +356,13 @@ void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
     }
 }
 
+void MainWindow::fireDocumentSave(IEditor *edit)
+{
+    if (activeProject && edit->filePath() == activeProject->filePath()) {
+         activeProject->reload();
+    }
+}
+
 void MainWindow::fireProjectChanged(IProject *project)
 {
     activeProject = project;
@@ -520,5 +534,12 @@ void MainWindow::dropEvent(QDropEvent *event)
 
     if (!liteApp->loadProject(fileName)) {
         liteApp->loadEditor(fileName);
+    }
+}
+
+void MainWindow::closeProject()
+{
+    if (activeProject) {
+        activeProject->close();
     }
 }
