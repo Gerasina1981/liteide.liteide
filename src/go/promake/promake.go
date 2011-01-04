@@ -11,8 +11,10 @@ import (
 	"syscall"
 )
 
-var gcFileName *string = flag.String("gc", "8g", "golang build 8g[6g][5g] filepath")
-var glFileName *string = flag.String("gl", "8l", "golang build 8l[6l][5l] filepath")
+var gcFileName *string = flag.String("gc", "8g", "golang gc compiler 8g[6g][5g] filepath")
+var glFileName *string = flag.String("gl", "8l", "golang linker 8l[6l][5l] filepath")
+var arFileName *string = flag.String("ar", "gopack", "golang ar tool gopack filepath")
+var cgoFileName *string = flag.String("cgo", "cgo", "golang call C cgo filepath")
 var proFileName *string = flag.String("p", "", "build golang project file example.pro")
 var goFileName *string = flag.String("f", "", "build golang source file example.go")
 
@@ -129,10 +131,26 @@ func build(gcfile string, proFileName string, files [][]byte, envv []string, dir
 	return
 }
 
-func link(glfile string, target string, proFileName string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
-	arg := []string{glfile, "-o", target, proFileName}
+func link(glfile string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
+	arg := []string{glfile, "-o", target, ofile}
 	fmt.Println("\t", arg)
 	cmd, err := exec.Run(glfile, arg[:], envv[:], dir, 0, 1, 2)
+	if err != nil {
+		fmt.Printf("Error, %s", err)
+	}
+	wait, err := cmd.Wait(0)
+	if err != nil {
+		fmt.Printf("Error, %s", err)
+	}
+	status = wait.WaitStatus
+	cmd.Close()
+	return
+}
+
+func pack(pkfile string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
+	arg := []string{pkfile, "grc", target, ofile}
+	fmt.Println("\t", arg)
+	cmd, err := exec.Run(pkfile, arg[:], envv[:], dir, 0, 1, 2)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
 	}
@@ -171,7 +189,7 @@ func MakeFile(gcfile, glfile string, file string) (status syscall.WaitStatus, er
 }
 
 
-func (file *Gopro) MakeTarget(gcfile, glfile string) (status syscall.WaitStatus, err os.Error) {
+func (file *Gopro) MakeTarget(gcfile, glfile, pkfile string) (status syscall.WaitStatus, err os.Error) {
 	all := file.AllPackage()
 	for _, v := range all {
 		fmt.Printf("build package %s:\n", v)
@@ -185,22 +203,28 @@ func (file *Gopro) MakeTarget(gcfile, glfile string) (status syscall.WaitStatus,
 		if err != nil || status.ExitStatus() != 0 {
 			return
 		}
-		if string(v) != "main" {
-			continue
-		}
-		target = target + ".exe"
+
 		dest := file.DestDir()
 		if len(dest) > 0 {
 			dest = path.Join(file.ProjectDir(), dest)
 			os.MkdirAll(dest, 0)
 			target = path.Join(dest, target)
 		}
-
-		status, err = link(glfile, target, ofile, os.Environ(), file.ProjectDir())
-		if err != nil || status.ExitStatus() != 0 {
-			return
+		if string(v) == "main" {
+			target = target + ".exe"
+			status, err = link(glfile, target, ofile, os.Environ(), file.ProjectDir())
+			if err != nil || status.ExitStatus() != 0 {
+				return
+			}
+			fmt.Printf("link target : %s\n", target)
+		} else {
+			target = target + ".a"
+			status, err = pack(pkfile, target, ofile, os.Environ(), file.ProjectDir())
+			if err != nil || status.ExitStatus() != 0 {
+				return
+			}
+			fmt.Printf("pack target : %s\n", target)
 		}
-		fmt.Printf("link target : %s\n", target)
 	}
 	return
 }
@@ -210,6 +234,7 @@ func main() {
 	flag.Parse()
 	gcfile := *gcFileName
 	glfile := *glFileName
+	pkfile := *arFileName
 	if len(*proFileName) > 0 {
 		file, _ := makePro(*proFileName)
 		if file == nil {
@@ -222,7 +247,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		status, err := file.MakeTarget(gcfile, glfile)
+		status, err := file.MakeTarget(gcfile, glfile, pkfile)
 		if err != nil || status.ExitStatus() != 0 {
 			fmt.Printf("Error and exit!\n")
 			os.Exit(1)

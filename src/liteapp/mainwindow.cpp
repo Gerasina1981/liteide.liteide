@@ -370,6 +370,11 @@ void MainWindow::fireDocumentSave(IEditor *edit)
 void MainWindow::fireProjectChanged(IProject *project)
 {
     activeProject = project;
+    if (activeProject) {
+        setWindowTitle(QString(tr("LiteIDE - %1")).arg(activeProject->displayName()));
+    } else {
+        setWindowTitle(tr("LiteIDE"));
+    }
 }
 
 void MainWindow::fireBuildStarted()
