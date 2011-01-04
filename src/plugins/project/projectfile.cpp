@@ -56,6 +56,7 @@ bool ProjectFile::open(const QString &fileName)
     QStringList list = all.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     context.clear();
     foreach(QString line, list) {
+         line.replace("\t"," ");
         QStringList v = line.split(QRegExp("\\+="),QString::SkipEmptyParts);
         if (v.count() == 1) {
             v = line.split(QRegExp("="),QString::SkipEmptyParts);

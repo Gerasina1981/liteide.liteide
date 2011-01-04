@@ -9,6 +9,11 @@ SyntaxEditor::SyntaxEditor()
     setLineWrapMode(QPlainTextEdit::NoWrap);
 
     isUntitled = true;
+    editorArea = new SyntaxEditorArea(this);
+    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateAreaWidth(int)));
+    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateEditorArea(QRect,int)));
+
+    updateAreaWidth(0);
 }
 
 void SyntaxEditor::reload()
@@ -153,4 +158,72 @@ void SyntaxEditor::setCurrentFile(const QString &fileName)
 QString SyntaxEditor::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
+}
+
+int SyntaxEditor::editorAreaWidth()
+{
+    int digits = 1;
+    int max = qMax(1, blockCount());
+    while (max >= 10) {
+        max /= 10;
+        ++digits;
+    }
+
+    int space = 6 + fontMetrics().width(QLatin1Char('9')) * digits;
+
+    return space;
+}
+
+void SyntaxEditor::areaPaintEvent(QPaintEvent *event)
+{
+    QPainter painter(editorArea);
+    painter.fillRect(event->rect(), Qt::lightGray);//lightGray);
+
+//![extraAreaPaintEvent_0]
+
+//![extraAreaPaintEvent_1]
+    QTextBlock block = firstVisibleBlock();
+    int blockNumber = block.blockNumber();
+    int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
+    int bottom = top + (int) blockBoundingRect(block).height();
+//![extraAreaPaintEvent_1]
+
+//![extraAreaPaintEvent_2]
+    while (block.isValid() && top <= event->rect().bottom()) {
+        if (block.isVisible() && bottom >= event->rect().top()) {
+            QString number = QString::number(blockNumber + 1);
+            painter.setPen(Qt::black);
+            painter.drawText(0, top, editorArea->width()-3, fontMetrics().height(),
+                             Qt::AlignRight, number);
+        }
+
+        block = block.next();
+        top = bottom;
+        bottom = top + (int) blockBoundingRect(block).height();
+        ++blockNumber;
+    }
+}
+
+void SyntaxEditor::resizeEvent(QResizeEvent *e)
+{
+    QPlainTextEdit::resizeEvent(e);
+
+    QRect cr = contentsRect();
+    editorArea->setGeometry(QRect(cr.left(), cr.top(), editorAreaWidth(), cr.height()));
+}
+
+void SyntaxEditor::updateAreaWidth(int /* newBlockCount */)
+{
+    setViewportMargins(editorAreaWidth(), 0, 0, 0);
+}
+
+void SyntaxEditor::updateEditorArea(const QRect &rect, int dy)
+{
+    if (dy)
+        editorArea->scroll(0, dy);
+    else
+        editorArea->update(0, rect.y(), editorArea->width(), rect.height());
+
+    if (rect.contains(viewport()->rect()))
+        updateAreaWidth(0);
 }
