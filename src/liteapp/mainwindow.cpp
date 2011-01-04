@@ -53,6 +53,8 @@ MainWindow::MainWindow(LiteApp *app) :
     resize(640,480);
 
     setAcceptDrops(true);
+
+    outputDock->hide();
     //setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -293,9 +295,11 @@ void MainWindow::createOutputWidget()
     outputTabWidget->setTabPosition(QTabWidget::South);
 
     buildOutputEdit = new QPlainTextEdit(this);
+    buildOutputEdit->setReadOnly(true);
     outputTabWidget->addTab(buildOutputEdit,tr("Build Output"));
 
     runTargetOutputEdit = new QPlainTextEdit(this);
+    runTargetOutputEdit->setReadOnly(true);
     outputTabWidget->addTab(runTargetOutputEdit,tr("Application Output"));
 
     outputDock->setWidget(outputTabWidget);
@@ -466,6 +470,8 @@ void MainWindow::buildProject()
 
     saveAll();
 
+    buildOutputEdit->moveCursor(QTextCursor::End);
+
     if (activeProject) {
         activeBuild->buildProject(activeProject);
     } else if(activeEditor) {
@@ -486,6 +492,9 @@ void MainWindow::runTarget()
     if (!activeRunTarget) {
         return;
     }
+
+    runTargetOutputEdit->moveCursor(QTextCursor::End);
+
     if (activeProject) {
         activeRunTarget->runProject(activeProject);
     } else if (activeEditor) {

@@ -228,7 +228,7 @@ func main() {
 			os.Exit(1)
 		}
 	} else if len(*goFileName) > 0 {
-		status, err := MakeFile(gcfile, glfile,*goFileName)
+		status, err := MakeFile(gcfile, glfile, *goFileName)
 		if err != nil || status.ExitStatus() != 0 {
 			fmt.Printf("Error and exit!\n")
 			os.Exit(1)
