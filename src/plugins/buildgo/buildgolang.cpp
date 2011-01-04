@@ -34,13 +34,6 @@ QString BuildGolang::buildName() const
 
 bool BuildGolang::buildProject(IProject *proj)
 {
-    if (proj->values("GOFILES").isEmpty()) {
-        liteApp->buildEvent()->fireBuildStoped(0);
-        return false;
-    }
-
-    liteApp->buildEvent()->fireBuildOutput("\nbuild project "+proj->displayName(),false);
-
     QStringList val = proj->values("TARGET");
     if (!val.isEmpty())
         target = val.at(0);
@@ -49,27 +42,28 @@ bool BuildGolang::buildProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
 
-    build8g = true;
-    build8l = false;
-
-    QString projDir = QFileInfo(proj->filePath()).absolutePath();
-    process.setWorkingDirectory(projDir);
-
     QStringList args;
-    args << "-o" << target+"_go_.8" << proj->values("GOFILES");
-    liteApp->buildEvent()->fireBuildOutput("8g "+args.join(" "),false);
-    process.start("c:\\go\\bin\\8g.exe",args);
+    args << "-p" << proj->filePath();
+    process.start("gopromake.exe",args);
+
     return true;
 }
 
-bool BuildGolang::buildEditor(IEditor *edit)
+bool BuildGolang::buildFile(const QString &fileName)
 {
+    target = QFileInfo(fileName).baseName();
+    QString projDir = QFileInfo(fileName).absolutePath();
+    process.setWorkingDirectory(projDir);
+
+    QStringList args;
+    args << "-f" << fileName;
+    process.start("gopromake.exe",args);
+
     return false;
 }
 
 void BuildGolang::cancelBuild()
 {
-    build8g = false;
     if (process.state() == QProcess::Starting) {
         process.waitForStarted(3000);
     } else if (process.state() == process.Running) {
@@ -79,21 +73,6 @@ void BuildGolang::cancelBuild()
 
 void BuildGolang::finished(int code)
 {
-    if (build8g == true) {
-        build8g = false;
-        liteApp->buildEvent()->fireBuildOutput("--- 8g ended! ---",false);
-        if (code == 0) {
-            build8l = true;
-            QStringList args;
-            args << "-o" << target+".exe" << target+"_go_.8";
-            liteApp->buildEvent()->fireBuildOutput("8l "+args.join(" "),false);
-            process.start("c:\\go\\bin\\8l.exe",args);
-            return;
-        }
-    } else if (build8l == true) {
-        build8l = false;
-        liteApp->buildEvent()->fireBuildOutput("--- 8l ended !",false);
-    }
     liteApp->buildEvent()->fireBuildStoped(code == 0);
 }
 
@@ -115,7 +94,5 @@ void BuildGolang::readStderr()
 
 void BuildGolang::started()
 {
-    if (build8g) {
-        liteApp->buildEvent()->fireBuildStarted();
-    }
+   liteApp->buildEvent()->fireBuildStarted();
 }

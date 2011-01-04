@@ -13,7 +13,7 @@ public:
     virtual QString buildName() const = 0;
     virtual void setActive() = 0;
     virtual bool buildProject(IProject *proj) = 0;
-    virtual bool buildEditor(IEditor *edit) = 0;
+    virtual bool buildFile(const QString &fileName) = 0;
     virtual void cancelBuild() = 0;
 };
 

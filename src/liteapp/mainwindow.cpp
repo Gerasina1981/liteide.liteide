@@ -20,6 +20,7 @@
 #include <QTextEdit>
 #include <QTextCharFormat>
 #include <QTextCodec>
+#include <QPlainTextEdit>
 
 MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
@@ -108,6 +109,11 @@ void MainWindow::createActions()
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     buildProjectAct->setStatusTip(tr("Build Project"));
     connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
+
+    buildFileAct = new QAction(QIcon(":/images/build.png"),tr("Build File\tCtrl+B"),this);
+    buildFileAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_B));
+    buildFileAct->setStatusTip(tr("Build File"));
+    connect(buildFileAct,SIGNAL(triggered()),this,SLOT(buildFile()));
 
     cancelBuildAct = new QAction(tr("Cancel Build"),this);
  //   cancelBuildAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
@@ -276,10 +282,10 @@ void MainWindow::createOutputWidget()
     outputTabWidget = new QTabWidget;
     outputTabWidget->setTabPosition(QTabWidget::South);
 
-    buildOutputEdit = new QTextEdit(this);
+    buildOutputEdit = new QPlainTextEdit(this);
     outputTabWidget->addTab(buildOutputEdit,tr("Build Output"));
 
-    runTargetOutputEdit = new QTextEdit(this);
+    runTargetOutputEdit = new QPlainTextEdit(this);
     outputTabWidget->addTab(runTargetOutputEdit,tr("Application Output"));
 
     outputDock->setWidget(outputTabWidget);
@@ -374,7 +380,7 @@ void MainWindow::fireBuildOutput(const QString &text, bool stdError)
     else
         fmt.setForeground(Qt::black);
     buildOutputEdit->setCurrentCharFormat(fmt);
-    buildOutputEdit->append(text);
+    buildOutputEdit->appendPlainText(text);
 }
 
 void MainWindow::fireRunTargetStarted()
@@ -405,7 +411,7 @@ void MainWindow::fireRunTargetOutput(const QByteArray &text, bool stdError)
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
 
     runTargetOutputEdit->setCurrentCharFormat(fmt);
-    runTargetOutputEdit->append(codec->toUnicode(text));
+    runTargetOutputEdit->appendPlainText(codec->toUnicode(text));
 }
 
 
@@ -446,7 +452,7 @@ void MainWindow::buildProject()
     if (activeProject) {
         activeBuild->buildProject(activeProject);
     } else if(activeEditor) {
-        activeBuild->buildEditor(activeEditor);
+        activeBuild->buildFile(activeEditor->filePath());
     }
 }
 
@@ -465,8 +471,7 @@ void MainWindow::runTarget()
     }
     if (activeProject) {
         activeRunTarget->runProject(activeProject);
-    }
-    else if (activeEditor) {
+    } else if (activeEditor) {
         activeRunTarget->runEditor(activeEditor);
     }
 }
@@ -476,4 +481,9 @@ void MainWindow::saveAll()
     foreach(IEditor *ed, editors) {
         ed->save();
     }
+}
+
+void MainWindow::buildFile()
+{
+
 }

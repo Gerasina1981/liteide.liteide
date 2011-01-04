@@ -10,6 +10,7 @@
 #include "../api/iruntarget.h"
 
 class LiteApp;
+class QPlainTextEdit;
 class QActionGroup;
 class MainWindow : public QMainWindow,
         public IEditorEvent,
@@ -33,6 +34,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void buildFile();
     void runTarget();
     void cancelBuild();
     void buildProject();
@@ -82,6 +84,7 @@ private:
 
     QActionGroup *buildActGroup;
     QAction *buildProjectAct;
+    QAction *buildFileAct;
     QAction *cancelBuildAct;
     QAction *runTargetAct;
     QAction *debugAct;
@@ -91,8 +94,8 @@ private:
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
-    QTextEdit   *buildOutputEdit;
-    QTextEdit   *runTargetOutputEdit;
+    QPlainTextEdit   *buildOutputEdit;
+    QPlainTextEdit   *runTargetOutputEdit;
 
     IEditor *activeEditor;
     IProject *activeProject;

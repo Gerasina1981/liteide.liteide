@@ -162,7 +162,7 @@ void ProjectManager::appendProject(ProjectFile *pro)
         }
     }   
 
-    QStringList paks = pro->values("GOPACK");
+    QStringList paks = pro->values("PACKAGE");
     foreach (QString pak,paks) {
         QStringList files = pro->values(pak);
         if (!files.isEmpty()) {

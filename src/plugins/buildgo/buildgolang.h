@@ -19,13 +19,11 @@ public:
     virtual QString buildName() const;
     virtual void setActive();
     virtual bool buildProject(IProject *proj);
-    virtual bool buildEditor(IEditor *edit);
+    virtual bool buildFile(const QString &fileName);
     virtual void cancelBuild();
 public:
     QProcess        process;
     QString         target;
-    bool            build8g;
-    bool            build8l;
     IApplication    *liteApp;
     RunTargetApp    *runTarget;
 private slots:
