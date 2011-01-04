@@ -21,6 +21,7 @@
 #include <QTextCharFormat>
 #include <QTextCodec>
 #include <QPlainTextEdit>
+#include <QUrl>
 
 MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
@@ -50,6 +51,8 @@ MainWindow::MainWindow(LiteApp *app) :
     createOutputWidget();
 
     resize(640,480);
+
+    setAcceptDrops(true);
     //setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -486,4 +489,36 @@ void MainWindow::saveAll()
 void MainWindow::buildFile()
 {
 
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+    /*
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty())
+        return;
+    QString fileName = urls.first().toLocalFile();
+    if (fileName.isEmpty())
+        return;
+    //qDebug() << fileName;
+    QString ext = QFileInfo(fileName).suffix();
+
+    //event->acceptProposedAction();
+    */
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty())
+        return;
+    QString fileName = urls.first().toLocalFile();
+    if (fileName.isEmpty())
+        return;
+
+    if (!liteApp->loadProject(fileName)) {
+        liteApp->loadEditor(fileName);
+    }
 }

@@ -51,6 +51,8 @@ public:
     void addOutputPage(QWidget *w, const QString &name);
     void addEditor(IEditor *ed);
 private:
+    virtual void dropEvent(QDropEvent *event);
+    virtual void dragEnterEvent(QDragEnterEvent *event);
     void createActions();
     void createMenus();
     void createToolBars();
