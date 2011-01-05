@@ -1,0 +1,26 @@
+gopromake
+
+Usage gopromake:
+  -ar="gopack": golang ar tool gopack filepath
+  -cgo="cgo": golang call C cgo filepath
+  -gl="8l": golang linker 8l[6l][5l] filepath
+  -gc="8g": golang gc compiler 8g[6g][5g] filepath
+  -p="": build golang project file example.pro
+  -f="": build golang source file example.go
+
+
+.pro files
+
+key: TARGET DESTDIR PACKAGE
+
+examples/helloui
+
+TARGET=hello
+DESTDIR=./bin
+PACKAGE = user32 main
+user32 =\
+	user32.go
+main =\
+	hello.go
+
+
