@@ -6,8 +6,8 @@
 
 LiteApp::LiteApp()
 {
-    mainWindow = new MainWindow(this);
     mainSettings = new QSettings(QSettings::IniFormat,QSettings::UserScope,"liteide","liteapp",this);
+    mainWindow = new MainWindow(this);
 }
 
 LiteApp::~LiteApp()

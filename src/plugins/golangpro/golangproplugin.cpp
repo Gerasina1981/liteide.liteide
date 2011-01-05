@@ -52,7 +52,7 @@ QString GolangProPlugin::anchor() const
 
 QString GolangProPlugin::info() const
 {
-    return tr("golang pro tools");
+    return tr("Golang tools 1.0");
 }
 
 

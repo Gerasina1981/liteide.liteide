@@ -31,6 +31,7 @@ MainWindow::MainWindow(LiteApp *app) :
         activeBuild(NULL),
         activeRunTarget(NULL)
 {
+    this->setWindowTitle("LiteIDE");
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     editTabWidget = new QTabWidget;
@@ -57,6 +58,7 @@ MainWindow::MainWindow(LiteApp *app) :
 
     outputDock->hide();
     //setUnifiedTitleAndToolBarOnMac(true);
+    restoreGeometry(liteApp->settings()->value("geometry").toByteArray());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -74,6 +76,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             }
         }
     }
+    liteApp->settings()->setValue("geometry",saveGeometry());
     event->accept();
 }
 
@@ -372,11 +375,14 @@ void MainWindow::openFile()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About LiteIDE"),
-                tr("<h2 class='title'>LiteIDE </h2>"
-                   "<p>"
-                   "<h3>Anchor:  <b>visualfc@gamil.com</b></h3>"
-                   "<h3>Project: <b>http://code.google.com/p/liteide</b></h3>"
-                   "<h3>Version: <b>1.0 beta1 (2010.1.5)</b></h3>"));
+                tr("<h3 class='title'>LiteIDE </h3>"
+                   "<p></p>"
+                   "<table border=0>"
+                   "<tr><td>Anchor</td><td>visualfc</td></tr>"
+                   "<tr><td>Project</td><td>http://code.google.com/p/liteide</td></tr>"
+                   "<tr><td>Version</td><td>1.0 beta1</td></tr>"
+                   "<tr><td>Build Time </td><td>2011.1.5</td></tr>"
+                   "</table>"));
 }
 
 void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
