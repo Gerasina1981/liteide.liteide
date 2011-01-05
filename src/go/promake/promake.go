@@ -118,48 +118,60 @@ func build(gcfile string, proFileName string, files [][]byte, envv []string, dir
 		arg = append(arg, string(v))
 	}
 	fmt.Println("\t", arg)
-	cmd, err := exec.Run(gcfile, arg[:], envv[:], dir, 0, 1, 2)
+	var cmd *exec.Cmd
+	cmd, err = exec.Run(gcfile, arg[:], envv[:], dir, 0, 1, 2)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
-	wait, err := cmd.Wait(0)
+	defer cmd.Close()
+	var wait *os.Waitmsg
+	wait, err = cmd.Wait(0)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
 	status = wait.WaitStatus
-	cmd.Close()
 	return
 }
 
 func link(glfile string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
 	arg := []string{glfile, "-o", target, ofile}
 	fmt.Println("\t", arg)
-	cmd, err := exec.Run(glfile, arg[:], envv[:], dir, 0, 1, 2)
+	var cmd *exec.Cmd
+	cmd, err = exec.Run(glfile, arg[:], envv[:], dir, 0, 1, 2)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
-	wait, err := cmd.Wait(0)
+	defer cmd.Close()
+	var wait *os.Waitmsg
+	wait, err = cmd.Wait(0)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
 	status = wait.WaitStatus
-	cmd.Close()
 	return
 }
 
 func pack(pkfile string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
 	arg := []string{pkfile, "grc", target, ofile}
 	fmt.Println("\t", arg)
-	cmd, err := exec.Run(pkfile, arg[:], envv[:], dir, 0, 1, 2)
+	var cmd *exec.Cmd
+	cmd, err = exec.Run(pkfile, arg[:], envv[:], dir, 0, 1, 2)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
-	wait, err := cmd.Wait(0)
+	defer cmd.Close()
+	var wait *os.Waitmsg
+	wait, err = cmd.Wait(0)
 	if err != nil {
 		fmt.Printf("Error, %s", err)
+		return
 	}
 	status = wait.WaitStatus
-	cmd.Close()
 	return
 }
 
