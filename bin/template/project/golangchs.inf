@@ -1,0 +1,5 @@
+[PROJECT]
+NAME="GoLang Project CHS"
+PATH =golangchs
+PRO=root.pro
+FILES = root.go
