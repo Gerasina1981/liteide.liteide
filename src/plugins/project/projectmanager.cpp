@@ -1,6 +1,4 @@
 #include "projectmanager.h"
-#include "projectwizard.h"
-
 
 #include <QTreeView>
 #include <QStandardItemModel>
@@ -57,14 +55,6 @@ void ProjectManager::createActions()
     QAction *seperator = fileMenu->insertSeparator(fileMenu->actions()[0]);
     fileMenu->insertActions(seperator,QList<QAction*>() << newProjectAct
                             << openProjectAct << closeProjectAct);
-}
-
-void ProjectManager::newProject()
-{
-    ProjectWizard wiz;
-    if (wiz.exec() == QDialog::Accepted) {
-        //IProject * proj = createProject(wiz.projectLocation,wiz.projectName);
-    }
 }
 
 QString ProjectManager::projectTypeFilter() const
@@ -220,10 +210,10 @@ void ProjectManager::reloadProject()
 
 void ProjectManager::closeProject()
 {
+    liteApp->projectEvent()->fireProjectClose(project);
     model->clear();
     if (project) {
         project->deleteLater();
     }
     project = NULL;
-    liteApp->projectEvent()->fireProjectChanged(NULL);
 }

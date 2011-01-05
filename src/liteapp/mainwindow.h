@@ -26,6 +26,7 @@ public:
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireDocumentSave(IEditor *edit);
     virtual void fireProjectChanged(IProject *project);
+    virtual void fireProjectClose(IProject *project);
     virtual void fireBuildStarted();
     virtual void fireBuildStoped(bool success);
     virtual void fireBuildOutput(const QString &text, bool stdError);
@@ -35,6 +36,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void newProject();
     void closeProject();
     void buildFile();
     void runTarget();
@@ -78,6 +80,7 @@ private:
     QMenu   *toolMenu;
     QMenu   *helpMenu;
 
+    QAction *newProjectAct;
     QAction *openProjectAct;
     QAction *closeProjectAct;
     QAction *newFileAct;

@@ -14,10 +14,13 @@ TEMPLATE = app
 SOURCES += main.cpp \
     liteapp.cpp \
     mainwindow.cpp \
-    aboutpluginsdialog.cpp
+    aboutpluginsdialog.cpp \
+    projectwizard.cpp
+
 HEADERS += liteapp.h \
     mainwindow.h \
-    aboutpluginsdialog.h
+    aboutpluginsdialog.h \
+    projectwizard.h
 
 RESOURCES += liteapp.qrc
 

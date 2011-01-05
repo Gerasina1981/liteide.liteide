@@ -21,24 +21,25 @@ public:
     QString userFriendlyCurrentFile();
     QString currentFile() { return curFile; }
 
- protected:
-     virtual void closeEvent(QCloseEvent *event);
-     virtual void resizeEvent(QResizeEvent *e);
- public:
-     int editorAreaWidth();
- protected slots:
-     void updateAreaWidth(int newBlockCount);
-     void updateEditorArea(const QRect &, int);
- protected:
-     bool maybeSave();
-     void setCurrentFile(const QString &fileName);
-     QString strippedName(const QString &fullFileName);
+protected:
+    virtual bool event(QEvent *event);
+    virtual void closeEvent(QCloseEvent *event);
+    virtual void resizeEvent(QResizeEvent *e);
+public:
+    int editorAreaWidth();
+protected slots:
+    void updateAreaWidth(int newBlockCount);
+    void updateEditorArea(const QRect &, int);
+protected:
+    bool maybeSave();
+    void setCurrentFile(const QString &fileName);
+    QString strippedName(const QString &fullFileName);
 
-     QString curFile;
-     QString curText;
+    QString curFile;
+    QString curText;
 
-     bool isUntitled;
-     QWidget *editorArea;
+    bool isUntitled;
+    QWidget *editorArea;
 };
 
 class SyntaxEditorArea : public QWidget
@@ -53,7 +54,7 @@ public:
     }
 
 protected:
-    void paintEvent(QPaintEvent *event) {
+    void paintEvent(QPaintEvent *event) {        
         editor->areaPaintEvent(event);
     }
 

@@ -10,11 +10,6 @@ EditorImpl::EditorImpl(IApplication *app, QObject *parent)
 {
 }
 
-EditorImpl::~EditorImpl()
-{
-    qDebug() << "~EditorImpl";
-}
-
 void EditorImpl::setUndoEnabled(bool b)
 {
     undoEnable = b;
@@ -90,11 +85,6 @@ EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
 
     editorFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
     editorFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
-}
-
-EditorFactoryImpl::~EditorFactoryImpl()
-{
-    qDebug() << "~EditorFactoryImpl";
 }
 
 QStringList EditorFactoryImpl::fileTypes()

@@ -31,6 +31,7 @@ class IProjectEvent
 public:
     virtual ~IProjectEvent() {}
     virtual void fireProjectChanged(IProject *project) = 0;
+    virtual void fireProjectClose(IProject *project) = 0;
 };
 
 #endif // __LITEAPI_IPROJECT_H__

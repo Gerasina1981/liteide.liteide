@@ -12,7 +12,6 @@ class ProjectFile : public QObject , public IProject
     Q_OBJECT
 public:
     ProjectFile(QObject *parent = 0);
-    virtual ~ProjectFile();
     QStringList sourceFiles();
     QStringList headerFiles();
     QStringList goFiles();

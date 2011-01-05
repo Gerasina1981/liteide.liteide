@@ -35,7 +35,6 @@ private slots:
     void showProjectMenu(QPoint pt);
     void doubleClickedTree(const QModelIndex  &index);
     void closeProject();
-    void newProject();
 protected:
     QString reloadProjectPath;
     QModelIndex reloadProjectIndex;

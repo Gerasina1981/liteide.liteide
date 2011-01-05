@@ -2,6 +2,7 @@
 #include "liteapp.h"
 #include "aboutpluginsdialog.h"
 #include "../util/texteditoutput.h"
+#include "projectwizard.h"
 
 #include <QApplication>
 #include <QAction>
@@ -78,6 +79,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createActions()
 {
+    newProjectAct = new QAction(QIcon(":/images/new.png"), tr("&New Project"),this);
+    newProjectAct->setShortcuts(QKeySequence::New);
+    newProjectAct->setStatusTip(tr("Open Project"));
+    connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
+
     openProjectAct = new QAction(QIcon(":/images/open.png"), tr("&Open Project"),this);
     openProjectAct->setShortcuts(QKeySequence::Open);
     openProjectAct->setStatusTip(tr("Open Project"));
@@ -158,6 +164,7 @@ void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
 
+    fileMenu->addAction(newProjectAct);
     fileMenu->addAction(openProjectAct);
     fileMenu->addAction(closeProjectAct);
     fileMenu->addSeparator();
@@ -367,6 +374,20 @@ void MainWindow::fireDocumentSave(IEditor *edit)
     }
 }
 
+void MainWindow::fireProjectClose(IProject *project)
+{
+    activeProject = NULL;
+    int count = editTabWidget->count();
+    while (count--) {
+        QWidget *w = editTabWidget->widget(count);
+        IEditor *ed = editors.value(w,NULL);
+        if (ed && ed->close()) {
+            editTabWidget->removeTab(count);
+            editors.remove(w);
+        }
+    }
+}
+
 void MainWindow::fireProjectChanged(IProject *project)
 {
     activeProject = project;
@@ -555,5 +576,26 @@ void MainWindow::closeProject()
 {
     if (activeProject) {
         activeProject->close();
+    }
+}
+
+void MainWindow::newProject()
+{
+    ProjectWizard wiz(this);
+    QString location = liteApp->settings()->value("PROJECT_LOCATION",qApp->applicationDirPath()).toString();
+    wiz.setField("PROJECT_LOCATION",location);
+    if (wiz.exec() == QDialog::Accepted) {
+        QString location = wiz.field("PROJECT_LOCATION").toString();
+        liteApp->settings()->setValue("PROJECT_LOCATION",location);
+        QMessageBox::StandardButton ret;
+        ret = QMessageBox::question(this, tr("LiteIDE"),
+                                    tr("Project '%1' is created.\n"
+                                       "Do you want to load?")
+                                    .arg(QFileInfo(wiz.projectFileName).baseName()),
+                                    QMessageBox::Yes | QMessageBox::No
+                                    | QMessageBox::Cancel);
+        if (ret == QMessageBox::Yes) {
+            liteApp->loadProject(wiz.projectFileName);
+        }
     }
 }

@@ -25,6 +25,10 @@ void RunTargetApp::runProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
     QString projDir = QFileInfo(proj->filePath()).absolutePath();
+    QStringList dest = proj->values("DESTDIR");
+    if (!dest.isEmpty()) {
+        projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
+    }
     process.setWorkingDirectory(projDir);
     target = QFileInfo(QDir(projDir),target+".exe").absoluteFilePath();
     process.start(target);

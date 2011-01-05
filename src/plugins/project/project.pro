@@ -13,13 +13,11 @@ DESTDIR = $$IDE_PLGUINS_PATH
 DEFINES += PROJECT_LIBRARY
 
 SOURCES += projectplugin.cpp \
-    projectwizard.cpp \
     projectfile.cpp \
     projectmanager.cpp
 
 HEADERS += projectplugin.h\
         project_global.h \
-    projectwizard.h \
     projectfile.h \
     projectmanager.h
 

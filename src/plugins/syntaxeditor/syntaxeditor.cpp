@@ -30,6 +30,13 @@ void SyntaxEditor::reload()
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     setPlainText(codec->toUnicode(file.readAll()));
+    /*
+    QTextCursor cursor(document());
+    cursor.beginEditBlock();
+    cursor.select(QTextCursor::Document);
+    cursor.insertText(codec->toUnicode(file.readAll()));
+    cursor.endEditBlock();
+    */
     QApplication::restoreOverrideCursor();
 }
 
@@ -177,6 +184,7 @@ int SyntaxEditor::editorAreaWidth()
 void SyntaxEditor::areaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(editorArea);
+
     painter.fillRect(event->rect(), Qt::lightGray);//lightGray);
 
 //![extraAreaPaintEvent_0]
@@ -224,6 +232,122 @@ void SyntaxEditor::updateEditorArea(const QRect &rect, int dy)
     else
         editorArea->update(0, rect.y(), editorArea->width(), rect.height());
 
-    if (rect.contains(viewport()->rect()))
+    if (rect.contains(viewport()->rect())) {
         updateAreaWidth(0);
+    }
+}
+
+bool SyntaxEditor::event(QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Return ||
+            keyEvent->key() == Qt::Key_Enter) {
+
+            QTextCursor cursor(this->textCursor());
+
+            cursor.beginEditBlock();
+            int pos = cursor.positionInBlock();
+            QString text = cursor.block().text();
+            int i = 0;
+            int tab = 0;
+            int space = 0;
+            QString inText = "\n";
+            while (i < text.size()) {
+                if (!text.at(i).isSpace())
+                    break;
+                if (text.at(0) == ' ') {
+                    space++;
+                }
+                else if (text.at(0) == '\t') {
+                    inText += "\t";
+                    tab++;
+                }
+                i++;
+            }
+            text.trimmed();
+            if (!text.isEmpty()) {
+                if (pos >= text.size()) {
+                    const QChar ch = text.at(text.size()-1);
+                    if (ch == '{' || ch == '(') {
+                        inText += "\t";
+                    }
+                } else if (pos == text.size()-1 && text.size() >= 3) {
+                    qDebug() << "center";
+                    const QChar l = text.at(text.size()-2);
+                    const QChar r = text.at(text.size()-1);
+                    if ( (l == '{' && r == '}') ||
+                         (l == '(' && r== ')') ) {
+                        cursor.insertText(inText);
+                        int pos = cursor.position();
+                        cursor.insertText(inText);
+                        cursor.setPosition(pos);
+                        this->setTextCursor(cursor);
+                        cursor.insertText("\t");
+                        cursor.endEditBlock();
+                        return true;
+                    }
+                }
+            }
+            cursor.insertText(inText);
+            cursor.endEditBlock();
+            return true;
+        } else if (keyEvent->key() == '(') {
+            QTextCursor cursor(this->textCursor());
+            cursor.insertText("()");
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            setTextCursor(cursor);
+            return true;
+        } else if (keyEvent->key() == '{') {
+            QTextCursor cursor(this->textCursor());
+            cursor.insertText("{}");
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            setTextCursor(cursor);
+            return true;
+        } else if (keyEvent->key() == '\"') {
+            QTextCursor cursor(this->textCursor());
+            cursor.insertText("\"\"");
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            setTextCursor(cursor);
+            return true;
+        } else if (keyEvent->key() == '\`') {
+            QTextCursor cursor(this->textCursor());
+            cursor.insertText("\`\`");
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            setTextCursor(cursor);
+            return true;
+        } else if (keyEvent->key() == '\'') {
+            QTextCursor cursor(this->textCursor());
+            cursor.insertText("\'\'");
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            setTextCursor(cursor);
+            return true;
+        }
+        /*
+        else if (keyEvent->key() == Qt::Key_Tab) {
+            //qDebug() << this->cursorForPosition()
+            QTextCursor cursor(this->textCursor());
+            if (cursor.hasSelection()) {
+                QTextBlock block = document()->findBlock(cursor.selectionStart());
+                const QTextBlock end = document()->findBlock(cursor.selectionEnd()).next();
+                QTextCursor tc = textCursor();
+                tc.beginEditBlock();
+                do {
+                    int indent;
+                    int padding;
+                  //  codeFormatter.indentFor(block, &indent, &padding);
+                  //  ts.indentLine(block, indent + padding, padding);
+                  //  codeFormatter.updateLineStateChange(block);
+                    QTextCursor cur(block);
+                    cur.movePosition(QTextCursor::StartOfLine);//,QTextCursor::KeepAnchor);
+                    cur.insertText("\t");
+                    block = block.next();
+                } while (block.isValid() && block != end);
+                tc.endEditBlock();
+            }
+            return true;
+        }
+        */
+    }
+    return QPlainTextEdit::event(event);
 }
