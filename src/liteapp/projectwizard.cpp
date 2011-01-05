@@ -38,6 +38,7 @@ ProjectInfoPage::ProjectInfoPage(QWidget *parent) :
     model = new QStandardItemModel(this);
     tree = new QTreeView(this);
     tree->setModel(model);
+    tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tree->setHeaderHidden(true);
     //
     QDir dir = QFileInfo(qApp->applicationDirPath(),"template/project").absoluteFilePath();

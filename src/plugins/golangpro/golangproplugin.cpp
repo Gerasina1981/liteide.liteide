@@ -31,7 +31,6 @@ void GolangProPlugin::createOutput()
 void GolangProPlugin::install(IApplication *app)
 {
     liteApp = app;
-    gofmtCmd = liteApp->settings()->value("golangpro/gofmt","c:\\go\\bin\\gofmt.exe").toString();
     createActions();
     createOutput();
  }
@@ -43,12 +42,17 @@ void GolangProPlugin::uninstall()
 
 QString GolangProPlugin::name() const
 {
-    return tr("Golang Project");
+    return "GolangPro";
+}
+
+QString GolangProPlugin::anchor() const
+{
+    return "visualfc";
 }
 
 QString GolangProPlugin::info() const
 {
-    return tr("make by visualfc");
+    return tr("golang pro tools");
 }
 
 
@@ -72,6 +76,6 @@ void GolangProPlugin::gofmt()
     gofmtProcess.disconnect();
     connect(&gofmtProcess,SIGNAL(outputText(QString,bool)),gofmtOutputEdit,SLOT(appendPlainText(QString)));
     connect(&gofmtProcess,SIGNAL(processSuccess()),ed,SLOT(reload()));
-    gofmtProcess.start(tr("gofmt"),gofmtCmd,
+    gofmtProcess.start(tr("gofmt"),"gofmt",
                        QStringList() << "-w=true" << path);
 }

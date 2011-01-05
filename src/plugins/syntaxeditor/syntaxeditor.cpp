@@ -273,7 +273,6 @@ bool SyntaxEditor::event(QEvent *event)
                         inText += "\t";
                     }
                 } else if (pos == text.size()-1 && text.size() >= 3) {
-                    qDebug() << "center";
                     const QChar l = text.at(text.size()-2);
                     const QChar r = text.at(text.size()-1);
                     if ( (l == '{' && r == '}') ||

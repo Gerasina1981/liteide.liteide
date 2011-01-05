@@ -79,18 +79,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createActions()
 {
-    newProjectAct = new QAction(QIcon(":/images/new.png"), tr("&New Project"),this);
-    newProjectAct->setShortcuts(QKeySequence::New);
+    newProjectAct = new QAction(tr("&New Project"),this);
+    newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_N));
     newProjectAct->setStatusTip(tr("Open Project"));
     connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
 
-    openProjectAct = new QAction(QIcon(":/images/open.png"), tr("&Open Project"),this);
-    openProjectAct->setShortcuts(QKeySequence::Open);
+    openProjectAct = new QAction(tr("&Open Project"),this);
+    openProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
     openProjectAct->setStatusTip(tr("Open Project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
-    closeProjectAct = new QAction(QIcon(":/images/close.png"), tr("&Close Project"),this);
-    //closeProjectAct->setShortcuts(QKeySequence::Open);
+    closeProjectAct = new QAction(tr("&Close Project"),this);
+    closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
     closeProjectAct->setStatusTip(tr("Close Project"));
     connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(closeProject()));
 
@@ -122,9 +122,9 @@ void MainWindow::createActions()
 
     buildActGroup = new QActionGroup(this);
 
-    buildProjectAct = new QAction(QIcon(":/images/build.png"),tr("Build Project\tCtrl+B"),this);
+    buildProjectAct = new QAction(QIcon(":/images/build.png"),tr("Build Project"),this);
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    buildProjectAct->setStatusTip(tr("Build Project"));
+    buildProjectAct->setStatusTip(tr("Build Project or File"));
     connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
 
     buildFileAct = new QAction(QIcon(":/images/build.png"),tr("Build File\tCtrl+B"),this);
@@ -139,6 +139,7 @@ void MainWindow::createActions()
 
 
     runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
+    runTargetAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     runTargetAct->setStatusTip(tr("Run project or file"));
     connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
 
@@ -321,7 +322,23 @@ void MainWindow::saveFile()
 
 void MainWindow::newFile()
 {
+    static QString path;
+    QString fileName;
 
+    fileName = QFileDialog::getSaveFileName(this,
+           tr("Save File"), path, liteApp->editorTypeFilter());
+
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+            if (QFileInfo(fileName).suffix() == "go") {
+                file.write("package main");
+            }
+            file.close();
+            path = QFileInfo(fileName).absolutePath();
+            liteApp->loadEditor(fileName);
+        }
+    }
 }
 
 void MainWindow::openProject()
@@ -355,8 +372,11 @@ void MainWindow::openFile()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About LiteIDE"),
-                tr("The <b>LiteIDE</b> lite program editor. "
-                   "<p>Create by <i>visualfc@gmail.com</i>"));
+                tr("<h2 class='title'>LiteIDE </h2>"
+                   "<p>"
+                   "<h3>Anchor:  <b>visualfc@gamil.com</b></h3>"
+                   "<h3>Project: <b>http://code.google.com/p/liteide</b></h3>"
+                   "<h3>Version: <b>1.0 beta1 (2010.1.5)</b></h3>"));
 }
 
 void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
@@ -377,6 +397,7 @@ void MainWindow::fireDocumentSave(IEditor *edit)
 void MainWindow::fireProjectClose(IProject *project)
 {
     activeProject = NULL;
+    setWindowTitle(tr("LiteIDE"));
     int count = editTabWidget->count();
     while (count--) {
         QWidget *w = editTabWidget->widget(count);
@@ -468,7 +489,7 @@ void MainWindow::aboutPlugins()
     AboutPluginsDialog dlg(this);
     dlg.resize(400,300);
     foreach (IPlugin *p, liteApp->plugins) {
-        dlg.addPluginInfo(p->name(),p->info());
+        dlg.addPluginInfo(p->name(),p->anchor(),p->info());
     }
 
     dlg.exec();

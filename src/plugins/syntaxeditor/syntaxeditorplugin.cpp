@@ -138,12 +138,17 @@ SyntaxEditorPlugin::SyntaxEditorPlugin() : liteApp(NULL)
 
 QString SyntaxEditorPlugin::name() const
 {
-    return tr("SyntaxEditor");
+    return "SyntaxEditor";
+}
+
+QString SyntaxEditorPlugin::anchor() const
+{
+    return "visualfc";
 }
 
 QString SyntaxEditorPlugin::info() const
 {
-    return tr("SyntaxEditor 1.0 make by visualfc");
+    return tr("Syntax Editor 1.0");
 }
 
 

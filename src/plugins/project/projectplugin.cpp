@@ -21,12 +21,17 @@ void ProjectPlugin::uninstall()
 
 QString ProjectPlugin::name() const
 {
-    return tr("Project");
+    return "Project";
+}
+
+QString ProjectPlugin::anchor() const
+{
+    return "visualfc";
 }
 
 QString ProjectPlugin::info() const
 {
-    return tr("Project Plugin");
+    return tr("Project Manager 1.0");
 }
 
 Q_EXPORT_PLUGIN(ProjectPlugin)

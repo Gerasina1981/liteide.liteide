@@ -11,6 +11,7 @@ public:
     virtual void install(IApplication *app) = 0;
     virtual void uninstall() = 0;
     virtual QString name() const = 0;
+    virtual QString anchor() const = 0;
     virtual QString info() const = 0;
 };
 

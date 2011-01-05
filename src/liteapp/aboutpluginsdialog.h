@@ -9,7 +9,7 @@ class AboutPluginsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    void addPluginInfo(const QString &name, const QString &info);
+    void addPluginInfo(const QString &name, const QString &anchor, const QString &info);
     explicit AboutPluginsDialog(QWidget *parent = 0);
 
 signals:

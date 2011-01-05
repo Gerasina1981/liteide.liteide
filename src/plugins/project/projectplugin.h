@@ -21,6 +21,7 @@ public:
     virtual void install(IApplication *app);
     virtual void uninstall();
     virtual QString name() const;
+    virtual QString anchor() const;
     virtual QString info() const;
 protected:
      ProjectManager *manager;

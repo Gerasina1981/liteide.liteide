@@ -21,6 +21,7 @@ public:
     virtual void install(IApplication *app);
     virtual void uninstall();
     virtual QString name() const;
+    virtual QString anchor() const;
     virtual QString info() const;
     void createActions();
     void createOutput();
@@ -32,9 +33,6 @@ protected:
     IEditor *curEditor;
     QPlainTextEdit *gofmtOutputEdit;
     QAction *gofmtAct;
-    QString gofmtCmd;
-    QString go8gCmd;
-    QString go8lCmd;
 };
 
 #endif // GOLANGPROPLUGIN_H
