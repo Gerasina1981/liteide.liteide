@@ -241,8 +241,9 @@ bool SyntaxEditor::event(QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Return ||
-            keyEvent->key() == Qt::Key_Enter) {
+        if (this->autoIndent &&
+            ( keyEvent->key() == Qt::Key_Return ||
+              keyEvent->key() == Qt::Key_Enter) ) {
 
             QTextCursor cursor(this->textCursor());
 
@@ -291,31 +292,31 @@ bool SyntaxEditor::event(QEvent *event)
             cursor.insertText(inText);
             cursor.endEditBlock();
             return true;
-        } else if (keyEvent->key() == '(') {
+        } else if (this->autoBlock && keyEvent->key() == '(') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("()");
             cursor.movePosition(QTextCursor::PreviousCharacter);
             setTextCursor(cursor);
             return true;
-        } else if (keyEvent->key() == '{') {
+        } else if (this->autoBlock && keyEvent->key() == '{') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("{}");
             cursor.movePosition(QTextCursor::PreviousCharacter);
             setTextCursor(cursor);
             return true;
-        } else if (keyEvent->key() == '\"') {
+        } else if (this->autoBlock && keyEvent->key() == '\"') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("\"\"");
             cursor.movePosition(QTextCursor::PreviousCharacter);
             setTextCursor(cursor);
             return true;
-        } else if (keyEvent->key() == '\`') {
+        } else if (this->autoBlock && keyEvent->key() == '\`') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("\`\`");
             cursor.movePosition(QTextCursor::PreviousCharacter);
             setTextCursor(cursor);
             return true;
-        } else if (keyEvent->key() == '\'') {
+        } else if (this->autoBlock && keyEvent->key() == '\'') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("\'\'");
             cursor.movePosition(QTextCursor::PreviousCharacter);

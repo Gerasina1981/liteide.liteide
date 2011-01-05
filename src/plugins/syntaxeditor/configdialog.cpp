@@ -68,6 +68,8 @@ void ConfigDialog::load()
     ui->familyComboBox->setCurrentIndex(idx);
 
     updatePointSizes();
+    ui->autoIndentCheckBox->setChecked(this->autoIndent);
+    ui->autoBlockCheckBox->setChecked(this->autoBlock);
 }
 
 void ConfigDialog::save()
@@ -83,4 +85,6 @@ void ConfigDialog::save()
             fontSize = size;
         }
      }
+    this->autoIndent = ui->autoIndentCheckBox->isChecked();
+    this->autoBlock = ui->autoBlockCheckBox->isChecked();
 }

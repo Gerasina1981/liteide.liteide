@@ -102,6 +102,8 @@ void EditorFactoryImpl::config()
     ConfigDialog dlg;
     dlg.fontFamily = editorFont.family();
     dlg.fontSize = editorFont.pointSize();
+    dlg.autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
+    dlg.autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
     dlg.load();
     if (dlg.exec() == QDialog::Accepted) {
         dlg.save();
@@ -109,6 +111,8 @@ void EditorFactoryImpl::config()
         editorFont.setPointSize(dlg.fontSize);
         liteApp->settings()->setValue("editor/family",dlg.fontFamily);
         liteApp->settings()->setValue("editor/fontsize",dlg.fontSize);
+        liteApp->settings()->setValue("editor/autoindent",dlg.autoIndent);
+        liteApp->settings()->setValue("editor/autoblock",dlg.autoBlock);
     }
 }
 
@@ -126,6 +130,9 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
     EditorImpl *impl = new EditorImpl(liteApp,this);
     ed->setFont(editorFont);
     ed->setTabStopWidth(editorFont.pointSize()*4);
+    ed->autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
+    ed->autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
+
     impl->editor = ed;
     impl->event = liteApp->editorEvent();
     QObject::connect(ed,SIGNAL(modificationChanged(bool)),impl,SLOT(modificationChanged(bool)));

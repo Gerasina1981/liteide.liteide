@@ -8,6 +8,8 @@ class SyntaxEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
+    bool autoIndent;
+    bool autoBlock;
     void areaPaintEvent(QPaintEvent *event);
     SyntaxEditor();
     void newFile();

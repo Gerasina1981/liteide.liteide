@@ -20,6 +20,8 @@ public:
     void updatePointSizes();
     QList<int> pointSizesForSelectedFont() const;
 public:
+    bool autoIndent;
+    bool autoBlock;
     int fontSize;
     QString fontFamily;
     int zoomSize;
