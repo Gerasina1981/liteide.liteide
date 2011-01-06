@@ -59,7 +59,7 @@
       <item>
        <widget class="QCheckBox" name="autoBlockCheckBox">
         <property name="text">
-         <string>Eanble {} () &quot;&quot; auto complete</string>
+         <string>Eanble {} auto complete</string>
         </property>
        </widget>
       </item>

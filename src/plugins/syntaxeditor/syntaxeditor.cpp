@@ -292,62 +292,13 @@ bool SyntaxEditor::event(QEvent *event)
             cursor.insertText(inText);
             cursor.endEditBlock();
             return true;
-        } else if (this->autoBlock && keyEvent->key() == '(') {
-            QTextCursor cursor(this->textCursor());
-            cursor.insertText("()");
-            cursor.movePosition(QTextCursor::PreviousCharacter);
-            setTextCursor(cursor);
-            return true;
         } else if (this->autoBlock && keyEvent->key() == '{') {
             QTextCursor cursor(this->textCursor());
             cursor.insertText("{}");
             cursor.movePosition(QTextCursor::PreviousCharacter);
             setTextCursor(cursor);
             return true;
-        } else if (this->autoBlock && keyEvent->key() == '\"') {
-            QTextCursor cursor(this->textCursor());
-            cursor.insertText("\"\"");
-            cursor.movePosition(QTextCursor::PreviousCharacter);
-            setTextCursor(cursor);
-            return true;
-        } else if (this->autoBlock && keyEvent->key() == '\`') {
-            QTextCursor cursor(this->textCursor());
-            cursor.insertText("\`\`");
-            cursor.movePosition(QTextCursor::PreviousCharacter);
-            setTextCursor(cursor);
-            return true;
-        } else if (this->autoBlock && keyEvent->key() == '\'') {
-            QTextCursor cursor(this->textCursor());
-            cursor.insertText("\'\'");
-            cursor.movePosition(QTextCursor::PreviousCharacter);
-            setTextCursor(cursor);
-            return true;
         }
-        /*
-        else if (keyEvent->key() == Qt::Key_Tab) {
-            //qDebug() << this->cursorForPosition()
-            QTextCursor cursor(this->textCursor());
-            if (cursor.hasSelection()) {
-                QTextBlock block = document()->findBlock(cursor.selectionStart());
-                const QTextBlock end = document()->findBlock(cursor.selectionEnd()).next();
-                QTextCursor tc = textCursor();
-                tc.beginEditBlock();
-                do {
-                    int indent;
-                    int padding;
-                  //  codeFormatter.indentFor(block, &indent, &padding);
-                  //  ts.indentLine(block, indent + padding, padding);
-                  //  codeFormatter.updateLineStateChange(block);
-                    QTextCursor cur(block);
-                    cur.movePosition(QTextCursor::StartOfLine);//,QTextCursor::KeepAnchor);
-                    cur.insertText("\t");
-                    block = block.next();
-                } while (block.isValid() && block != end);
-                tc.endEditBlock();
-            }
-            return true;
-        }
-        */
     }
     return QPlainTextEdit::event(event);
 }
