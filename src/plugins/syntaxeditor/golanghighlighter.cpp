@@ -20,12 +20,12 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     HighlightingRule rule;
     //keyword
     rule.pattern = QRegExp("\\b"
-                           "break|default|func|interface|select|"
+                           "(break|default|func|interface|select|"
                            "case|defer|go|map|struct|"
                            "chan|else|goto|package|struct|"
                            "const|fallthrough|if|range|byte|"
                            "continue|for|import|return|var|"
-                           "nil"
+                           "nil)"
                            "\\b");
     rule.format = keywordFormat;
     highlightingRules.append(rule);

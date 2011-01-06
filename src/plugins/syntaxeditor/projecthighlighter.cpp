@@ -8,7 +8,7 @@ ProjectHighlighter::ProjectHighlighter(QTextDocument *document) :
     HighlightingRule rule;
     //keyword
     rule.pattern = QRegExp("\\b"
-                           "TARGET|DESTDIR|PACKAGE"
+                           "(TARGET|DESTDIR|PACKAGE)"
                            "\\b");
     rule.format = keywordFormat;
     highlightingRules.append(rule);
