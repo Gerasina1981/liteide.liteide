@@ -5,19 +5,24 @@
 #include <QHash>
 #include <QTextCharFormat>
 
-QT_BEGIN_NAMESPACE
 class QTextDocument;
-QT_END_NAMESPACE
 
-class GolangHighlighter : public QSyntaxHighlighter
+class GolangHighlighter: public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
-    GolangHighlighter(QTextDocument *parent = 0);
-
+    GolangHighlighter(QTextDocument* document);
 protected:
-    void highlightBlock(const QString &text);
-
+    enum
+    {
+        STATE_QUOTES = 0x02,
+        STATE_BACKQUOTES = 0x04,
+        STATE_SINGLELINE_COMMENT = 0x08,
+        STATE_MULTILINE_COMMENT = 0x10
+    };
+    virtual void highlightBlock(const QString &text);
+    bool highlightPreBlock(const QString &text, int &startPos, int &endPos);
+    int findQuotesEndPos(const QString &text, int startPos, const QChar &endChar);
 private:
     struct HighlightingRule
     {
@@ -25,17 +30,14 @@ private:
         QTextCharFormat format;
     };
     QVector<HighlightingRule> highlightingRules;
-
-    QRegExp commentStartExpression;
-    QRegExp commentEndExpression;
-    QRegExp singleLineCommentExpression;
-
-    QTextCharFormat keywordFormat;
-    QTextCharFormat classFormat;
+    QRegExp         regexpQuotesAndComment;
+    QTextCharFormat functionFormat;
     QTextCharFormat singleLineCommentFormat;
     QTextCharFormat multiLineCommentFormat;
-    QTextCharFormat quotationFormat;
-    QTextCharFormat functionFormat;
+    QTextCharFormat keywordFormat;
+    QTextCharFormat numberFormat;
+    QTextCharFormat quotesFormat;
 };
+
 
 #endif // GOLANGHIGHLIGHTER_H

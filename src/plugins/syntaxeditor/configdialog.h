@@ -24,7 +24,6 @@ public:
     bool autoBlock;
     int fontSize;
     QString fontFamily;
-    int zoomSize;
 private:
     Ui::ConfigDialog *ui;
 };

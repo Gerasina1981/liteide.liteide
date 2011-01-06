@@ -16,6 +16,7 @@ SOURCES += syntaxeditorplugin.cpp \
     syntaxeditor.cpp \
     golanghighlighter.cpp \
     configdialog.cpp
+
 HEADERS += syntaxeditorplugin.h \
     syntaxeditor_global.h \
     syntaxeditor.h \

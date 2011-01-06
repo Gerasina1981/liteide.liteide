@@ -1,141 +1,173 @@
 #include "golanghighlighter.h"
 #include <QDebug>
 
-GolangHighlighter::GolangHighlighter(QTextDocument *parent)
-    : QSyntaxHighlighter(parent)
+GolangHighlighter::GolangHighlighter(QTextDocument* document):
+    QSyntaxHighlighter(document)
 {
-    HighlightingRule rule;
-
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bbreak\\b" << "\\bdefault\\b" << "\\bfunc\\b" << "\\binterface\\b" << "\\bselect\\b"
-                    << "\\bcase\\b"   << "\\bdefer\\b" << "\\bgo\\b" << "\\bmap\\b" << "\\bstruct\\b"
-                    << "\\bchan\\b" << "\\belse\\b"   << "\\bgoto\\b" << "\\bpackage\\b" << "\\bswitch\\b"
-                    << "\\bconst\\b" << "\\bfallthrough\\b" << "\\bif\\b" << "\\brange\\b" << "\\btype\\b"
-                    << "\\bcontinue\\b" << "\\bfor\\b" << "\\bimport\\b" << "\\breturn\\b" << "\\bvar\\b"
-                    << "\\bnil\\b";
-    foreach (const QString &pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
-//! [0] //! [1]
-    }
-//! [1]
 
-//! [2]
-    classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(Qt::darkMagenta);
-    rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-//! [2]
-
-//! [3]
-    singleLineCommentFormat.setForeground(Qt::red);
-    singleLineCommentExpression = QRegExp("//[^\n]*");
-    /*
-    rule.pattern = QRegExp("//[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-    */
-    multiLineCommentFormat.setForeground(Qt::red);
-//! [3]
-
-//! [4]
-    quotationFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-//! [4]
-
-//! [5]
-    //functionFormat.setFontItalic(true);
     functionFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_.]+(?=\\()");
+
+    numberFormat.setForeground(Qt::darkMagenta);
+
+    quotesFormat.setForeground(Qt::darkGreen);
+
+    singleLineCommentFormat.setForeground(Qt::red);
+    multiLineCommentFormat.setForeground(Qt::red);
+
+
+    HighlightingRule rule;
+    rule.pattern = QRegExp("\\b"
+                           "break|default|func|interface|select|"
+                           "case|defer|go|map|struct|"
+                           "chan|else|goto|package|struct|"
+                           "const|fallthrough|if|range|byte|"
+                           "continue|for|import|return|var|"
+                           "nil"
+                           "\\b");
+    rule.format = keywordFormat;
+    highlightingRules.append(rule);
+
+    rule.pattern = QRegExp("(\\b|\\.)([0-9]+|0[xX][0-9a-fA-F]+|0[0-7]+)(\\.[0-9]+)?([eE][+-]?[0-9]+i?)?\\b");
+    rule.format = numberFormat;
+
+    highlightingRules.push_back(rule);
+
+
+    highlightingRules.push_back(rule);
+
+    rule.pattern = QRegExp("\\b[a-zA-Z_][a-zA-Z0-9_]+\\s*(?=\\()");
     rule.format = functionFormat;
 
-    highlightingRules.append(rule);
-//! [5]
+    highlightingRules.push_back(rule);
 
-//! [6]
-    commentStartExpression = QRegExp("/\\*");
-    commentEndExpression = QRegExp("\\*/");
+    regexpQuotesAndComment = QRegExp("//|\\\"|'|`|/\\*");
 }
-//! [6]
 
-//! [7]
+
+bool GolangHighlighter::highlightPreBlock(QString const& text, int& startPos, int& endPos)
+{
+    int state = previousBlockState();
+
+    if (state == -1)
+        state = 0;
+
+    if ((state & STATE_QUOTES) || (state & STATE_BACKQUOTES)) {
+        endPos = findQuotesEndPos(text, startPos, (state&STATE_BACKQUOTES) ? '`':'"');
+        if (endPos == -1) {
+            setFormat(0, text.length(), quotesFormat);
+            setCurrentBlockState(STATE_QUOTES);
+            return true;
+        } else {
+            endPos += 1;
+            setFormat(0, endPos - startPos, quotesFormat);
+            startPos = endPos;
+        }
+    } else if (state & STATE_MULTILINE_COMMENT) {
+        endPos = text.indexOf("*/", startPos);
+        if (endPos == -1) {
+            setFormat(0, text.length(), multiLineCommentFormat);
+            setCurrentBlockState(previousBlockState());
+            return true;
+        } else {
+            endPos += 2;
+            setFormat(0, endPos - startPos, multiLineCommentFormat);
+            startPos = endPos;
+        }
+    } else if (state & STATE_SINGLELINE_COMMENT) {
+        setFormat(0, text.length(), singleLineCommentFormat);
+        if (text.endsWith("\\")) {
+            setCurrentBlockState(STATE_SINGLELINE_COMMENT);
+        }
+        return true;
+    }
+    return false;
+}
+
 void GolangHighlighter::highlightBlock(const QString &text)
 {
-    foreach (const HighlightingRule &rule, highlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
-        }
-    }
+    int startPos = 0;
+    int endPos = text.length();
 
     setCurrentBlockState(0);
 
-    int singleIndex = singleLineCommentExpression.indexIn(text);
-    if (singleIndex >= 0 && previousBlockState() <= 0) {
-        int index = 0;
-        while (singleIndex >= 0 && previousBlockState() <= 0) {
-            int startIndex = commentStartExpression.indexIn(text,index);
-            int endIndex = commentEndExpression.indexIn(text, startIndex);
-            int length = 0;
-            bool bformat = false;
-            if (startIndex < 0 ) {
-                bformat = true;
-            } else if (startIndex >= 0 && singleIndex < startIndex) {
-                bformat = true;
-            } else if (startIndex >=0 && endIndex>= 0 &&
-                       singleIndex > endIndex ) {
-                bformat = true;
-            }
-            if (startIndex >=0 && endIndex >= 0) {
-                setFormat(startIndex, endIndex-startIndex+commentEndExpression.matchedLength(), multiLineCommentFormat);
-            }
-
-            if (bformat) {
-                length = singleLineCommentExpression.matchedLength();
-                setFormat(singleIndex, length, singleLineCommentFormat);
-            } else if (endIndex >= 0) {
-                length = commentEndExpression.matchedLength();
-            } else if (startIndex >= 0) {
-                length = commentStartExpression.matchedLength();
-            }
-            index = singleIndex + length;
-            singleIndex = singleLineCommentExpression.indexIn(text,index);
-        }
+    if (highlightPreBlock(text, startPos, endPos)) {
         return;
     }
 
-//! [7] //! [8]
-//! [8]
-
-//! [9]
-
-    int startIndex = 0;
-    if (previousBlockState() != 1) {
-         startIndex = commentStartExpression.indexIn(text);
-    }
-
-//! [9] //! [10]
-    while (startIndex >= 0) {
-//! [10] //! [11]
-        int endIndex = commentEndExpression.indexIn(text, startIndex);
-        int commentLength;
-        if (endIndex == -1) {
-            setCurrentBlockState(1);
-            commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex
-                            + commentEndExpression.matchedLength();
+    //keyword and func
+    foreach (const HighlightingRule &rule, highlightingRules) {
+        QRegExp expression(rule.pattern);
+        int index = expression.indexIn(text,startPos);
+        while (index >= 0) {
+            int length = expression.matchedLength();
+            setFormat(index, length, rule.format);
+            index = expression.indexIn(text, startPos+index + length);
         }
-        setFormat(startIndex, commentLength, multiLineCommentFormat);
-        startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
+
+    //quote and comment
+    while (true)
+    {
+        startPos = text.indexOf(regexpQuotesAndComment, startPos);
+        if (startPos == -1)
+            break;
+
+        QString cap = regexpQuotesAndComment.cap();
+        if ((cap == "\"") || (cap == "'") || (cap == "`"))
+        {
+            endPos = findQuotesEndPos(text, startPos + 1, cap.at(0));
+            if (endPos == -1)
+            {
+                //multiline
+                setFormat(startPos, text.length() - startPos, quotesFormat);
+                setCurrentBlockState(cap.at(0) == QChar('`')? STATE_BACKQUOTES : STATE_QUOTES );
+                return;
+            }
+            else
+            {
+                endPos += 1;
+                setFormat(startPos, endPos - startPos, quotesFormat);
+                startPos = endPos;
+            }
+        }
+        else if (cap == "//")
+        {
+            setFormat(startPos, text.length() - startPos, singleLineCommentFormat);
+            if (text.endsWith("\\"))
+                setCurrentBlockState(STATE_SINGLELINE_COMMENT);
+            return;
+        }
+        else if (cap == "/*")
+        {
+            endPos = text.indexOf("*/", startPos+2);
+            if (endPos == -1)
+            {
+                //miltiline
+                setFormat(startPos, text.length() - startPos, multiLineCommentFormat);
+                setCurrentBlockState(STATE_MULTILINE_COMMENT);
+                return;
+            }
+            else
+            {
+                endPos += 2;
+                setFormat(startPos, endPos - startPos, multiLineCommentFormat);
+                startPos = endPos;
+            }
+        }
+    }
+}
+
+int GolangHighlighter::findQuotesEndPos(const QString &text, int startPos, const QChar &endChar)
+{
+    for (int pos = startPos; pos < text.length(); pos++)
+    {        
+        if (text.at(pos) == endChar) {
+            return pos;
+        } else if (text.at(pos) == QChar('\\') && endChar != QChar('`')) {
+            ++pos;
+        }
+    }
+    return -1;
 }
