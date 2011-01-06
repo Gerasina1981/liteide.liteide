@@ -15,13 +15,15 @@ DEFINES += SYNTAXEDITOR_LIBRARY
 SOURCES += syntaxeditorplugin.cpp \
     syntaxeditor.cpp \
     golanghighlighter.cpp \
-    configdialog.cpp
+    configdialog.cpp \
+    projecthighlighter.cpp
 
 HEADERS += syntaxeditorplugin.h \
     syntaxeditor_global.h \
     syntaxeditor.h \
     golanghighlighter.h \
-    configdialog.h
+    configdialog.h \
+    projecthighlighter.h
 
 INSTALLS += target
 

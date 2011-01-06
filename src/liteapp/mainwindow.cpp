@@ -374,15 +374,16 @@ void MainWindow::openFile()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About LiteIDE"),
-                tr("<h3 class='title'>LiteIDE </h3>"
+     QMessageBox::about(this, tr("About LiteIDE"),
+                QString(tr("<h1 class='title'>LiteIDE </h1>"
+                   "<p>Open Source Editor - Copyright (C)2011</p>"
                    "<p></p>"
                    "<table border=0>"
-                   "<tr><td>Anchor</td><td>visualfc</td></tr>"
-                   "<tr><td>Project</td><td>http://code.google.com/p/liteide</td></tr>"
-                   "<tr><td>Version</td><td>1.0 beta1</td></tr>"
-                   "<tr><td>Build Time </td><td>2011.1.5</td></tr>"
-                   "</table>"));
+                   "<tr><td>Devoloper:    </td><td>visualfc (visualfc@gmail.com)</td></tr>"
+                   "<tr><td>Project:</td><td>http://code.google.com/p/liteide</td></tr>"
+                   "<tr><td>Version:</td><td>0.1</td></tr>"
+                   "<tr><td>Build Time:</td><td>%1</td></tr>"
+                   "</table>").arg(__DATE__)));
 }
 
 void MainWindow::fireDocumentChanged(IEditor *edit, bool b)

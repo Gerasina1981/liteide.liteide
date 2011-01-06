@@ -2,7 +2,7 @@
 #define GOLANGHIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
-#include <QHash>
+#include <QVector>
 #include <QTextCharFormat>
 
 class QTextDocument;

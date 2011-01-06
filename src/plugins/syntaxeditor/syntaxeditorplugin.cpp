@@ -1,5 +1,6 @@
 #include "syntaxeditorplugin.h"
 #include "golanghighlighter.h"
+#include "projecthighlighter.h"
 #include "configdialog.h"
 
 #include <QFileInfo>
@@ -126,6 +127,8 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
     QString ext = QFileInfo(fileName).suffix();
     if (ext.toLower() == "go") {
         new GolangHighlighter(ed->document());
+    } else if (ext.toLower() == "pro") {
+        new ProjectHighlighter(ed->document());
     }
     EditorImpl *impl = new EditorImpl(liteApp,this);
     ed->setFont(editorFont);

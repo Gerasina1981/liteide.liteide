@@ -7,11 +7,10 @@ go语言开发工具
 *) 项目管理
 *) 支持.pro项目编译
 *) 支持无项目单独文件编译
-*) 支持项目/文件拖拽操作
 *) gopromake编译工具
 
-作者邮件  visualfc@gamil.com
-项目主项 http://code.google.com/p/liteide
+开发者:    visualfc (visualfc@gamil.com)
+项目主页: http://code.google.com/p/liteide
 
 需要设置的go编译环境变量：
 set path=%path%;c:\go\bin

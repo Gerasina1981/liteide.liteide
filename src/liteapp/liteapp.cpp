@@ -173,14 +173,22 @@ IEditor *LiteApp::loadEditor(const QString &fileName)
     }
 
     QString fileExt = QFileInfo(fileName).suffix();
-    foreach(IEditorFactory *factory, editorFactorys) {
-        if (factory->fileTypes().contains(fileExt)) {
-            IEditor *ed = factory->create(fileName);
-            if (ed) {
-                mainWindow->addEditor(ed);
-                return ed;
-            }
+    if (editorFactorys.isEmpty()) {
+        return NULL;
+    }
+    IEditorFactory *factory = editorFactorys.at(0);
+    QListIterator<IEditorFactory*> i(editorFactorys);
+    while (i.hasNext()) {
+        IEditorFactory *v = i.next();
+        if (v->fileTypes().contains(fileExt)) {
+            factory = v;
+            break;
         }
+    }
+    IEditor *ed = factory->create(fileName);
+    if (ed) {
+        mainWindow->addEditor(ed);
+        return ed;
     }
     return NULL;
 }

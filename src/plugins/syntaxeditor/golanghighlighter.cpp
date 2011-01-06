@@ -18,6 +18,7 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
 
 
     HighlightingRule rule;
+    //keyword
     rule.pattern = QRegExp("\\b"
                            "break|default|func|interface|select|"
                            "case|defer|go|map|struct|"
@@ -29,19 +30,19 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     rule.format = keywordFormat;
     highlightingRules.append(rule);
 
+    //number
     rule.pattern = QRegExp("(\\b|\\.)([0-9]+|0[xX][0-9a-fA-F]+|0[0-7]+)(\\.[0-9]+)?([eE][+-]?[0-9]+i?)?\\b");
     rule.format = numberFormat;
 
     highlightingRules.push_back(rule);
 
-
-    highlightingRules.push_back(rule);
-
+    //function
     rule.pattern = QRegExp("\\b[a-zA-Z_][a-zA-Z0-9_]+\\s*(?=\\()");
     rule.format = functionFormat;
 
     highlightingRules.push_back(rule);
 
+    //quotes and comment
     regexpQuotesAndComment = QRegExp("//|\\\"|'|`|/\\*");
 }
 

@@ -7,11 +7,10 @@ golang developer editor
 *) Project Manager
 *) Project Build and run
 *) No project, file build and run
-*) Drop file and open(.pro .go)
 *) gopromake tools
 
-Anchor  visualfc@gamil.com
-Project http://code.google.com/p/liteide
+Developer:  visualfc (visualfc@gamil.com)
+Project : 	   http://code.google.com/p/liteide
 
 usage:
 set path=%path%;c:\go\bin
