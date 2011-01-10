@@ -15,9 +15,10 @@ var gcFileName *string = flag.String("gc", "8g", "golang gc compiler 8g[6g][5g] 
 var glFileName *string = flag.String("gl", "8l", "golang linker 8l[6l][5l] filepath")
 var arFileName *string = flag.String("ar", "gopack", "golang ar tool gopack filepath")
 var cgoFileName *string = flag.String("cgo", "cgo", "golang call C cgo filepath")
-var proFileName *string = flag.String("p", "", "build golang project file example.pro")
-var goFileName *string = flag.String("f", "", "build golang source file example.go")
-var printDep *bool = flag.Bool("dep", true, "print all files depends pakckage")
+var proFileName *string = flag.String("gopro", "", "build go project file : -pro example.pro")
+var goFileName *string = flag.String("gofiles", "", "build go source files : -file \"go1.go go2.go\"")
+var goTargetName *string = flag.String("out", "", "output execute target name")
+var printDep *bool = flag.Bool("showdep", false, "print all files depends package")
 
 type Gopro struct {
 	Name   string
@@ -98,6 +99,9 @@ func (file *Gopro) TargetName() string {
 	v := file.Values["TARGET"]
 	if len(v) >= 1 {
 		return string(v[0])
+	}
+	if len(file.Name) == 0 {
+		return "main"
 	}
 	ext := path.Ext(file.Name)
 	name := path.Base(file.Name)
@@ -246,43 +250,54 @@ func (file *Gopro) MakeTarget(gcfile, glfile, pkfile string) (status syscall.Wai
 	return
 }
 
+var Usage = func() {
+    fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+    flag.PrintDefaults()
+}
+
 func main() {
-	fmt.Printf("Gopro : golan .pro file build tools. make by visualfc.\n\n")
+	fmt.Println("\nGoproMake : go files auto build tools. make by visualfc@gmail.com.")
 	flag.Parse()
 	gcfile := *gcFileName
 	glfile := *glFileName
 	pkfile := *arFileName
+	var pro *Gopro;
+	var err os.Error;
 	if len(*proFileName) > 0 {
-		file, _ := makePro(*proFileName)
-		if file == nil {
-			flag.Usage()
-			return
-		}
-
-		if file.IsEmpty() {
-			fmt.Printf("Error load .pro file %s\n", *proFileName)
-			os.Exit(1)
-		}
-		files := file.Gofiles()
-		file.array = ParserFiles(files)
-		
-		if (printDep != nil && *printDep == true) {
-			fmt.Printf("AllPackage:\n%s\n",file.array)
-		}
-
-		status, err := file.MakeTarget(gcfile, glfile, pkfile)
-		if err != nil || status.ExitStatus() != 0 {
-			fmt.Printf("Error and exit!\n")
-			os.Exit(1)
+		pro,err = makePro(*proFileName)	
+		if err != nil{
+			fmt.Printf("Error %s",err)
 		}
 	} else if len(*goFileName) > 0 {
-		status, err := MakeFile(gcfile, glfile, *goFileName)
-		if err != nil || status.ExitStatus() != 0 {
-			fmt.Printf("Error and exit!\n")
-			os.Exit(1)
+		var input []byte = []byte(*goFileName)
+		all := bytes.SplitAfter(input, []byte(" "), -1)	
+		pro = new(Gopro)	
+		pro.Values = make(map[string][]string)	
+		
+		for _,v := range all {
+			pro.Values["GOFILES"] = append(pro.Values["GOFILES"],string(v))
 		}
-	} else {
-		flag.Usage()
+	}
+	if pro == nil || err != nil{
+		Usage()
+		os.Exit(1)
+	}
+	
+	if goTargetName != nil && len(*goTargetName) > 1 {
+		pro.Name = *goTargetName
+	}
+	
+	files := pro.Gofiles()
+	pro.array = ParserFiles(files)
+				
+	if (printDep != nil && *printDep == true) {
+		fmt.Printf("AllPackage:\n%s\n",pro.array)
+	}
+
+	status, err := pro.MakeTarget(gcfile, glfile, pkfile)
+	if err != nil || status.ExitStatus() != 0 {
+		fmt.Printf("Error and exit!\n")
+		os.Exit(1)
 	}
 	os.Exit(0)
 }

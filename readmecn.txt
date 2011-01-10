@@ -22,7 +22,7 @@ FAQ:
 
 2.项目文件编写举例
 TARGET=cat
-
+DESTDIR=./bin
 GOFILES = \
 	file.go \
 	cat.go

@@ -23,7 +23,7 @@ FAQ:
 2. Project Editor
 
 TARGET=cat
-
+DESTDIR=./bin
 GOFILES = \
 	file.go \
 	cat.go
