@@ -15,12 +15,14 @@ SOURCES += main.cpp \
     liteapp.cpp \
     mainwindow.cpp \
     aboutpluginsdialog.cpp \
-    projectwizard.cpp
+    projectwizard.cpp \
+    finddialog.cpp
 
 HEADERS += liteapp.h \
     mainwindow.h \
     aboutpluginsdialog.h \
-    projectwizard.h
+    projectwizard.h \
+    finddialog.h
 
 RESOURCES += liteapp.qrc
 

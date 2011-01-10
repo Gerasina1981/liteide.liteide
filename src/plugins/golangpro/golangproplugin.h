@@ -6,6 +6,7 @@
 #include "../../api/iapp.h"
 #include "../../api/ieditor.h"
 #include "../../util/processoutput.h"
+#include "buildgolang.h"
 
 #include <QObject>
 #include <QtPlugin>
@@ -17,22 +18,22 @@ class GOLANGPROSHARED_EXPORT GolangProPlugin : public QObject, public IPlugin
     Q_OBJECT
     Q_INTERFACES(IPlugin)
 public:
+    void createGofmt();
     GolangProPlugin();
+    virtual ~GolangProPlugin();
     virtual void install(IApplication *app);
     virtual void uninstall();
     virtual QString name() const;
     virtual QString anchor() const;
     virtual QString info() const;
-    void createActions();
-    void createOutput();
-private slots:
-    void gofmt();
-protected:
+private:
     IApplication *liteApp;
+    BuildGolang *build;
     ProcessOutput gofmtProcess;
-    IEditor *curEditor;
     QPlainTextEdit *gofmtOutputEdit;
     QAction *gofmtAct;
+private slots:
+    void gofmt();
 };
 
 #endif // GOLANGPROPLUGIN_H

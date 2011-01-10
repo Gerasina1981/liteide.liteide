@@ -12,6 +12,7 @@
 class LiteApp;
 class QPlainTextEdit;
 class QActionGroup;
+class FindDialog;
 class MainWindow : public QMainWindow,
         public IEditorEvent,
         public IProjectEvent,
@@ -36,6 +37,11 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void findText(const QString&,QTextDocument::FindFlags);
+    void find();
+    void closeAllFile();
+    void saveAllFile();
+    void outputTabChanged(int index);
     void newProject();
     void closeProject();
     void buildFile();
@@ -87,6 +93,11 @@ private:
     QAction *openFileAct;
     QAction *saveFileAct;
     QAction *closeFileAct;
+    QAction *saveAllFileAct;
+    QAction *closeAllFileAct;
+
+    QAction *findAct;
+
     QAction *undoAct;
     QAction *redoAct;
 
@@ -105,6 +116,8 @@ private:
     QPlainTextEdit   *buildOutputEdit;
     QPlainTextEdit   *runTargetOutputEdit;
 
+    FindDialog *findDialog;
+
     IEditor *activeEditor;
     IProject *activeProject;
     IBuild   *activeBuild;
@@ -112,7 +125,6 @@ private:
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
 public slots:
-    void saveAll();
     void selectBuild();
 };
 

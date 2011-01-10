@@ -23,13 +23,15 @@
 #include <QTextCodec>
 #include <QPlainTextEdit>
 #include <QUrl>
+#include <finddialog.h>
 
 MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
         activeEditor(NULL),
         activeProject(NULL),
         activeBuild(NULL),
-        activeRunTarget(NULL)
+        activeRunTarget(NULL),
+        findDialog(NULL)
 {
     this->setWindowTitle("LiteIDE");
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -108,10 +110,26 @@ void MainWindow::createActions()
     saveFileAct->setStatusTip(tr("Save file"));
     connect(saveFileAct, SIGNAL(triggered()), this, SLOT(saveFile()));
 
+    saveAllFileAct = new QAction(tr("Save All"), this);
+    saveAllFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+    saveAllFileAct->setStatusTip(tr("Save All Files"));
+    connect(saveAllFileAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
+
+    closeAllFileAct = new QAction(tr("Close All"), this);
+    closeAllFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+    closeAllFileAct->setStatusTip(tr("Close All Files"));
+    connect(closeAllFileAct, SIGNAL(triggered()), this, SLOT(closeAllFile()));
+
     openFileAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
     openFileAct->setShortcuts(QKeySequence::Open);
     openFileAct->setStatusTip(tr("Open file"));
     connect(openFileAct, SIGNAL(triggered()), this, SLOT(openFile()));
+
+
+    findAct = new QAction(tr("&Find"), this);
+    findAct->setShortcuts(QKeySequence::Find);
+    findAct->setStatusTip(tr("Find Text"));
+    connect(findAct,SIGNAL(triggered()),this,SLOT(find()));
 
     undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
     undoAct->setShortcuts(QKeySequence::Undo);
@@ -174,8 +192,11 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
 
     fileMenu->addAction(newFileAct);
-    fileMenu->addAction(saveFileAct);
     fileMenu->addAction(openFileAct);
+    fileMenu->addAction(saveFileAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(saveAllFileAct);
+    fileMenu->addAction(closeAllFileAct);
     fileMenu->addSeparator();
     fileMenu->addAction(quitAct);
 
@@ -183,6 +204,8 @@ void MainWindow::createMenus()
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(undoAct);
     editMenu->addAction(redoAct);
+    editMenu->addSeparator();
+    editMenu->addAction(findAct);
 
     viewMenu = menuBar()->addMenu(tr("&View"));
 
@@ -297,6 +320,7 @@ void MainWindow::createDockWindows()
 void MainWindow::createOutputWidget()
 {
     outputDock = new QDockWidget(tr("Output"), this);
+
     outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     outputDock->setFeatures(QDockWidget::DockWidgetClosable);
     viewMenu->addAction(outputDock->toggleViewAction());
@@ -314,6 +338,8 @@ void MainWindow::createOutputWidget()
     outputTabWidget->addTab(runTargetOutputEdit,tr("Application Output"));
 
     outputDock->setWidget(outputTabWidget);
+
+    connect(outputTabWidget,SIGNAL(currentChanged(int)),this,SLOT(outputTabChanged(int)));
 }
 
 void MainWindow::saveFile()
@@ -405,15 +431,7 @@ void MainWindow::fireProjectClose(IProject *project)
 {
     activeProject = NULL;
     setWindowTitle(tr("LiteIDE"));
-    int count = editTabWidget->count();
-    while (count--) {
-        QWidget *w = editTabWidget->widget(count);
-        IEditor *ed = editors.value(w,NULL);
-        if (ed && ed->close()) {
-            editTabWidget->removeTab(count);
-            editors.remove(w);
-        }
-    }
+    closeAllFile();
 }
 
 void MainWindow::fireProjectChanged(IProject *project)
@@ -494,7 +512,7 @@ void MainWindow::fireRunTargetOutput(const QByteArray &text, bool stdError)
 void MainWindow::aboutPlugins()
 {
     AboutPluginsDialog dlg(this);
-    dlg.resize(400,300);
+    dlg.resize(450,300);
     foreach (IPlugin *p, liteApp->plugins) {
         dlg.addPluginInfo(p->name(),p->anchor(),p->info());
     }
@@ -522,7 +540,7 @@ void MainWindow::buildProject()
         return;
     }
 
-    saveAll();
+    saveAllFile();
 
     buildOutputEdit->moveCursor(QTextCursor::End);
 
@@ -556,7 +574,7 @@ void MainWindow::runTarget()
     }
 }
 
-void MainWindow::saveAll()
+void MainWindow::saveAllFile()
 {
     foreach(IEditor *ed, editors) {
         ed->save();
@@ -611,7 +629,7 @@ void MainWindow::newProject()
 {
     ProjectWizard wiz(this);
     QString location = liteApp->settings()->value("PROJECT_LOCATION",qApp->applicationDirPath()).toString();
-    wiz.setField("PROJECT_LOCATION",location);
+    wiz.setField("PROJECT_LOCATION",QDir::toNativeSeparators(location));
     if (wiz.exec() == QDialog::Accepted) {
         QString location = wiz.field("PROJECT_LOCATION").toString();
         liteApp->settings()->setValue("PROJECT_LOCATION",location);
@@ -624,6 +642,49 @@ void MainWindow::newProject()
                                     | QMessageBox::Cancel);
         if (ret == QMessageBox::Yes) {
             liteApp->loadProject(wiz.projectFileName);
+        }
+    }
+}
+
+void MainWindow::outputTabChanged(int index)
+{
+//    QString text = outputTabWidget->tabText(index);
+//    outputDock->setWindowTitle(QString(tr("Output - %1")).arg(text));
+}
+
+void MainWindow::closeAllFile()
+{
+    int count = editTabWidget->count();
+    while (count--) {
+        QWidget *w = editTabWidget->widget(count);
+        IEditor *ed = editors.value(w,NULL);
+        if (ed && ed->close()) {
+            editTabWidget->removeTab(count);
+            editors.remove(w);
+        }
+    }
+}
+
+void MainWindow::find()
+{
+    if (!activeEditor)
+        return;
+
+    if (!findDialog) {
+        findDialog = new FindDialog(this);
+        connect(findDialog,SIGNAL(findText(QString,QTextDocument::FindFlags)),this,SLOT(findText(QString,QTextDocument::FindFlags)));
+    }
+    findDialog->show();
+    findDialog->raise();
+    findDialog->activateWindow();
+}
+
+void MainWindow::findText(const QString& text,QTextDocument::FindFlags flags)
+{
+    if (activeEditor) {
+        QPlainTextEdit*ed = qobject_cast<QPlainTextEdit*>(activeEditor->widget());
+        if (ed) {
+            ed->find(text,flags);
         }
     }
 }

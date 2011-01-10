@@ -92,7 +92,7 @@ void ProjectInfoPage::browseLocation()
 {
     QString location = QFileDialog::getExistingDirectory(this);
     if (!location.isEmpty()) {
-        locationLineEdit->setText(location);
+        locationLineEdit->setText(QDir::toNativeSeparators(location));
     }
 }
 

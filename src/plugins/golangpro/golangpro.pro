@@ -14,9 +14,11 @@ DESTDIR = $$IDE_PLGUINS_PATH
 
 DEFINES += GOLANGPRO_LIBRARY
 
-SOURCES += golangproplugin.cpp
+SOURCES += golangproplugin.cpp \
+    buildgolang.cpp
 
 HEADERS += golangproplugin.h\
-        golangpro_global.h
+        golangpro_global.h \
+    buildgolang.h
 
 INSTALLS += target

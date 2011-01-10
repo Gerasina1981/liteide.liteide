@@ -6,34 +6,26 @@
 #include <QPlainTextEdit>
 #include <QTextCodec>
 
-GolangProPlugin::GolangProPlugin()
+GolangProPlugin::GolangProPlugin() : build(NULL)
 {
 }
 
-void GolangProPlugin::createActions()
+GolangProPlugin::~GolangProPlugin()
 {
-    gofmtAct = new QAction(tr("gofmt\tAlt+F8"),this);
-    gofmtAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F8));
-    gofmtAct->setStatusTip(tr("Format go file"));
-
-    connect(gofmtAct,SIGNAL(triggered()),this,SLOT(gofmt()));
-    liteApp->toolMenu()->addAction(gofmtAct);
-}
-
-void GolangProPlugin::createOutput()
-{
-    gofmtOutputEdit = new QPlainTextEdit;
-    gofmtOutputEdit->setReadOnly(true);
-    liteApp->addOutputPane(gofmtOutputEdit,tr("gofmt"));
+    if (build) {
+        delete build;
+    }
 }
 
 
 void GolangProPlugin::install(IApplication *app)
 {
     liteApp = app;
-    createActions();
-    createOutput();
- }
+    build = new BuildGolang(app);
+    app->addBuild(build);
+
+    createGofmt();
+}
 
 void GolangProPlugin::uninstall()
 {
@@ -52,11 +44,22 @@ QString GolangProPlugin::anchor() const
 
 QString GolangProPlugin::info() const
 {
-    return tr("Golang tools 1.0");
+    return tr("Golang Project 1.0");
 }
 
+void GolangProPlugin::createGofmt()
+{
+    gofmtOutputEdit = new QPlainTextEdit;
+    gofmtOutputEdit->setReadOnly(true);
+    liteApp->addOutputPane(gofmtOutputEdit,tr("gofmt"));
 
-Q_EXPORT_PLUGIN(GolangProPlugin)
+    gofmtAct = new QAction(tr("gofmt\tAlt+F8"),this);
+    gofmtAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F8));
+    gofmtAct->setStatusTip(tr("Format go file"));
+
+    connect(gofmtAct,SIGNAL(triggered()),this,SLOT(gofmt()));
+    liteApp->toolMenu()->addAction(gofmtAct);
+}
 
 void GolangProPlugin::gofmt()
 {
@@ -79,3 +82,5 @@ void GolangProPlugin::gofmt()
     gofmtProcess.start(tr("gofmt"),"gofmt",
                        QStringList() << "-w=true" << path);
 }
+
+Q_EXPORT_PLUGIN(GolangProPlugin)
