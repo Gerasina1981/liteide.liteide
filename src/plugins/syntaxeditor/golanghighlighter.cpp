@@ -25,7 +25,7 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
                            "chan|else|goto|package|struct|"
                            "const|fallthrough|if|range|byte|"
                            "continue|for|import|return|var|"
-                           "nil)"
+                           "nil|type)"
                            "\\b");
     rule.format = keywordFormat;
     highlightingRules.append(rule);

@@ -17,10 +17,12 @@ var arFileName *string = flag.String("ar", "gopack", "golang ar tool gopack file
 var cgoFileName *string = flag.String("cgo", "cgo", "golang call C cgo filepath")
 var proFileName *string = flag.String("p", "", "build golang project file example.pro")
 var goFileName *string = flag.String("f", "", "build golang source file example.go")
+var printDep *bool = flag.Bool("dep", true, "print all files depends pakckage")
 
 type Gopro struct {
 	Name   string
-	Values map[string][][]byte
+	Values map[string][]string
+	array *PackageArray
 }
 
 func makePro(name string) (pro *Gopro, err os.Error) {
@@ -33,7 +35,7 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 
 	pro = new(Gopro)
 	pro.Name = name
-	pro.Values = make(map[string][][]byte)
+	pro.Values = make(map[string][]string)
 
 	var buf [512]byte
 	n, err := file.Read(buf[:])
@@ -57,14 +59,14 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 		if find != -1 {
 			k := bytes.TrimSpace(line[0:find])
 			v := bytes.SplitAfter(line[find+offset:], []byte(" "), -1)
-			var vall [][]byte
+			var vall []string
 			if offset == 2 {
 				vall = pro.Values[string(k)]
 			}
 			for _, nv := range v {
 				nv2 := bytes.TrimSpace(nv)
 				if len(nv2) != 0 {
-					vall = append(vall, nv2)
+					vall = append(vall, string(nv2))
 				}
 			}
 			pro.Values[string(k)] = vall
@@ -73,20 +75,23 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 	return
 }
 
-func (file *Gopro) Gofiles() [][]byte {
+func (file *Gopro) Gofiles() []string {
 	return file.Values["GOFILES"]
 }
 
-func (file *Gopro) AllPackage() [][]byte {
-	return file.Values["PACKAGE"]
+func (file *Gopro) AllPackage() (paks []string) {
+	for i := 0; i < len(file.array.Data); i++ {
+		paks = append(paks,file.array.Data[i].pakname)
+	}
+	return
 }
 
-func (file *Gopro) PackageFilesString(pakname string) [][]byte {
+func (file *Gopro) PackageFilesString(pakname string) []string {
 	return file.Values[pakname]
 }
 
-func (file *Gopro) PackageFiles(pakname []byte) [][]byte {
-	return file.Values[string(pakname)]
+func (file *Gopro) PackageFiles(pakname string) []string {
+	return file.array.index(pakname).files
 }
 
 func (file *Gopro) TargetName() string {
@@ -112,7 +117,7 @@ func (file *Gopro) ProjectDir() (dir string) {
 	return
 }
 
-func build(gcfile string, proFileName string, files [][]byte, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
+func build(gcfile string, proFileName string, files []string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
 	arg := []string{gcfile, "-o", proFileName}
 	for _, v := range files {
 		arg = append(arg, string(v))
@@ -176,7 +181,7 @@ func pack(pkfile string, target string, ofile string, envv []string, dir string)
 }
 
 func (file *Gopro) IsEmpty() bool {
-	return len(file.AllPackage()) == 0
+	return len(file.Values) == 0
 }
 
 func MakeFile(gcfile, glfile string, file string) (status syscall.WaitStatus, err os.Error) {
@@ -185,7 +190,7 @@ func MakeFile(gcfile, glfile string, file string) (status syscall.WaitStatus, er
 	title := name[0 : len(name)-len(ext)]
 
 	ofile := title + ".8"
-	files := [][]byte{[]byte(file)}
+	files := []string{file}
 	status, err = build(gcfile, ofile, files, os.Environ(), dir)
 	if err != nil || status.ExitStatus() != 0 {
 		return
@@ -205,9 +210,9 @@ func (file *Gopro) MakeTarget(gcfile, glfile, pkfile string) (status syscall.Wai
 	all := file.AllPackage()
 	for _, v := range all {
 		fmt.Printf("build package %s:\n", v)
-		target := string(v)
+		target := v
 		ofile := target + ".8"
-		if string(v) == "main" {
+		if v == "main" {
 			target = file.TargetName()
 			ofile = target + "_go_.8"
 		}
@@ -257,6 +262,12 @@ func main() {
 		if file.IsEmpty() {
 			fmt.Printf("Error load .pro file %s\n", *proFileName)
 			os.Exit(1)
+		}
+		files := file.Gofiles()
+		file.array = ParserFiles(files)
+		
+		if (printDep != nil && *printDep == true) {
+			fmt.Printf("AllPackage:\n%s\n",file.array)
 		}
 
 		status, err := file.MakeTarget(gcfile, glfile, pkfile)

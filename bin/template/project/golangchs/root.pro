@@ -1,6 +1,4 @@
 TARGET=$ROOT$
 
-PACKAGE = main
-
-main =\
+GOFILES = \
 	$ROOT$.go

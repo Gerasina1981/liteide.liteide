@@ -1,8 +1,8 @@
 TARGET=gopromake
 #DESTDIR = ../../../bin
 
-PACKAGE = \
-	main
-
-main = \
-	promake.go
+GOFILES = \
+	promake.go \
+	depparser.go
+	
+	

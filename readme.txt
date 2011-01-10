@@ -7,7 +7,7 @@ golang developer editor
 *) Project Manager
 *) Project Build and run
 *) No project, file build and run
-*) gopromake tools
+*) gopromake auto build tools
 
 Developer:  visualfc (visualfc@gamil.com)
 Project : 	   http://code.google.com/p/liteide
@@ -21,14 +21,13 @@ FAQ:
    LiteIDE open project, .edit pro file and save, auto reload project.
 
 2. Project Editor
-   "PACKAGE = name" , the "name" is go source "package name"
+
 TARGET=cat
-DESTDIR£½./bin
-PACKAGE = file main
-file = \
-	file.go
-main = \
+
+GOFILES = \
+	file.go \
 	cat.go
+
 
 3. Open project or file
   file open project/open or drop file (.pro/.go) to liteide ui

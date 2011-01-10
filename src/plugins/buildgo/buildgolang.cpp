@@ -42,6 +42,8 @@ bool BuildGolang::buildProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
 
+    process.setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
+
     QStringList args;
     args << "-p" << proj->filePath();
     process.start("gopromake.exe",args);

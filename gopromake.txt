@@ -11,16 +11,16 @@ Usage gopromake:
 
 .pro files
 
-key: TARGET DESTDIR PACKAGE
+key: TARGET DESTDIR GOFILES
 
-examples/helloui
+examples/helloui/hello.pro
 
 TARGET=hello
+
 DESTDIR=./bin
-PACKAGE = user32 main
-user32 =\
+
+GOFILES = \
+	hello.go \
 	user32.go
-main =\
-	hello.go
 
 

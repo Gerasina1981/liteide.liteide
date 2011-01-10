@@ -7,7 +7,7 @@ go语言开发工具
 *) 项目管理
 *) 支持.pro项目编译
 *) 支持无项目单独文件编译
-*) gopromake编译工具
+*) gopromake自动编译工具
 
 开发者:    visualfc (visualfc@gamil.com)
 项目主页: http://code.google.com/p/liteide
@@ -21,14 +21,12 @@ FAQ:
 　在LiteIDE开发环境内打开项目，在LiteIDE环境中.pro文件直接进行编写，保盘后LiteIDE将自动更新项目，并重建项目文件列表。
 
 2.项目文件编写举例
-  其中、PACKAGE中的名称要与go源文件内的package name名称一致
 TARGET=cat
-DESTDIR＝./bin
-PACKAGE = file main
-file = \
-	file.go
-main = \
+
+GOFILES = \
+	file.go \
 	cat.go
+
 
 
 ３.打开项目或文件
