@@ -19,6 +19,7 @@ var proFileName *string = flag.String("gopro", "", "build go project file : -pro
 var goFileName *string = flag.String("gofiles", "", "build go source files : -file \"go1.go go2.go\"")
 var goTargetName *string = flag.String("out", "", "output execute target name")
 var printDep *bool = flag.Bool("showdep", false, "print all files depends package")
+var showVer *bool = flag.Bool("version",true,"show gopromake version")
 
 type Gopro struct {
 	Name   string
@@ -256,8 +257,13 @@ var Usage = func() {
 }
 
 func main() {
-	fmt.Println("\nGoproMake : go files auto build tools. make by visualfc@gmail.com.")
 	flag.Parse()
+	if *showVer == true {
+		fmt.Println("GoproMake 0.1: go files auto build tools. make by visualfc@gmail.com.")
+	} else {
+		fmt.Println("GoproMake parser files...")
+	}
+
 	gcfile := *gcFileName
 	glfile := *glFileName
 	pkfile := *arFileName

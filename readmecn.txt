@@ -21,12 +21,11 @@ FAQ:
 　在LiteIDE开发环境内打开项目，在LiteIDE环境中.pro文件直接进行编写，保盘后LiteIDE将自动更新项目，并重建项目文件列表。
 
 2.项目文件编写举例
-TARGET=cat
+TARGET=hello
 DESTDIR=./bin
 GOFILES = \
-	file.go \
-	cat.go
-
+	hello.go \
+	user32.go
 
 
 ３.打开项目或文件

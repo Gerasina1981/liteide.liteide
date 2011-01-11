@@ -22,11 +22,11 @@ FAQ:
 
 2. Project Editor
 
-TARGET=cat
+TARGET=hello
 DESTDIR=./bin
 GOFILES = \
-	file.go \
-	cat.go
+	hello.go \
+	user32.go
 
 
 3. Open project or file

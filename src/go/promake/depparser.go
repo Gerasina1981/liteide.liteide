@@ -80,7 +80,7 @@ func (p *PackageData) appendFile(file string) {
 }
 
 type PackageArray struct {
-	Data []*PackageData
+	Data         []*PackageData
 	LocalImports map[string][]string
 }
 
@@ -108,19 +108,49 @@ func (p *PackageArray) String() (info string) {
 	return
 }
 
+func findvalue(array []string, value string) bool {
+	for i := 0; i < len(array); i++ {
+		if array[i] == value {
+			return true
+		}
+	}
+	return false
+}
+
 func ParserFiles(files []string) (array *PackageArray) {
 	array = new(PackageArray)
 	array.LocalImports = make(map[string][]string)
 
+	done := make(chan bool)
 	for _, file := range files {
-		pakname, imports, err := GetPackageImportLocal(file)
-		if err == nil {
-			array.index(pakname).appendFile(file)
-			for _, v := range imports {
-				array.LocalImports[pakname] = append(array.LocalImports[pakname], v)
+		go func(f string) {
+			pakname, imports, err := GetPackageImportLocal(f)
+			if err == nil {
+				array.index(pakname).appendFile(f)
+				for _, v := range imports {
+					array.LocalImports[pakname] = append(array.LocalImports[pakname], v)
+				}
+			} else {
+				fmt.Printf("Error %s\n",err)
+			}
+			done <- bool(err == nil)
+		}(file)
+	}
+
+	for _ = range files {
+		<-done
+	}
+
+	for k, v := range array.LocalImports {
+		var paks []string
+		for i := 0; i < len(v); i++ {
+			if findvalue(paks, v[i]) == false {
+				paks = append(paks, v[i])
 			}
 		}
+		array.LocalImports[k] = paks
 	}
+
 	for i := 0; i < len(array.Data); i++ {
 		for _, f := range array.LocalImports[array.Data[i].pakname] {
 			array.Data[i].index += array.index(f).index + 1

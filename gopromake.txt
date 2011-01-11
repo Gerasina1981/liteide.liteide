@@ -1,6 +1,6 @@
 GoproMake : go files auto build tools. make by visualfc@gmail.com.
 
-Usage of e:\lite\liteide\src\go\promake\gopromake.exe:
+Usage of gopromake.exe:
   -ar="gopack": golang ar tool gopack filepath
   -cgo="cgo": golang call C cgo filepath
   -gl="8l": golang linker 8l[6l][5l] filepath
@@ -9,6 +9,7 @@ Usage of e:\lite\liteide\src\go\promake\gopromake.exe:
   -out="": output execute target name
   -gofiles="": build go source files : -file "go1.go go2.go"
   -gopro="": build go project file : -pro example.pro
+  -version=true: show gopromake version
 
 .pro files
 
