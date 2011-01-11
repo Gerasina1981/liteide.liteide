@@ -28,8 +28,9 @@ type Gopro struct {
 }
 
 func makePro(name string) (pro *Gopro, err os.Error) {
-	file, err := os.Open(name, os.O_RDONLY, 0)
-	if err != nil {
+	file, e := os.Open(name, os.O_RDONLY, 0)
+	if e != nil {
+		err = e
 		return
 	}
 
@@ -38,12 +39,13 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 	pro = new(Gopro)
 	pro.Name = name
 	pro.Values = make(map[string][]string)
-
-	var buf [512]byte
+	
+	var buf [1024]byte
 	n, err := file.Read(buf[:])
 
-	pre, err := regexp.Compile("\\\\[^a-z|A-Z|0-9|_|=]*[\n\r]+[^a-z|A-Z|0-9|_]*")
-	if err != nil {
+	pre, e := regexp.Compile("\\\\[^a-z|A-Z|0-9|_|=]*[\n\r]+[^a-z|A-Z|0-9|_]*")
+	if e != nil {
+		err = e
 		return
 	}
 	all := pre.ReplaceAll(buf[0:n], []byte(" "))
