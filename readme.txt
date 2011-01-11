@@ -3,11 +3,12 @@ LiteIDE
 golang developer editor
 
 *) UTF8 file load and save
-*) Syntax Highliter
+*) Syntax Highlighter
 *) Project Manager
-*) Project Build and run
-*) No project, file build and run
+*) Project build and run
+*) No use project, file build and run
 *) gopromake auto build tools
+*) build error goto source
 
 Developer:  visualfc (visualfc@gamil.com)
 Project : 	   http://code.google.com/p/liteide

@@ -24,6 +24,9 @@
 #include <QPlainTextEdit>
 #include <QUrl>
 #include <finddialog.h>
+#include <QTextBlock>
+#include <QRegExp>
+#include <QFileInfo>
 
 MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
@@ -329,8 +332,11 @@ void MainWindow::createOutputWidget()
     outputTabWidget = new QTabWidget;
     outputTabWidget->setTabPosition(QTabWidget::South);
 
-    buildOutputEdit = new QPlainTextEdit(this);
+    buildOutputEdit = new PlainTextEditEx(this);
     buildOutputEdit->setReadOnly(true);
+
+    connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
+
     outputTabWidget->addTab(buildOutputEdit,tr("Build Output"));
 
     runTargetOutputEdit = new QPlainTextEdit(this);
@@ -685,6 +691,57 @@ void MainWindow::findText(const QString& text,QTextDocument::FindFlags flags)
         QPlainTextEdit*ed = qobject_cast<QPlainTextEdit*>(activeEditor->widget());
         if (ed) {
             ed->find(text,flags);
+        }
+    }
+}
+
+void MainWindow::dbclickOutputEdit()
+{
+    QTextCursor cur = buildOutputEdit->textCursor();
+    QRegExp rep("(\\w+[/])*(\\w+[.]\\w+)+:(\\d+)");
+    int index = rep.indexIn(cur.block().text());
+    if (index < 0)
+        return;
+    QStringList list = rep.capturedTexts();
+    if (list.count() < 3)
+        return;
+    QString cap = list.at(0);
+    QStringList capList = cap.split(":");
+    if (capList.count() < 2) {
+        return;
+    }
+    QString fileName = capList[0];
+    QString fileLine = capList[1];
+    bool ok = false;
+    int line = fileLine.toInt(&ok);
+    if (!ok)
+        return;
+
+    cur.select(QTextCursor::LineUnderCursor);
+    buildOutputEdit->setTextCursor(cur);
+    IEditor *ed = NULL;
+    if (activeProject) {
+        QString projectPath = QFileInfo(activeProject->filePath()).absolutePath();
+        QString filePath = QFileInfo(projectPath,fileName).absoluteFilePath();
+        ed = liteApp->loadEditor(filePath);
+    } else if (activeEditor && activeEditor->fileName() == fileName) {
+        ed = activeEditor;
+    }
+    if (!ed)
+        return;
+    QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(ed->widget());
+    if (!editor)
+        return;
+
+    int count = 1;
+    for ( QTextBlock b = editor->document()->begin(); b.isValid(); b = b.next(), count++ )
+    {
+        if ( count == line )
+        {
+            QTextCursor c = QTextCursor(b);
+            c.select(QTextCursor::LineUnderCursor);
+            editor->setTextCursor(c);
+            break;
         }
     }
 }

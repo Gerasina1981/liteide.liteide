@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QMap>
 #include "../api/ieditor.h"
 #include "../api/iproject.h"
@@ -13,6 +13,24 @@ class LiteApp;
 class QPlainTextEdit;
 class QActionGroup;
 class FindDialog;
+
+class PlainTextEditEx : public QPlainTextEdit
+{
+    Q_OBJECT
+public:
+    explicit PlainTextEditEx(QWidget *parent = 0) :
+            QPlainTextEdit(parent)
+    {
+    }
+    virtual void mouseDoubleClickEvent(QMouseEvent *e)
+    {
+        QPlainTextEdit::mouseDoubleClickEvent(e);
+        emit dbclickEvent();
+    }
+signals:
+    void dbclickEvent();
+};
+
 class MainWindow : public QMainWindow,
         public IEditorEvent,
         public IProjectEvent,
@@ -37,6 +55,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void dbclickOutputEdit();
     void findText(const QString&,QTextDocument::FindFlags);
     void find();
     void closeAllFile();
@@ -113,7 +132,7 @@ private:
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
-    QPlainTextEdit   *buildOutputEdit;
+    PlainTextEditEx   *buildOutputEdit;
     QPlainTextEdit   *runTargetOutputEdit;
 
     FindDialog *findDialog;
