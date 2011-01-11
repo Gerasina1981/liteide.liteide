@@ -8,7 +8,7 @@ golang developer editor
 *) Project build and run
 *) No use project, file build and run
 *) gopromake auto build tools
-*) build error goto source
+*) build error can jump to source line
 
 Developer:  visualfc (visualfc@gamil.com)
 Project : 	   http://code.google.com/p/liteide

@@ -698,13 +698,14 @@ void MainWindow::findText(const QString& text,QTextDocument::FindFlags flags)
 void MainWindow::dbclickOutputEdit()
 {
     QTextCursor cur = buildOutputEdit->textCursor();
-    QRegExp rep("(\\w+[/])*(\\w+[.]\\w+)+:(\\d+)");
+    QRegExp rep("(\\w+[\\\\/])*(\\w+[.]\\w+)+:(\\d+)");
     int index = rep.indexIn(cur.block().text());
     if (index < 0)
         return;
     QStringList list = rep.capturedTexts();
     if (list.count() < 3)
         return;
+    qDebug() << list;
     QString cap = list.at(0);
     QStringList capList = cap.split(":");
     if (capList.count() < 2) {

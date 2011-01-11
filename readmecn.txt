@@ -8,7 +8,7 @@ go语言开发工具
 *) 支持.pro项目编译
 *) 支持无项目单独文件编译
 *) gopromake自动编译工具
-*) 编译错误源码定位
+*) 可以从编译错误中定位到源码
 
 开发者:    visualfc (visualfc@gamil.com)
 项目主页: http://code.google.com/p/liteide
