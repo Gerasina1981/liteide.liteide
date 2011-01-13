@@ -99,7 +99,6 @@ void ProjectManager::resetProjectTree()
         parentDock->show();
     }
 
-
     model->clear();
 
     QStandardItem *root = new QStandardItem(project->displayName());
@@ -204,7 +203,7 @@ void ProjectManager::showProjectMenu(QPoint pos)
 void ProjectManager::reloadProject()
 {
     if (project) {
-         resetProjectTree();
+        resetProjectTree();
     }
 }
 

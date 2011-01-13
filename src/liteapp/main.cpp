@@ -19,8 +19,7 @@ int main(int argc, char *argv[])
     app.mainWindow->show();
 
     if (argc >= 2) {
-        //app.loadProject(argv[1]);
-        QString fileName = argv[1];
+        QString fileName = QDir::fromNativeSeparators(argv[1]);
         QString ext = QFileInfo(fileName).suffix();
         ext.toLower();
         if (ext == "pro") {

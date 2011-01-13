@@ -82,6 +82,7 @@ func (p *PackageData) appendFile(file string) {
 type PackageArray struct {
 	Data         []*PackageData
 	LocalImports map[string][]string
+	HasMain	bool
 }
 
 func (p *PackageArray) index(pakname string) (data *PackageData) {
@@ -126,6 +127,9 @@ func ParserFiles(files []string) (array *PackageArray) {
 		go func(f string) {
 			pakname, imports, err := GetPackageImportLocal(f)
 			if err == nil {
+				if pakname == "main" {
+					array.HasMain = true
+				}
 				array.index(pakname).appendFile(f)
 				for _, v := range imports {
 					array.LocalImports[pakname] = append(array.LocalImports[pakname], v)
