@@ -1,15 +1,13 @@
-GoproMake : go files auto build tools. make by visualfc@gmail.com.
+GoproMake 0.2: go files auto build tools. make by visualfc@gmail.com.
 
-Usage of gopromake.exe:
-  -ar="gopack": golang ar tool gopack filepath
-  -cgo="cgo": golang call C cgo filepath
-  -gl="8l": golang linker 8l[6l][5l] filepath
-  -gc="8g": golang gc compiler 8g[6g][5g] filepath
-  -showdep=false: print all files depends package
-  -out="": output execute target name
-  -gofiles="": build go source files : -file "go1.go go2.go"
-  -gopro="": build go project file : -pro example.pro
-  -version=true: show gopromake version
+usage: gopromake.exe -gopro   example.pro
+       gopromake.exe -gofiles "go1.go go2.go"
+  -o="": file specify output file
+  -dep=false: print packages depends
+  -ver=true: print version
+  -lib=false: build packages as librarys outside main
+  -gofiles="": make go sources
+  -gopro="": make go project
 
 .pro files
 
@@ -30,5 +28,5 @@ Build A:
 gopromake -gopro hello.pro
 
 Build B:
-gopromake -gofiles "hello.go user32.go" -out hello
+gopromake -gofiles "hello.go user32.go" -o hello
 

@@ -58,7 +58,7 @@ bool BuildGolang::buildFile(const QString &fileName)
     process.setWorkingDirectory(projDir);
 
     QStringList args;
-    args << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-out" << target;
+    args << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     process.start("gopromake.exe",args);
 
     return false;
