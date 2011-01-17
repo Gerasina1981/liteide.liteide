@@ -58,7 +58,7 @@ bool GolangHighlighter::highlightPreBlock(QString const& text, int& startPos, in
         endPos = findQuotesEndPos(text, startPos, (state&STATE_BACKQUOTES) ? '`':'"');
         if (endPos == -1) {
             setFormat(0, text.length(), quotesFormat);
-            setCurrentBlockState(STATE_QUOTES);
+            setCurrentBlockState(state);
             return true;
         } else {
             endPos += 1;
@@ -118,7 +118,7 @@ void GolangHighlighter::highlightBlock(const QString &text)
         QString cap = regexpQuotesAndComment.cap();
         if ((cap == "\"") || (cap == "'") || (cap == "`"))
         {
-            endPos = findQuotesEndPos(text, startPos + 1, cap.at(0));
+             endPos = findQuotesEndPos(text, startPos + 1, cap.at(0));
             if (endPos == -1)
             {
                 //multiline
