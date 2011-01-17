@@ -3,11 +3,15 @@
 
 #include <QPlainTextEdit>
 #include <QTextEdit>
+#include "syntaxcompleter.h"
 
 class SyntaxEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
+    QString textUnderCursor() const;
+    void setCompleter(SyntaxCompleter *c);
+    SyntaxCompleter *completer() const;
     bool autoIndent;
     bool autoBlock;
     void areaPaintEvent(QPaintEvent *event);
@@ -24,12 +28,15 @@ public:
     QString currentFile() { return curFile; }
 
 protected:
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void focusInEvent(QFocusEvent *e);
     virtual bool event(QEvent *event);
     virtual void closeEvent(QCloseEvent *event);
     virtual void resizeEvent(QResizeEvent *e);
 public:
     int editorAreaWidth();
 protected slots:
+    void insertCompletion(const QString& completion);
     void updateAreaWidth(int newBlockCount);
     void updateEditorArea(const QRect &, int);
 protected:
@@ -42,6 +49,7 @@ protected:
 
     bool isUntitled;
     QWidget *editorArea;
+    SyntaxCompleter *editCompleter;
 };
 
 class SyntaxEditorArea : public QWidget

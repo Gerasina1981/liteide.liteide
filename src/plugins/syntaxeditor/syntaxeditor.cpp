@@ -2,8 +2,9 @@
 
 #include "syntaxeditor.h"
 #include "golanghighlighter.h"
+#include "QCompleter"
 
-SyntaxEditor::SyntaxEditor()
+SyntaxEditor::SyntaxEditor() : editCompleter(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -301,4 +302,101 @@ bool SyntaxEditor::event(QEvent *event)
         }
     }
     return QPlainTextEdit::event(event);
+}
+
+void SyntaxEditor::setCompleter(SyntaxCompleter *completer)
+{
+    if (editCompleter)
+        QObject::disconnect(editCompleter, 0, this, 0);
+
+    editCompleter = completer;
+
+    if (!editCompleter)
+        return;
+
+    editCompleter->setFileName(this->curFile);
+    editCompleter->setWidget(this);
+    editCompleter->setCompletionMode(QCompleter::PopupCompletion);
+    editCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    QObject::connect(editCompleter, SIGNAL(activated(QString)),
+                     this, SLOT(insertCompletion(QString)));
+}
+
+SyntaxCompleter *SyntaxEditor::completer() const
+{
+    return this->editCompleter;
+}
+
+
+QString SyntaxEditor::textUnderCursor() const
+{
+    QTextCursor tc = textCursor();
+    tc.select(QTextCursor::WordUnderCursor);
+    return tc.selectedText();
+}
+
+void SyntaxEditor::focusInEvent(QFocusEvent *e)
+{
+    if (editCompleter)
+         editCompleter->setWidget(this);
+     QPlainTextEdit::focusInEvent(e);
+}
+
+void SyntaxEditor::keyPressEvent(QKeyEvent *e)
+{
+    if (editCompleter && editCompleter->popup()->isVisible()) {
+          // The following keys are forwarded by the completer to the widget
+         switch (e->key()) {
+         case Qt::Key_Enter:
+         case Qt::Key_Return:
+         case Qt::Key_Escape:
+         case Qt::Key_Tab:
+         case Qt::Key_Backtab:
+              e->ignore();
+              return; // let the completer do default behavior
+         default:
+             break;
+         }
+      }
+
+      bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+      if (!editCompleter || !isShortcut) // do not process the shortcut when we have a completer
+          QPlainTextEdit::keyPressEvent(e);
+
+      const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+      if (!editCompleter || (ctrlOrShift && e->text().isEmpty()))
+          return;
+
+      static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+      QString completionPrefix = textUnderCursor();
+
+      editCompleter->underCursor(this->textCursor(),completionPrefix);
+
+      if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
+                        || eow.contains(e->text().right(1)))) {
+          editCompleter->popup()->hide();
+          return;
+      }
+
+      if (completionPrefix != editCompleter->completionPrefix()) {
+          editCompleter->setCompletionPrefix(completionPrefix);
+          editCompleter->popup()->setCurrentIndex(editCompleter->completionModel()->index(0, 0));
+      }
+      QRect cr = cursorRect();
+      cr.setWidth(editCompleter->popup()->sizeHintForColumn(0)
+                  + editCompleter->popup()->verticalScrollBar()->sizeHint().width());
+      editCompleter->complete(cr); // popup it up!
+}
+
+void SyntaxEditor::insertCompletion(const QString& completion)
+{
+    if (editCompleter->widget() != this)
+        return;
+    QTextCursor tc = textCursor();
+    int extra = completion.length() - editCompleter->completionPrefix().length();
+    tc.movePosition(QTextCursor::Left);
+    tc.movePosition(QTextCursor::EndOfWord);
+    tc.insertText(completion.right(extra));
+    setTextCursor(tc);
 }
