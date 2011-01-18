@@ -239,7 +239,7 @@ var Usage = func() {
 func main() {
 	flag.Parse()
 	if *showVer == true {
-		fmt.Println("GoproMake 0.2: go files auto build tools. make by visualfc@gmail.com.")
+		fmt.Println("GoproMake 0.2.1: go files auto build tools. make by visualfc@gmail.com.")
 	}
 
 	gobin, err := newGoBin()

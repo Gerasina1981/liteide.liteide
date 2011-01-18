@@ -14,29 +14,31 @@ type GoBin struct {
 	objext   string
 	exeext   string
 	pakext   string
-	rm		 string
+	rm       string
 }
 
 func newGoBin() (p *GoBin, err os.Error) {
 	var curos = runtime.GOOS
 	goroot := os.Getenv("GOROOT")
-	if goroot == "" {		
-		switch(curos) {
+	if goroot == "" {
+		path := os.Getenv("PATH")
+		switch curos {
 		case "windows":
 			goroot = "c:/go"
+			path += ";c:/go/bin"
 		default:
 			home := os.Getenv("HOME")
-			goroot = home+"/go"
+			goroot = home + "/go"
+			path += ":" + home + "go/bin"
 		}
-		os.Setenv("GOROOT",goroot)
-		path := os.Getenv("PATH")
-		os.Setenv("PATH",path+":"+goroot+"/bin")
+		os.Setenv("GOROOT", goroot)
+		os.Setenv("PATH", path)
 	}
-	
+
 	goos := os.Getenv("GOOS")
 	if goos == "" {
 		goos = runtime.GOOS
-		os.Setenv("GOOS",goos)
+		os.Setenv("GOOS", goos)
 	}
 
 	var exeext string
@@ -45,14 +47,14 @@ func newGoBin() (p *GoBin, err os.Error) {
 	switch goos {
 	case "windows":
 		exeext = ".exe"
-		rm ="del"
+		rm = "del"
 	}
 
 	var goarch string
 	goarch = os.Getenv("GOARCH")
 	if goarch == "" {
 		goarch = runtime.GOARCH
-		os.Setenv("GOARCH",goarch)
+		os.Setenv("GOARCH", goarch)
 	}
 	var o string
 	switch goarch {

@@ -1,5 +1,5 @@
 TARGET=gopromake
-#DESTDIR = ../../../bin
+DESTDIR = ../../../bin
 
 GOFILES = \
 	promake.go gobin.go depparser.go
