@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow,
     Q_OBJECT
 public:
     friend class LiteApp;
+    void loadSettings();
     void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);

@@ -45,7 +45,7 @@ MainWindow::MainWindow(LiteApp *app) :
 
 
     setCentralWidget(editTabWidget);
-    editTabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+    editTabWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     connect(editTabWidget,SIGNAL(currentChanged(int)),this,SLOT(editTabChanged(int)));
     connect(editTabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(editTabClose(int)));
@@ -64,7 +64,7 @@ MainWindow::MainWindow(LiteApp *app) :
     outputDock->hide();
 
     //setUnifiedTitleAndToolBarOnMac(true);
-    restoreGeometry(liteApp->settings()->value("geometry").toByteArray());
+    loadSettings();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -83,6 +83,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
     liteApp->settings()->setValue("geometry",saveGeometry());
+    liteApp->settings()->setValue("state",saveState());
+
     event->accept();
 }
 
@@ -237,15 +239,18 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar(tr("File"));
+    fileToolBar->setObjectName("File");
     fileToolBar->addAction(newFileAct);
     fileToolBar->addAction(saveFileAct);
     fileToolBar->addAction(openFileAct);
 
     editToolBar = addToolBar(tr("Edit"));
+    editToolBar->setObjectName("Edit");
     editToolBar->addAction(undoAct);
     editToolBar->addAction(redoAct);
 
     buildToolBar = addToolBar(tr("Build"));
+    buildToolBar->setObjectName("Build");
     buildToolBar->addAction(buildProjectAct);
     buildToolBar->addAction(runTargetAct);
 }
@@ -258,6 +263,7 @@ void MainWindow::createStatusBar()
 QDockWidget *MainWindow::addWorkspacePane(QWidget *w, const QString &name)
 {
     QDockWidget *dock = new QDockWidget(name, this);
+    dock->setObjectName(name);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     dock->setWidget(w);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -324,9 +330,13 @@ void MainWindow::createDockWindows()
 void MainWindow::createOutputWidget()
 {
     outputDock = new QDockWidget(tr("Output"), this);
+    outputDock->setObjectName("outputDock");
 
     outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     outputDock->setFeatures(QDockWidget::DockWidgetClosable);
+
+    //outputDock->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
     viewMenu->addAction(outputDock->toggleViewAction());
     addDockWidget(Qt::BottomDockWidgetArea, outputDock);
 
@@ -358,11 +368,16 @@ void MainWindow::saveFile()
 
 void MainWindow::newFile()
 {
-    static QString path;
+    static QString path = liteApp->applicationPath()+"/..";
+
+    if (activeProject) {
+        path = QFileInfo(this->activeProject->filePath()).absolutePath();
+    }
+
     QString fileName;
 
     fileName = QFileDialog::getSaveFileName(this,
-           tr("Save File"), path, liteApp->editorTypeFilter());
+           tr("Save New File"), path, liteApp->editorTypeFilter());
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -379,7 +394,8 @@ void MainWindow::newFile()
 
 void MainWindow::openProject()
 {
-    static QString path;
+    static QString path = liteApp->applicationPath()+"/..";
+
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(this,
@@ -393,7 +409,7 @@ void MainWindow::openProject()
 
 void MainWindow::openFile()
 {
-    static QString path;
+    static QString path = liteApp->applicationPath()+"/..";
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(this,
@@ -635,7 +651,8 @@ void MainWindow::closeProject()
 void MainWindow::newProject()
 {
     ProjectWizard wiz(this);
-    QString location = liteApp->settings()->value("PROJECT_LOCATION",qApp->applicationDirPath()).toString();
+    static QString path = liteApp->applicationPath()+"/..";
+    QString location = liteApp->settings()->value("PROJECT_LOCATION",path).toString();
     wiz.setField("PROJECT_LOCATION",QDir::toNativeSeparators(location));
     if (wiz.exec() == QDialog::Accepted) {
         QString location = wiz.field("PROJECT_LOCATION").toString();
@@ -746,4 +763,10 @@ void MainWindow::dbclickOutputEdit()
             break;
         }
     }
+}
+
+void MainWindow::loadSettings()
+{
+    restoreGeometry(liteApp->settings()->value("geometry").toByteArray());
+    restoreState(liteApp->settings()->value("state").toByteArray());
 }
