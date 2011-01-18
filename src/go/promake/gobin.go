@@ -29,7 +29,7 @@ func newGoBin() (p *GoBin, err os.Error) {
 		default:
 			home := os.Getenv("HOME")
 			goroot = home + "/go"
-			path += ":" + home + "go/bin"
+			path += ":" + home + "/go/bin"
 		}
 		os.Setenv("GOROOT", goroot)
 		os.Setenv("PATH", path)
