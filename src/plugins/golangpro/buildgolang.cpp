@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QDebug>
 
+
 BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     liteApp(app), QObject(parent)
 {
@@ -46,7 +47,8 @@ bool BuildGolang::buildProject(IProject *proj)
 
     QStringList args;
     args  << "-ver=false" << "-gopro" << proj->filePath();
-    process.start("gopromake.exe",args);
+    QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
+    process.start(cmd,args);
 
     return true;
 }
@@ -59,7 +61,8 @@ bool BuildGolang::buildFile(const QString &fileName)
 
     QStringList args;
     args << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
-    process.start("gopromake.exe",args);
+    QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
+    process.start(cmd,args);
 
     return false;
 }

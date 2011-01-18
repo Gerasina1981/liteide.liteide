@@ -82,7 +82,7 @@ func (p *PackageData) appendFile(file string) {
 type PackageArray struct {
 	Data         []*PackageData
 	LocalImports map[string][]string
-	HasMain	bool
+	HasMain      bool
 }
 
 func (p *PackageArray) index(pakname string) (data *PackageData) {
@@ -135,7 +135,7 @@ func ParserFiles(files []string) (array *PackageArray) {
 					array.LocalImports[pakname] = append(array.LocalImports[pakname], v)
 				}
 			} else {
-				fmt.Printf("Error %s\n",err)
+				fmt.Printf("Error %s\n", err)
 			}
 			done <- bool(err == nil)
 		}(file)

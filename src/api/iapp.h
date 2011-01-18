@@ -42,6 +42,8 @@ public:
     virtual QMenu *toolMenu() = 0;
     virtual IEditor *activeEditor() = 0;
     virtual IProject *activeProject() = 0;
+    virtual QString applicationPath() = 0;
+    virtual QString osExecuteExt() = 0;
 };
 
 #endif //__LITEAPI_IAPP_H__

@@ -79,8 +79,23 @@ void GolangProPlugin::gofmt()
     gofmtProcess.disconnect();
     connect(&gofmtProcess,SIGNAL(outputText(QString,bool)),gofmtOutputEdit,SLOT(appendPlainText(QString)));
     connect(&gofmtProcess,SIGNAL(processSuccess()),ed,SLOT(reload()));
-    gofmtProcess.start(tr("gofmt"),"gofmt",
-                       QStringList() << "-w=true" << path);
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    QString goroot = env.value("GOROOT");
+    if (goroot.isEmpty()) {
+#ifdef Q_OS_WIN32
+        goroot = "c:/go";
+#else
+        goroot = env.value("HOME")+"/go";
+#endif
+    }
+    QString projDir = QFileInfo(path).absolutePath();
+    gofmtProcess.setWorkingDirectory(projDir);
+
+    QString cmd = goroot+"/bin/gofmt"+liteApp->osExecuteExt();
+
+    gofmtProcess.start("gofmt",cmd,
+                       QStringList() << "-w=true" << ed->fileName());
 }
 
 Q_EXPORT_PLUGIN(GolangProPlugin)

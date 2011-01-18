@@ -30,7 +30,7 @@ void RunTargetApp::runProject(IProject *proj)
         projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
     }
     process.setWorkingDirectory(projDir);
-    target = QFileInfo(QDir(projDir),target+".exe").absoluteFilePath();
+    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
     process.start(target);
 }
 
@@ -39,7 +39,7 @@ void RunTargetApp::runEditor(IEditor *edit)
     target = QFileInfo(edit->filePath()).baseName();
     QString projDir = QFileInfo(edit->filePath()).absolutePath();
     process.setWorkingDirectory(projDir);
-    target = QFileInfo(QDir(projDir),target+".exe").absoluteFilePath();
+    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
     process.start(target);
 }
 

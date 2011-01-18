@@ -18,10 +18,25 @@ type GoBin struct {
 }
 
 func newGoBin() (p *GoBin, err os.Error) {
-	var goos string
-	goos = os.Getenv("GOOS")
+	var curos = runtime.GOOS
+	goroot := os.Getenv("GOROOT")
+	if goroot == "" {		
+		switch(curos) {
+		case "windows":
+			goroot = "c:/go"
+		default:
+			home := os.Getenv("HOME")
+			goroot = home+"/go"
+		}
+		os.Setenv("GOROOT",goroot)
+		path := os.Getenv("PATH")
+		os.Setenv("PATH",path+":"+goroot+"/bin")
+	}
+	
+	goos := os.Getenv("GOOS")
 	if goos == "" {
 		goos = runtime.GOOS
+		os.Setenv("GOOS",goos)
 	}
 
 	var exeext string
@@ -37,6 +52,7 @@ func newGoBin() (p *GoBin, err os.Error) {
 	goarch = os.Getenv("GOARCH")
 	if goarch == "" {
 		goarch = runtime.GOARCH
+		os.Setenv("GOARCH",goarch)
 	}
 	var o string
 	switch goarch {

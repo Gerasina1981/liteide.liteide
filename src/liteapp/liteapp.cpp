@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QPluginLoader>
 #include <QDebug>
+#include <QApplication>
 
 LiteApp::LiteApp()
 {
@@ -75,6 +76,20 @@ QSettings *LiteApp::settings()
 QWidget *LiteApp::main()
 {
     return mainWindow;
+}
+
+QString LiteApp::applicationPath()
+{
+    return qApp->applicationDirPath();
+}
+
+QString LiteApp::osExecuteExt()
+{
+#ifdef Q_OS_WIN32
+    return ".exe";
+#else
+    return "";
+#endif
 }
 
 QMenu *LiteApp::fileMenu()

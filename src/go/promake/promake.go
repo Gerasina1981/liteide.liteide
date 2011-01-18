@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"io/ioutil"
 	"bytes"
 	"regexp"
 	"flag"
@@ -18,8 +19,8 @@ var (
 	goTargetName *string = flag.String("o", "", "file specify output file")
 	printDep     *bool   = flag.Bool("dep", false, "print packages depends ")
 	showVer      *bool   = flag.Bool("ver", true, "print version ")
-	buildLib	 *bool	 = flag.Bool("lib", false,"build packages as librarys outside main")
-//	clean		 *bool   = flag.Bool("clean",false,"clean build object")
+	buildLib     *bool   = flag.Bool("lib", false, "build packages as librarys outside main")
+	//	clean		 *bool   = flag.Bool("clean",false,"clean build object")
 )
 
 type Gopro struct {
@@ -29,29 +30,23 @@ type Gopro struct {
 }
 
 func makePro(name string) (pro *Gopro, err os.Error) {
-	file, e := os.Open(name, os.O_RDONLY, 0)
+	buf, e := ioutil.ReadFile(name)
 	if e != nil {
 		err = e
 		return
 	}
-
-	defer file.Close()
-
 	pro = new(Gopro)
 	pro.Name = name
 	pro.Values = make(map[string][]string)
-
-	var buf [1024]byte
-	n, err := file.Read(buf[:])
 
 	pre, e := regexp.Compile("\\\\[^a-z|A-Z|0-9|_|=]*[\n\r]+[^a-z|A-Z|0-9|_]*")
 	if e != nil {
 		err = e
 		return
 	}
-	all := pre.ReplaceAll(buf[0:n], []byte(" "))
-
-	lines := bytes.Split(all, []byte("\r\n"), -1)
+	all := pre.ReplaceAll(buf[:], []byte(" "))
+	all = bytes.Replace(all, []byte("\r\n"), []byte("\n"), -1)
+	lines := bytes.Split(all, []byte("\n"), -1)
 
 	for _, line := range lines {
 		offset := 2
@@ -104,13 +99,13 @@ func (file *Gopro) TargetName() string {
 	if len(v) >= 1 && len(v[0]) > 0 {
 		name := v[0]
 		ext := path.Ext(name)
-		return name[0:len(name)-len(ext)]
+		return name[0 : len(name)-len(ext)]
 	}
 	if len(file.Name) == 0 {
 		return "main"
-	} 
+	}
 	ext := path.Ext(file.Name)
-	name := path.Base(file.Name)		
+	name := path.Base(file.Name)
 	return name[0 : len(name)-len(ext)]
 }
 
@@ -202,7 +197,7 @@ func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.E
 		ofile := target + gobin.objext
 		if v == "main" {
 			target = file.TargetName()
-			ofile = target + "_go_"+gobin.objext
+			ofile = target + "_go_" + gobin.objext
 		}
 		status, err = build(gobin.compiler, ofile, file.PackageFiles(v), os.Environ(), file.ProjectDir())
 		if err != nil || status.ExitStatus() != 0 {
@@ -235,7 +230,7 @@ func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.E
 }
 
 var Usage = func() {
-	_,name := path.Split(os.Args[0])
+	_, name := path.Split(os.Args[0])
 	fmt.Fprintf(os.Stderr, "usage: %s -gopro   example.pro\n", name)
 	fmt.Fprintf(os.Stderr, "       %s -gofiles \"go1.go go2.go\"\n", name)
 	flag.PrintDefaults()
@@ -245,13 +240,13 @@ func main() {
 	flag.Parse()
 	if *showVer == true {
 		fmt.Println("GoproMake 0.2: go files auto build tools. make by visualfc@gmail.com.")
-	} 
+	}
 
 	gobin, err := newGoBin()
 	if err != nil {
 		log.Exitln(err)
 	}
-	
+
 	var pro *Gopro
 
 	if len(*proFileName) > 0 {

@@ -37,6 +37,8 @@ public:
     virtual QMenu *viewMenu();
     virtual QMenu *toolMenu();
     virtual QWidget *main();
+    virtual QString applicationPath() ;
+    virtual QString osExecuteExt();
     void loadPlugins(const QString &dir);
     void installPlugins();
     QString editorTypeFilter() const;
