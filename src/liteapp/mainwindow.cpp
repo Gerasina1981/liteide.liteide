@@ -61,10 +61,9 @@ MainWindow::MainWindow(LiteApp *app) :
 
     setAcceptDrops(true);
 
-    outputDock->hide();
-
-    //setUnifiedTitleAndToolBarOnMac(true);
+     //setUnifiedTitleAndToolBarOnMac(true);
     loadSettings();
+    outputDock->hide();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
