@@ -206,8 +206,8 @@ func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.E
 
 		dest := file.DestDir()
 		if len(dest) > 0 {
-			dest = path.Join(file.ProjectDir(), dest)
-			os.MkdirAll(dest, 0)
+			//dest = path.Join(file.ProjectDir(), dest)
+			os.MkdirAll(dest, 0777)
 			target = path.Join(dest, target)
 		}
 		if string(v) == "main" {

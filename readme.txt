@@ -10,11 +10,9 @@ golang developer editor
 *) gopromake auto build tools
 *) build error can jump to source line
 
-Developer:  visualfc (visualfc@gamil.com)
+Developer:  visualfc (visualfc@gmail.com)
 Project : 	   http://code.google.com/p/liteide
 
-usage:
-set path=%path%;c:\go\bin
 
 FAQ:
 

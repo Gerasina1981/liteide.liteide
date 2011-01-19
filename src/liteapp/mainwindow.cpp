@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "liteapp.h"
 #include "aboutpluginsdialog.h"
+#include "finddialog.h"
 #include "../util/texteditoutput.h"
 #include "projectwizard.h"
 
@@ -23,7 +24,6 @@
 #include <QTextCodec>
 #include <QPlainTextEdit>
 #include <QUrl>
-#include <finddialog.h>
 #include <QTextBlock>
 #include <QRegExp>
 #include <QFileInfo>

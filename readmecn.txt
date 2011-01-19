@@ -10,11 +10,8 @@ go语言开发工具
 *) gopromake自动编译工具
 *) 可以从编译错误中定位到源码
 
-开发者:    visualfc (visualfc@gamil.com)
+开发者:    visualfc (visualfc@gmail.com)
 项目主页: http://code.google.com/p/liteide
-
-需要设置的go编译环境变量：
-set path=%path%;c:\go\bin
 
 FAQ:
 

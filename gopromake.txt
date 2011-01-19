@@ -1,4 +1,4 @@
-GoproMake 0.2: go files auto build tools. make by visualfc@gmail.com.
+GoproMake 0.2.1: go files auto build tools. make by visualfc@gmail.com.
 
 usage: gopromake.exe -gopro   example.pro
        gopromake.exe -gofiles "go1.go go2.go"
