@@ -1,0 +1,7 @@
+liteide request qt4.7 lib
+
+http://code.google.com/p/golangide
+download qtlib-linux-x86_64-4.7.0.tar.bz2 and extract to liteide/bin
+
+liteide/bin/liteide.sh
+

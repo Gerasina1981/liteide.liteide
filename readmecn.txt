@@ -1,24 +1,24 @@
-LiteIDE
+ï»¿LiteIDE
 
-goÓïÑÔ¿ª·¢¹¤¾ß
+goè¯­è¨€å¼€å‘å·¥å…·
 
-*) UTF8ÎÄ¼þ¶ÁÐ´
-*) GOÓï·¨¸ßÁÁ
-*) ÏîÄ¿¹ÜÀí
-*) Ö§³Ö.proÏîÄ¿±àÒë
-*) Ö§³ÖÎÞÏîÄ¿µ¥¶ÀÎÄ¼þ±àÒë
-*) gopromake×Ô¶¯±àÒë¹¤¾ß
-*) ¿ÉÒÔ´Ó±àÒë´íÎóÖÐ¶¨Î»µ½Ô´Âë
+*) UTF8æ–‡ä»¶è¯»å†™
+*) GOè¯­æ³•é«˜äº®
+*) é¡¹ç›®ç®¡ç†
+*) æ”¯æŒ.proé¡¹ç›®ç¼–è¯‘
+*) æ”¯æŒæ— é¡¹ç›®å•ç‹¬æ–‡ä»¶ç¼–è¯‘
+*) gopromakeè‡ªåŠ¨ç¼–è¯‘å·¥å…·
+*) å¯ä»¥ä»Žç¼–è¯‘é”™è¯¯ä¸­å®šä½åˆ°æºç 
 
-¿ª·¢Õß:    visualfc (visualfc@gmail.com)
-ÏîÄ¿Ö÷Ò³: http://code.google.com/p/liteide
+å¼€å‘è€…:    visualfc (visualfc@gmail.com)
+é¡¹ç›®ä¸»é¡µ: http://code.google.com/p/liteide
 
 FAQ:
 
-£±.ÈçºÎ½øÐÐÏîÄ¿¹ÜÀí
-¡¡ÔÚLiteIDE¿ª·¢»·¾³ÄÚ´ò¿ªÏîÄ¿£¬ÔÚLiteIDE»·¾³ÖÐ.proÎÄ¼þÖ±½Ó½øÐÐ±àÐ´£¬±£ÅÌºóLiteIDE½«×Ô¶¯¸üÐÂÏîÄ¿£¬²¢ÖØ½¨ÏîÄ¿ÎÄ¼þÁÐ±í¡£
+ï¼‘.å¦‚ä½•è¿›è¡Œé¡¹ç›®ç®¡ç†
+ã€€åœ¨LiteIDEå¼€å‘çŽ¯å¢ƒå†…æ‰“å¼€é¡¹ç›®ï¼Œåœ¨LiteIDEçŽ¯å¢ƒä¸­.proæ–‡ä»¶ç›´æŽ¥è¿›è¡Œç¼–å†™ï¼Œä¿ç›˜åŽLiteIDEå°†è‡ªåŠ¨æ›´æ–°é¡¹ç›®ï¼Œå¹¶é‡å»ºé¡¹ç›®æ–‡ä»¶åˆ—è¡¨ã€‚
 
-2.ÏîÄ¿ÎÄ¼þ±àÐ´¾ÙÀý
+2.é¡¹ç›®æ–‡ä»¶ç¼–å†™ä¸¾ä¾‹
 TARGET=hello
 DESTDIR=./bin
 GOFILES = \
@@ -26,10 +26,10 @@ GOFILES = \
 	user32.go
 
 
-£³.´ò¿ªÏîÄ¿»òÎÄ¼þ
-¡¡¿ÉÒÔ´ÓÎÄ¼þ²Ëµ¥ÖÐÑ¡Ôñ´ò¿ªÏîÄ¿/´ò¿ªÎÄ¼þ£¬Ò²¿ÉÒÔÖ±½Ó½«.pro»ò.goÎÄ¼þÍÏµ½LiteIDE½çÃæÉÏ¡£
+ï¼“.æ‰“å¼€é¡¹ç›®æˆ–æ–‡ä»¶
+ã€€å¯ä»¥ä»Žæ–‡ä»¶èœå•ä¸­é€‰æ‹©æ‰“å¼€é¡¹ç›®/æ‰“å¼€æ–‡ä»¶ï¼Œä¹Ÿå¯ä»¥ç›´æŽ¥å°†.proæˆ–.goæ–‡ä»¶æ‹–åˆ°LiteIDEç•Œé¢ä¸Šã€‚
 
-£´.±àÒëºÍÔËÐÐ
-¡¡Èç¹û´æÔÚÏîÄ¿£¬Ôò±àÒëºÍÔËÐÐµ±Ç°ÏîÄ¿¡£
-¡¡Èç¹ûÃ»ÓÐÏîÄ¿£¬Ôò±àÒëºÍÔËÐÐµ±Ç°±à¼­ÎÄ¼þ¡£
+ï¼”.ç¼–è¯‘å’Œè¿è¡Œ
+ã€€å¦‚æžœå­˜åœ¨é¡¹ç›®ï¼Œåˆ™ç¼–è¯‘å’Œè¿è¡Œå½“å‰é¡¹ç›®ã€‚
+ã€€å¦‚æžœæ²¡æœ‰é¡¹ç›®ï¼Œåˆ™ç¼–è¯‘å’Œè¿è¡Œå½“å‰ç¼–è¾‘æ–‡ä»¶ã€‚
 
