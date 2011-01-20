@@ -7,7 +7,7 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
 
-    indentFormat.setForeground(Qt::darkBlue);
+    identFormat.setForeground(Qt::darkBlue);
 
     functionFormat.setForeground(Qt::blue);
 
@@ -42,7 +42,7 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
                            "append|cap|close|closed|cmplx|copy|imag|len|"
                            "make|new|panic|print|println|real|recover)"
                            "\\b");
-    rule.format = indentFormat;
+    rule.format = identFormat;
     highlightingRules.append(rule);
 
     //keyword
@@ -68,11 +68,11 @@ bool GolangHighlighter::highlightPreBlock(QString const& text, int& startPos, in
     if (state == -1)
         state = 0;
 
-    if ((state & STATE_QUOTES) || (state & STATE_BACKQUOTES)) {
-        endPos = findQuotesEndPos(text, startPos, (state&STATE_BACKQUOTES) ? '`':'"');
+    if (state & STATE_BACKQUOTES) {
+        endPos = findQuotesEndPos(text, startPos, '`');
         if (endPos == -1) {
             setFormat(0, text.length(), quotesFormat);
-            setCurrentBlockState(state);
+            setCurrentBlockState(STATE_BACKQUOTES);
             return true;
         } else {
             endPos += 1;
@@ -132,12 +132,14 @@ void GolangHighlighter::highlightBlock(const QString &text)
         QString cap = regexpQuotesAndComment.cap();
         if ((cap == "\"") || (cap == "'") || (cap == "`"))
         {
-             endPos = findQuotesEndPos(text, startPos + 1, cap.at(0));
+            endPos = findQuotesEndPos(text, startPos + 1, cap.at(0));
             if (endPos == -1)
             {
                 //multiline
                 setFormat(startPos, text.length() - startPos, quotesFormat);
-                setCurrentBlockState(cap.at(0) == QChar('`')? STATE_BACKQUOTES : STATE_QUOTES );
+                if (cap == "`") {
+                    setCurrentBlockState(STATE_BACKQUOTES);
+                }
                 return;
             }
             else

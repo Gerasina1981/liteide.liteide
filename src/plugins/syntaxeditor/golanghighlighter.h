@@ -15,7 +15,6 @@ public:
 protected:
     enum
     {
-        STATE_QUOTES = 0x02,
         STATE_BACKQUOTES = 0x04,
         STATE_SINGLELINE_COMMENT = 0x08,
         STATE_MULTILINE_COMMENT = 0x10
@@ -34,7 +33,7 @@ private:
     QTextCharFormat functionFormat;
     QTextCharFormat singleLineCommentFormat;
     QTextCharFormat multiLineCommentFormat;
-    QTextCharFormat indentFormat;
+    QTextCharFormat identFormat;
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;
     QTextCharFormat quotesFormat;
