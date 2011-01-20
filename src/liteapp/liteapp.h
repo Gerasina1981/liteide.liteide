@@ -15,7 +15,7 @@ public:
     LiteApp();
     virtual ~LiteApp();
 public:
-    void setAstViewEditor(IEditor *ed);
+    void loadAstViewEditor(IEditor *ed);
     void closeProject();
     IBuild *selectBuild(const QString &name);
     virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name);

@@ -306,7 +306,7 @@ void MainWindow::editTabChanged(int index)
     activeEditor = ed;
 
     activeEditor->activeEditor(undoAct,redoAct);
-    liteApp->setAstViewEditor(activeEditor);
+    liteApp->loadAstViewEditor(activeEditor);
 }
 
 void MainWindow::addEditor(IEditor *editor)
@@ -323,7 +323,7 @@ void MainWindow::addOutputPage(QWidget *w, const QString &name)
 
 void MainWindow::createDockWindows()
 {
-    this->setDockOptions(ForceTabbedDocks);
+    //this->setDockOptions(ForceTabbedDocks);
 }
 
 void MainWindow::createOutputWidget()
@@ -446,6 +446,9 @@ void MainWindow::fireDocumentSave(IEditor *edit)
 {
     if (activeProject && edit->filePath() == activeProject->filePath()) {
          activeProject->reload();
+    }
+    if (activeEditor && activeEditor == edit) {
+        liteApp->loadAstViewEditor(activeEditor);
     }
 }
 

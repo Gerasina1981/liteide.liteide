@@ -237,7 +237,7 @@ void LiteApp::closeProject()
     mainWindow->activeProject = NULL;
 }
 
-void LiteApp::setAstViewEditor(IEditor *ed)
+void LiteApp::loadAstViewEditor(IEditor *ed)
 {   
     QString ext = QFileInfo(ed->filePath()).suffix();
     foreach (IAstViewFactory *factory, astFactorys) {

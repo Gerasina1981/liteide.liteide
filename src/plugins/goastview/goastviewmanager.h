@@ -27,6 +27,26 @@ protected:
     QIcon   iconVars;
     QIcon   iconConst;
     QIcon   iconConsts;
+    QIcon   iconMethod;
+};
+
+class GoAstViewIconPriv
+{
+public:
+    GoAstViewIconPriv();
+    QIcon iconFromTag(const QString &tag) const;
+protected:
+    QIcon   iconPackage;
+    QIcon   iconType;
+    QIcon   iconStruct;
+    QIcon   iconInterface;
+    QIcon   iconFunc;
+    QIcon   iconFuncs;
+    QIcon   iconVar;
+    QIcon   iconVars;
+    QIcon   iconConst;
+    QIcon   iconConsts;
+    QIcon   iconMethod;
 };
 
 class GoAstViewManager : public QWidget, public IAstViewFactory
@@ -48,6 +68,7 @@ protected:
     QTreeView            *tree;
     GoAstView   *astView;
     GoAstViewIcon   icons;
+    GoAstViewIconPriv icons_p;
 };
 
 #endif // GOASTVIEWMANAGER_H

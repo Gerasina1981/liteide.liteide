@@ -18,19 +18,20 @@ GoAstView::GoAstView(IApplication *app, QObject *parent):
 
 void GoAstView::update(const QString &fileName, const QByteArray &data)
 {
+    if (process.state() == QProcess::Running)
+        return;
+
     QString projDir = QFileInfo(fileName).absolutePath();
     process.setWorkingDirectory(projDir);
 
     QStringList args;
     args << "-src" << QFileInfo(fileName).fileName();
     QString cmd = QFileInfo(liteApp->applicationPath(),"goastview"+liteApp->osExecuteExt()).absoluteFilePath();
-
     process.start(cmd,args);
 }
 
 void GoAstView::started()
 {
-    qDebug() << "start";
 }
 
 void GoAstView::readStderr()
