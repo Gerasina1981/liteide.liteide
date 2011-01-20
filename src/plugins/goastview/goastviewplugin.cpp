@@ -1,4 +1,5 @@
 #include "goastviewplugin.h"
+#include "goastviewmanager.h"
 
 
 GoAstViewPlugin::GoAstViewPlugin() : liteApp(NULL)
@@ -8,6 +9,7 @@ GoAstViewPlugin::GoAstViewPlugin() : liteApp(NULL)
 void GoAstViewPlugin::install(IApplication *app)
 {
     liteApp = app;
+    new GoAstViewManager(app);
 }
 
 void GoAstViewPlugin::uninstall()

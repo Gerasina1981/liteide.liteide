@@ -6,20 +6,23 @@
 #include "../api/iapp.h"
 #include "../api/iproject.h"
 #include "../api/ibuild.h"
+#include "../api/iastview.h"
 
 class LiteApp : public QObject, public IApplication
 {
     Q_OBJECT
-
 public:
+    LiteApp();
+    virtual ~LiteApp();
+public:
+    void setAstViewEditor(IEditor *ed);
     void closeProject();
     IBuild *selectBuild(const QString &name);
-    LiteApp();
-    ~LiteApp();
     virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
     virtual void addOutputPane(QWidget *w, const QString &name);
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
+    virtual void addAstViewFactory(IAstViewFactory *astFactory);
     virtual void addBuild(IBuild *build);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
@@ -50,6 +53,7 @@ public:
     QList<IBuild*>   buildList;
     QList<IEditorFactory*> editorFactorys;
     QList<IProjectFactory*> projectFactorys;
+    QList<IAstViewFactory*> astFactorys;
 };
 
 #endif // LITEAPP_H

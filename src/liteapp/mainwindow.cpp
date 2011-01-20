@@ -306,7 +306,7 @@ void MainWindow::editTabChanged(int index)
     activeEditor = ed;
 
     activeEditor->activeEditor(undoAct,redoAct);
-    //connect(this,SLOT(undo()),ed,SLOT(undo()));
+    liteApp->setAstViewEditor(activeEditor);
 }
 
 void MainWindow::addEditor(IEditor *editor)

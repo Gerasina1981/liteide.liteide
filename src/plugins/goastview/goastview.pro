@@ -15,7 +15,11 @@ DESTDIR = $$IDE_PLGUINS_PATH
 
 DEFINES += GOASTVIEW_LIBRARY
 
-SOURCES += goastviewplugin.cpp
+SOURCES += goastviewplugin.cpp \
+    goastviewmanager.cpp \
+    goastview.cpp
 
 HEADERS += goastviewplugin.h\
-        goastview_global.h
+        goastview_global.h \
+    goastviewmanager.h \
+    goastview.h
