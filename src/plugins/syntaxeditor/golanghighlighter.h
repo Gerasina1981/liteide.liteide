@@ -34,6 +34,7 @@ private:
     QTextCharFormat functionFormat;
     QTextCharFormat singleLineCommentFormat;
     QTextCharFormat multiLineCommentFormat;
+    QTextCharFormat indentFormat;
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;
     QTextCharFormat quotesFormat;

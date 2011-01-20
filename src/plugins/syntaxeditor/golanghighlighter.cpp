@@ -7,29 +7,19 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
 
+    indentFormat.setForeground(Qt::darkBlue);
+
     functionFormat.setForeground(Qt::blue);
 
     numberFormat.setForeground(Qt::darkMagenta);
 
     quotesFormat.setForeground(Qt::darkGreen);
 
-    singleLineCommentFormat.setForeground(Qt::red);
-    multiLineCommentFormat.setForeground(Qt::red);
+    singleLineCommentFormat.setForeground(Qt::darkCyan);
+    multiLineCommentFormat.setForeground(Qt::darkCyan);
 
 
     HighlightingRule rule;
-    //keyword
-    rule.pattern = QRegExp("\\b"
-                           "(break|default|func|interface|select|"
-                           "case|defer|go|map|struct|"
-                           "chan|else|goto|package|struct|"
-                           "const|fallthrough|if|range|byte|"
-                           "continue|for|import|return|var|"
-                           "nil|type)"
-                           "\\b");
-    rule.format = keywordFormat;
-    highlightingRules.append(rule);
-
     //number
     rule.pattern = QRegExp("(\\b|\\.)([0-9]+|0[xX][0-9a-fA-F]+|0[0-7]+)(\\.[0-9]+)?([eE][+-]?[0-9]+i?)?\\b");
     rule.format = numberFormat;
@@ -41,6 +31,30 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     rule.format = functionFormat;
 
     highlightingRules.push_back(rule);
+
+    //indent
+    rule.pattern = QRegExp("\\b"
+                           "(bool|byte|complex64|complex128|float32|float64|"
+                           "int8|int16|int32|int64|string|uint8|uint16|uint32|uint64|"
+                           "complex|float|int|uint|uintptr|"
+                           "true|false|iota|"
+                           "nil|"
+                           "append|cap|close|closed|cmplx|copy|imag|len|"
+                           "make|new|panic|print|println|real|recover)"
+                           "\\b");
+    rule.format = indentFormat;
+    highlightingRules.append(rule);
+
+    //keyword
+    rule.pattern = QRegExp("\\b"
+                           "(break|default|func|interface|select|"
+                           "case|defer|go|map|struct|"
+                           "chan|else|goto|package|switch|"
+                           "const|fallthrough|if|range|type|"
+                           "continue|for|import|return|var)"
+                           "\\b");
+    rule.format = keywordFormat;
+    highlightingRules.append(rule);
 
     //quotes and comment
     regexpQuotesAndComment = QRegExp("//|\\\"|'|`|/\\*");
