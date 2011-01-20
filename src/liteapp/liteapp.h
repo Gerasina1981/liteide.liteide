@@ -24,6 +24,7 @@ public:
     virtual void addProjectFactory(IProjectFactory *projFactory);
     virtual void addAstViewFactory(IAstViewFactory *astFactory);
     virtual void addBuild(IBuild *build);
+    virtual void gotoLine(const QString &fileName, int line, int col);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
     virtual IEditorEvent *editorEvent();

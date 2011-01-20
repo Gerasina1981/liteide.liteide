@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	flagInputSrc = flag.String("src","","input go source file")	
+	flagInputSrc = flag.String("src","packageview.go","input go source file")	
 	flagInputPro = flag.String("pro","","input go project file")
 )	
 

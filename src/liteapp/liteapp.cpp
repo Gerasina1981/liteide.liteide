@@ -47,6 +47,11 @@ void LiteApp::addBuild(IBuild *build)
     mainWindow->appendBuild(build);
 }
 
+void LiteApp::gotoLine(const QString &fileName, int line, int col)
+{
+    mainWindow->gotoLine(fileName,line,col);
+}
+
 IProject *LiteApp::loadProject(const QString &fileName)
 {
     QString ext = QFileInfo(fileName).suffix();

@@ -17,10 +17,10 @@ const (
 	tag_interface = "i"
 	tag_value = "v"
 	tag_const = "c"
-	tag_value_folder = "+v:value"
-	tag_const_folder = "+c:const"
+	tag_value_folder = "+v"
+	tag_const_folder = "+c"
 	tag_func = "f"
-	tag_func_folder = "+f:func:"
+	tag_func_folder = "+f"
 	tag_type_method = "m"
 	tag_type_factor = "a"
 )	
@@ -47,19 +47,23 @@ func NewFilePackage(filename string) (*PackageView, os.Error) {
 
 func (p *PackageView) PrintFuncs(w io.Writer, funcs []*doc.FuncDoc, level int, tag string, tag_folder string) {
 	if len(tag_folder) > 0 && len(funcs) > 0{
-		fmt.Fprintf(w,"%d:%s\n",level,tag_folder)
+		fmt.Fprintf(w,"%d:%s:funcs:Functions\n",level,tag_folder)
 		level++
 	}
 			
 	for _, f := range funcs {
 		pos := p.fset.Position(f.Decl.Pos())
-		fmt.Fprintf(w, "%d:%s:%s:%s\n", level,tag, f.Name, pos)
+		fmt.Fprintf(w, "%d:%s:%s:func %s:%s\n", level,tag, f.Name,f.Name,pos)
 	}
 }
 
 func (p *PackageView) PrintVars(w io.Writer, vars []*doc.ValueDoc, level int,tag string, tag_folder string) {
 	if len(tag_folder) > 0 && len(vars) > 0{
-		fmt.Fprintf(w,"%d:%s\n",level,tag_folder)
+		if tag_folder == "+v" {
+			fmt.Fprintf(w,"%d:%s:values:Variables\n",level,tag_folder)
+		} else if tag_folder == "+c" {
+			fmt.Fprintf(w,"%d:%s:consts:Constants\n",level,tag_folder)
+		}
 		level++
 	}
 	for _, v := range vars {
@@ -70,7 +74,7 @@ func (p *PackageView) PrintVars(w io.Writer, vars []*doc.ValueDoc, level int,tag
 			if m, ok := s.(*ast.ValueSpec); ok {
 				pos := p.fset.Position(m.Pos())
 				for i := 0; i < len(m.Names); i++ {
-					fmt.Fprintf(w, "%d:%s:%s:%s\n",level,tag, m.Names[i], pos)			
+					fmt.Fprintf(w, "%d:%s:%s:%s:%s\n",level,tag, m.Names[i],m.Names[i], pos)			
 				}
 			}
 		}
@@ -83,13 +87,16 @@ func (p *PackageView) PrintTypes(w io.Writer, types []*doc.TypeDoc, level int) {
 			continue
 		}
 		var tag string = tag_type
+		var tag_text string
 		if _, ok := d.Type.Type.(*ast.InterfaceType); ok {
 			tag = tag_interface
+			tag_text = "interface"
 		} else if _, ok := d.Type.Type.(*ast.StructType); ok {
 			tag = tag_struct
+			tag_text = "struct"
 		}
 		pos := p.fset.Position(d.Type.Pos())
-		fmt.Fprintf(w, "%d:%s:%s:%s\n", level,tag, d.Type.Name, pos)
+		fmt.Fprintf(w, "%d:%s:%s:type %s %s:%s\n", level,tag, d.Type.Name, d.Type.Name,tag_text,pos)
 		p.PrintFuncs(w, d.Factories, level+1,tag_type_factor,"")
 		p.PrintFuncs(w, d.Methods, level+1,tag_type_method,"")
 		p.PrintVars(w,d.Vars,level+1,tag_value,tag_value_folder)
@@ -97,14 +104,14 @@ func (p *PackageView) PrintTypes(w io.Writer, types []*doc.TypeDoc, level int) {
 }
 
 func (p *PackageView) PrintPackage(w io.Writer, level int) {
-	fmt.Fprintf(w, "%d:%s:%s\n",level, tag_package,p.pdoc.PackageName)
+	fmt.Fprintf(w, "%d:%s:%s:package %s\n",level, tag_package,p.pdoc.PackageName, p.pdoc.PackageName);
 	level++
-	p.PrintFuncs(w, p.pdoc.Funcs, level, tag_func, "")
-	p.PrintTypes(w, p.pdoc.Types, level)
 	p.PrintVars(w, p.pdoc.Vars, level, tag_value,tag_value_folder)
 	p.PrintVars(w,p.pdoc.Consts,level, tag_const,tag_const_folder)	
+	p.PrintFuncs(w, p.pdoc.Funcs, level, tag_func, "")
+	p.PrintTypes(w, p.pdoc.Types, level)
 }
-
+// level:tag:name:text:source:x:y
 func (p *PackageView) PrintTree(w io.Writer) {
 	p.PrintPackage(w,0)
 }

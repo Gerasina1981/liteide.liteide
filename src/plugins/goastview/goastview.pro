@@ -23,3 +23,6 @@ HEADERS += goastviewplugin.h\
         goastview_global.h \
     goastviewmanager.h \
     goastview.h
+
+RESOURCES += \
+    goastview.qrc

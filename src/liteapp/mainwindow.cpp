@@ -737,6 +737,18 @@ void MainWindow::dbclickOutputEdit()
 
     cur.select(QTextCursor::LineUnderCursor);
     buildOutputEdit->setTextCursor(cur);
+
+    this->gotoLine(fileName,line,0);
+}
+
+void MainWindow::loadSettings()
+{
+    restoreGeometry(liteApp->settings()->value("geometry").toByteArray());
+    restoreState(liteApp->settings()->value("state").toByteArray());
+}
+
+void MainWindow::gotoLine(const QString &fileName, int line, int col)
+{
     IEditor *ed = NULL;
     if (activeProject) {
         QString projectPath = QFileInfo(activeProject->filePath()).absolutePath();
@@ -757,15 +769,9 @@ void MainWindow::dbclickOutputEdit()
         if ( count == line )
         {
             QTextCursor c = QTextCursor(b);
-            c.select(QTextCursor::LineUnderCursor);
+            editor->setFocus();
             editor->setTextCursor(c);
             break;
         }
     }
-}
-
-void MainWindow::loadSettings()
-{
-    restoreGeometry(liteApp->settings()->value("geometry").toByteArray());
-    restoreState(liteApp->settings()->value("state").toByteArray());
 }

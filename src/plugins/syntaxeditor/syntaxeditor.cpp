@@ -13,8 +13,12 @@ SyntaxEditor::SyntaxEditor() : editCompleter(0)
     editorArea = new SyntaxEditorArea(this);
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateEditorArea(QRect,int)));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+
+    setCursorWidth(2);
 
     updateAreaWidth(0);
+    highlightCurrentLine();
 }
 
 void SyntaxEditor::reload()
@@ -399,4 +403,23 @@ void SyntaxEditor::insertCompletion(const QString& completion)
     tc.movePosition(QTextCursor::EndOfWord);
     tc.insertText(completion.right(extra));
     setTextCursor(tc);
+}
+
+void SyntaxEditor::highlightCurrentLine()
+{
+    QList<QTextEdit::ExtraSelection> extraSelections;
+
+    if (!isReadOnly()) {
+        QTextEdit::ExtraSelection selection;
+
+        QColor lineColor = QColor(180,200,200,128);
+
+        selection.format.setBackground(lineColor);
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+        selection.cursor = textCursor();
+        selection.cursor.clearSelection();
+        extraSelections.append(selection);
+    }
+
+    setExtraSelections(extraSelections);
 }

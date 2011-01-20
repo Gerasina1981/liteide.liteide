@@ -36,6 +36,7 @@ protected:
 public:
     int editorAreaWidth();
 protected slots:
+    void highlightCurrentLine();
     void insertCompletion(const QString& completion);
     void updateAreaWidth(int newBlockCount);
     void updateEditorArea(const QRect &, int);

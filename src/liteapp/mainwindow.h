@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow,
     Q_OBJECT
 public:
     friend class LiteApp;
+    void gotoLine(const QString &fileName, int line, int col);
     void loadSettings();
     void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
