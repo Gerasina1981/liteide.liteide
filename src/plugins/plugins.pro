@@ -1,4 +1,4 @@
 TEMPLATE  = subdirs
 CONFIG   += ordered
 
-SUBDIRS = syntaxeditor project golangpro
+SUBDIRS = syntaxeditor project golangpro goastview

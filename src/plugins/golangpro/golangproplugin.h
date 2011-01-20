@@ -13,7 +13,7 @@
 #include <QPlainTextEdit>
 
 
-class GOLANGPROSHARED_EXPORT GolangProPlugin : public QObject, public IPlugin
+class /*GOLANGPROSHARED_EXPORT*/ GolangProPlugin : public QObject, public IPlugin
 {
     Q_OBJECT
     Q_INTERFACES(IPlugin)

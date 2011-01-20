@@ -12,7 +12,7 @@
 #include <QtPlugin>
 #include <QAction>
 
-class PROJECTSHARED_EXPORT ProjectPlugin : public QObject, public IPlugin
+class /*PROJECTSHARED_EXPORT*/ ProjectPlugin : public QObject, public IPlugin
 {
     Q_OBJECT
     Q_INTERFACES(IPlugin)

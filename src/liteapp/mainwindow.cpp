@@ -429,7 +429,7 @@ void MainWindow::about()
                    "<table border=0>"
                    "<tr><td>Devoloper:    </td><td>visualfc (visualfc@gmail.com)</td></tr>"
                    "<tr><td>Project:</td><td>http://code.google.com/p/liteide</td></tr>"
-                   "<tr><td>Version:</td><td>0.1.6</td></tr>"
+                   "<tr><td>Version:</td><td>0.1.7</td></tr>"
                    "<tr><td>Build Time:</td><td>%1</td></tr>"
                    "</table>").arg(__DATE__)));
 }
