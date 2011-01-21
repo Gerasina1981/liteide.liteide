@@ -36,10 +36,10 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     rule.pattern = QRegExp("\\b"
                            "(bool|byte|complex64|complex128|float32|float64|"
                            "int8|int16|int32|int64|string|uint8|uint16|uint32|uint64|"
-                           "complex|float|int|uint|uintptr|"
+                           "int|uint|uintptr|"
                            "true|false|iota|"
                            "nil|"
-                           "append|cap|close|closed|cmplx|copy|imag|len|"
+                           "append|cap|close|closed|complex|copy|imag|len|"
                            "make|new|panic|print|println|real|recover)"
                            "\\b");
     rule.format = identFormat;
