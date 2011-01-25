@@ -37,7 +37,7 @@ func NewFilePackage(filename string) (*PackageView, os.Error) {
 	if err != nil {
 		return nil, err
 	}
-	p.pdoc = doc.NewFileDoc(file, false)
+	p.pdoc = doc.NewFileDoc(file, true)
 	return p, nil
 }
 

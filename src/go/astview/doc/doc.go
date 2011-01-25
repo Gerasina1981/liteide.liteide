@@ -35,7 +35,7 @@ type typeDoc struct {
 //
 type docReader struct {
 	doc     *ast.CommentGroup // package documentation, if any
-	export	bool
+	showAll	bool
 	pkgName string
 	values  []*ast.GenDecl // consts and vars
 	types   map[string]*typeDoc
@@ -44,9 +44,9 @@ type docReader struct {
 }
 
 
-func (doc *docReader) init(pkgName string, export bool) {
+func (doc *docReader) init(pkgName string, showAll bool) {
 	doc.pkgName = pkgName
-	doc.export = export
+	doc.showAll = showAll
 	doc.types = make(map[string]*typeDoc)
 	doc.funcs = make(map[string]*ast.FuncDecl)
 }
@@ -101,16 +101,18 @@ func (doc *docReader) lookupTypeDoc(name string) *typeDoc {
 }
 
 
-func baseTypeName(typ ast.Expr, export bool) string {
+func baseTypeName(typ ast.Expr, showAll bool) string {
 	switch t := typ.(type) {
 	case *ast.Ident:
 		// if the type is not exported, the effect to
 		// a client is as if there were no type name
-		if export && t.IsExported() {
+		if showAll {
+			return string(t.Name)
+		} else if t.IsExported() {
 			return string(t.Name)
 		}
 	case *ast.StarExpr:
-		return baseTypeName(t.X, export)
+		return baseTypeName(t.X, showAll)
 	}
 	return ""
 }
@@ -130,7 +132,7 @@ func (doc *docReader) addValue(decl *ast.GenDecl) {
 			switch {
 			case v.Type != nil:
 				// a type is present; determine its name
-				name = baseTypeName(v.Type, doc.export)
+				name = baseTypeName(v.Type, doc.showAll)
 			case decl.Tok == token.CONST:
 				// no type is present but we have a constant declaration;
 				// use the previous type name (w/o more type information
@@ -192,7 +194,7 @@ func (doc *docReader) addFunc(fun *ast.FuncDecl) {
 	// determine if it should be associated with a type
 	if fun.Recv != nil {
 		// method
-		typ := doc.lookupTypeDoc(baseTypeName(fun.Recv.List[0].Type,doc.export))
+		typ := doc.lookupTypeDoc(baseTypeName(fun.Recv.List[0].Type,doc.showAll))
 		if typ != nil {
 			// exported receiver type
 			setFunc(typ.methods, fun)
@@ -213,7 +215,7 @@ func (doc *docReader) addFunc(fun *ast.FuncDecl) {
 			// exactly one (named or anonymous) result associated
 			// with the first type in result signature (there may
 			// be more than one result)
-			tname := baseTypeName(res.Type, doc.export)
+			tname := baseTypeName(res.Type, doc.showAll)
 			typ := doc.lookupTypeDoc(tname)
 			if typ != nil {
 				// named and exported result type
@@ -316,17 +318,17 @@ func (doc *docReader) addFile(src *ast.File) {
 }
 
 
-func NewFileDoc(file *ast.File, export bool) *PackageDoc {
+func NewFileDoc(file *ast.File, showAll bool) *PackageDoc {
 	var r docReader
-	r.init(file.Name.Name, export)
+	r.init(file.Name.Name, showAll)
 	r.addFile(file)
 	return r.newDoc("", nil)
 }
 
 
-func NewPackageDoc(pkg *ast.Package, importpath string, export bool) *PackageDoc {
+func NewPackageDoc(pkg *ast.Package, importpath string, showAll bool) *PackageDoc {
 	var r docReader
-	r.init(pkg.Name, export)
+	r.init(pkg.Name, showAll)
 	filenames := make([]string, len(pkg.Files))
 	i := 0
 	for filename, f := range pkg.Files {
