@@ -171,9 +171,11 @@ const (
 void GoAstViewManager::astOutput(const QByteArray &data)
 {
     model->clear();
+    astFiles.clear();
 
     QList<QByteArray> array = data.split('\n');
     QMap<int,QStandardItem*> items;
+
     foreach (QByteArray line, array) {
         QList<QByteArray> info = line.split(':');
         if (info.size() < 3) {
@@ -185,6 +187,14 @@ void GoAstViewManager::astOutput(const QByteArray &data)
         if (name.isEmpty() || tag.isEmpty()) {
             continue;
         }
+
+        if (tag == "p") {
+            for (int i = 3; i < info.size(); i ++) {
+                astFiles.append(info[i]);
+            }
+            qDebug() << astFiles;
+        }
+
         QStandardItem *item = new QStandardItem(name);
         item->setData(line);
         if (name.at(0).isLower()) {
@@ -215,9 +225,11 @@ void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
     QList<QByteArray> infos = line.split(':');
     // level:tag:name:source:x:y
     if (infos.size() >= 6) {
-        QString fileName = infos[3];
+        int index = infos[3].toInt();
         int x = infos[4].toInt();
         int y = infos[5].toInt();
-        liteApp->gotoLine(fileName,x,y);
+        if (index >= 0 && index < astFiles.size()) {
+            liteApp->gotoLine(astFiles[index],x,y);
+        }
     }
 }

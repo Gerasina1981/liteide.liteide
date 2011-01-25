@@ -25,7 +25,7 @@ void GoAstView::update(const QString &fileName, const QByteArray &data)
     process.setWorkingDirectory(projDir);
 
     QStringList args;
-    args << "-src" << QFileInfo(fileName).fileName();
+    args << "-src" << fileName;
     QString cmd = QFileInfo(liteApp->applicationPath(),"goastview"+liteApp->osExecuteExt()).absoluteFilePath();
     process.start(cmd,args);
 }
