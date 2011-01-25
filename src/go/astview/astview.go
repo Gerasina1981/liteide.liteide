@@ -21,7 +21,7 @@ func main() {
 	if len(*flagInputSrc) > 0 {
 		view,err := NewFilePackage(*flagInputSrc)
 		if err != nil {
-			fmt.Printf("Error:%s",err)
+			fmt.Fprintf(os.Stderr,"Error:%s",err)
 			os.Exit(1)
 		}
 		view.PrintTree(os.Stdout)

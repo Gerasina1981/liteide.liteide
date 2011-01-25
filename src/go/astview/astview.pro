@@ -4,4 +4,6 @@ DESTDIR=../../../bin
 
 GOFILES = \
 	astview.go \
-	packageview.go
+	packageview.go \
+	doc/doc.go \
+	doc/comment.go

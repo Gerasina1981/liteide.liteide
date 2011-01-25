@@ -12,6 +12,10 @@ EditorImpl::EditorImpl(IApplication *app, QObject *parent)
 {
 }
 
+void EditorImpl::update()
+{
+}
+
 void EditorImpl::setUndoEnabled(bool b)
 {
     undoEnable = b;
@@ -120,8 +124,9 @@ void EditorFactoryImpl::config()
 
 IEditor *EditorFactoryImpl::create(const QString &fileName)
 {
-    SyntaxEditor *ed = SyntaxEditor::openFile(fileName);
-    if (!ed) {
+    SyntaxEditor *ed = new SyntaxEditor(liteApp);
+    if (!ed->loadFile(fileName)) {
+        delete ed;
         return NULL;
     }
 
@@ -140,6 +145,7 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
 
     impl->editor = ed;
     impl->event = liteApp->editorEvent();
+    connect(ed,SIGNAL(update()),impl,SLOT(update()));
     QObject::connect(ed,SIGNAL(modificationChanged(bool)),impl,SLOT(modificationChanged(bool)));
     return impl;
 }

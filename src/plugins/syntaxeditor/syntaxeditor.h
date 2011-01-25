@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include <QTextEdit>
 #include "syntaxcompleter.h"
+#include "../../api/iapp.h"
 
 class SyntaxEditor : public QPlainTextEdit
 {
@@ -15,18 +16,18 @@ public:
     bool autoIndent;
     bool autoBlock;
     void areaPaintEvent(QPaintEvent *event);
-    SyntaxEditor();
+    SyntaxEditor(IApplication *app, QWidget *parent = 0);
     void newFile();
     void reload();
     QString currentText() { return curText; }
-    static SyntaxEditor *openFile(const QString &fileName);
     bool loadFile(const QString &fileName);
     bool save();
     bool saveAs();
     bool saveFile(const QString &fileName);
     QString userFriendlyCurrentFile();
     QString currentFile() { return curFile; }
-
+signals:
+    void update();
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e);
@@ -40,7 +41,7 @@ protected slots:
     void insertCompletion(const QString& completion);
     void updateAreaWidth(int newBlockCount);
     void updateEditorArea(const QRect &, int);
-protected:
+public:
     bool maybeSave();
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
@@ -51,6 +52,7 @@ protected:
     bool isUntitled;
     QWidget *editorArea;
     SyntaxCompleter *editCompleter;
+    IApplication *liteApp;
 };
 
 class SyntaxEditorArea : public QWidget

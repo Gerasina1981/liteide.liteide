@@ -4,7 +4,8 @@
 #include "golanghighlighter.h"
 #include "QCompleter"
 
-SyntaxEditor::SyntaxEditor() : editCompleter(0)
+SyntaxEditor::SyntaxEditor(IApplication *app, QWidget *parent) :
+        QPlainTextEdit(parent),liteApp(app),editCompleter(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -53,18 +54,6 @@ void SyntaxEditor::newFile()
     curFile = tr("document%1.go").arg(sequenceNumber++);
     curText = curFile + "[*]";
     setWindowTitle(curText);
-}
-
-SyntaxEditor *SyntaxEditor::openFile(const QString &fileName)
-{
-    SyntaxEditor *editor = new SyntaxEditor;
-    if (editor->loadFile(fileName)) {
-        editor->setCurrentFile(fileName);
-        return editor;
-    } else {
-        delete editor;
-        return 0;
-    }
 }
 
 bool SyntaxEditor::loadFile(const QString &fileName)
@@ -246,6 +235,13 @@ bool SyntaxEditor::event(QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+        if ( keyEvent->key() == Qt::Key_Return ||
+          keyEvent->key() == Qt::Key_Enter ) {
+            emit update();
+        }
+
+
         if (this->autoIndent &&
             ( keyEvent->key() == Qt::Key_Return ||
               keyEvent->key() == Qt::Key_Enter) ) {

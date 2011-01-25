@@ -37,7 +37,6 @@ void GoAstView::started()
 void GoAstView::readStderr()
 {
     QByteArray data = process.readAllStandardError();
-    emit astOutput("");
 }
 
 void GoAstView::readStdout()

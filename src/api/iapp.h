@@ -32,6 +32,7 @@ public:
     virtual void gotoLine(const QString &fileName, int line, int col) = 0;
     virtual IProject *loadProject(const QString &fileName) = 0;
     virtual IEditor *loadEditor(const QString &fileName) = 0;
+    virtual void loadAstViewEditor(const IEditor *ed) = 0;
     virtual IEditorEvent *editorEvent() = 0;
     virtual IProjectEvent *projectEvent() = 0;
     virtual IBuildEvent *buildEvent() = 0;

@@ -55,7 +55,7 @@ MainWindow::MainWindow(LiteApp *app) :
     createToolBars();
     createStatusBar();
     createDockWindows();
-    createOutputWidget();
+    createOutputWidget();  
 
     resize(640,480);
 
@@ -331,8 +331,9 @@ void MainWindow::createOutputWidget()
     outputDock = new QDockWidget(tr("Output"), this);
     outputDock->setObjectName("outputDock");
 
-    outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    outputDock->setFeatures(QDockWidget::DockWidgetClosable);
+    //outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+    //outputDock->setFeatures(QDockWidget::DockWidgetClosable);
+    //outputDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
     //outputDock->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -341,21 +342,20 @@ void MainWindow::createOutputWidget()
 
     outputTabWidget = new QTabWidget;
     outputTabWidget->setTabPosition(QTabWidget::South);
+    connect(outputTabWidget,SIGNAL(currentChanged(int)),this,SLOT(outputTabChanged(int)));
 
     buildOutputEdit = new PlainTextEditEx(this);
     buildOutputEdit->setReadOnly(true);
 
     connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
 
-    outputTabWidget->addTab(buildOutputEdit,tr("Build Output"));
+    outputTabWidget->addTab(buildOutputEdit,tr("Build"));
 
     runTargetOutputEdit = new QPlainTextEdit(this);
     runTargetOutputEdit->setReadOnly(true);
-    outputTabWidget->addTab(runTargetOutputEdit,tr("Application Output"));
+    outputTabWidget->addTab(runTargetOutputEdit,tr("Application"));
 
     outputDock->setWidget(outputTabWidget);
-
-    connect(outputTabWidget,SIGNAL(currentChanged(int)),this,SLOT(outputTabChanged(int)));
 }
 
 void MainWindow::saveFile()

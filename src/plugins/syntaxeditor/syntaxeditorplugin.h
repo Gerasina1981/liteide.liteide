@@ -25,6 +25,7 @@ public:
     virtual void reload();
     virtual void activeEditor(QAction *undoAct, QAction *redoAct);
 public slots:
+    void update();
     void setUndoEnabled(bool);
     void setRedoEnabled(bool);
     void  modificationChanged(bool);    
