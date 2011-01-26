@@ -96,6 +96,12 @@ bool SyntaxEditor::saveAs()
     return saveFile(fileName);
 }
 
+QByteArray SyntaxEditor::data() const
+{
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    return codec->fromUnicode(toPlainText());
+}
+
 bool SyntaxEditor::saveFile(const QString &fileName)
 {
     QFile file(fileName);

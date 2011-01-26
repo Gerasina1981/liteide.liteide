@@ -15,6 +15,7 @@ public:
     virtual QString filePath() const = 0;
     virtual QWidget *widget() const = 0;
     virtual QIcon icon() const = 0;
+    virtual QByteArray data() const = 0;
 public slots:
     virtual void save() = 0;
     virtual bool close() = 0;
@@ -37,6 +38,7 @@ public:
     virtual ~IEditorEvent() {}
     virtual void fireDocumentChanged(IEditor *edit, bool b) = 0;
     virtual void fireDocumentSave(IEditor *edit) = 0;
+    virtual void fireTextChanged(IEditor *edit) = 0;
 };
 
 

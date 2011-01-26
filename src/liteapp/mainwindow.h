@@ -8,6 +8,7 @@
 #include "../api/iproject.h"
 #include "../api/ibuild.h"
 #include "../api/iruntarget.h"
+#include <QTimer>
 
 class LiteApp;
 class QPlainTextEdit;
@@ -46,6 +47,7 @@ public:
     MainWindow(LiteApp *app);
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireDocumentSave(IEditor *edit);
+    virtual void fireTextChanged(IEditor *edit);
     virtual void fireProjectChanged(IProject *project);
     virtual void fireProjectClose(IProject *project);
     virtual void fireBuildStarted();
@@ -145,7 +147,10 @@ private:
     IRunTarget *activeRunTarget;
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
+
+    QTimer *astTimer;
 public slots:
+    void astUpdate();
     void selectBuild();
 };
 

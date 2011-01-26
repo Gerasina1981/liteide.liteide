@@ -64,6 +64,9 @@ MainWindow::MainWindow(LiteApp *app) :
      //setUnifiedTitleAndToolBarOnMac(true);
     loadSettings();
     outputDock->hide();
+
+    astTimer = new QTimer(this);
+    connect(astTimer,SIGNAL(timeout()),this,SLOT(astUpdate()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -287,6 +290,9 @@ void MainWindow::editTabClose(int index)
         editTabWidget->removeTab(index);
         editors.remove(w);
     }
+    if (editors.empty()) {
+        liteApp->loadAstViewEditor(NULL);
+    }
 }
 
 void MainWindow::editTabChanged(int index)
@@ -447,8 +453,13 @@ void MainWindow::fireDocumentSave(IEditor *edit)
     if (activeProject && edit->filePath() == activeProject->filePath()) {
          activeProject->reload();
     }
+}
+
+void MainWindow::fireTextChanged(IEditor *edit)
+{
     if (activeEditor && activeEditor == edit) {
-        liteApp->loadAstViewEditor(activeEditor);
+        astTimer->stop();
+        astTimer->start(2000);
     }
 }
 
@@ -680,6 +691,9 @@ void MainWindow::outputTabChanged(int index)
 
 void MainWindow::closeAllFile()
 {
+    this->activeEditor = NULL;
+    liteApp->loadAstViewEditor(NULL);
+    this->astTimer->stop();
     int count = editTabWidget->count();
     while (count--) {
         QWidget *w = editTabWidget->widget(count);
@@ -776,5 +790,13 @@ void MainWindow::gotoLine(const QString &fileName, int line, int col)
             editor->setTextCursor(c);
             break;
         }
+    }
+}
+
+void MainWindow::astUpdate()
+{
+    astTimer->stop();
+    if (this->activeEditor) {
+        liteApp->loadAstViewEditor(this->activeEditor);
     }
 }

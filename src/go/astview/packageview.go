@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"os"
 	"io"
+	"io/ioutil"
 	"fmt"
 	"./doc"
 )
@@ -26,12 +27,12 @@ const (
 )
 
 type PackageView struct {
-	fset *token.FileSet
-	pdoc *doc.PackageDoc
+	fset  *token.FileSet
+	pdoc  *doc.PackageDoc
 	files []string
 }
 
-func (p *PackageView)posFileIndex(pos token.Position) int {
+func (p *PackageView) posFileIndex(pos token.Position) int {
 	var index = -1
 	for i := 0; i < len(p.files); i++ {
 		if p.files[i] == pos.Filename {
@@ -40,21 +41,21 @@ func (p *PackageView)posFileIndex(pos token.Position) int {
 		}
 	}
 	if index == -1 {
-		p.files = append(p.files,pos.Filename)
-		index = len(p.files)-1		
+		p.files = append(p.files, pos.Filename)
+		index = len(p.files) - 1
 	}
 	return index
 }
 
-func (p *PackageView)posText(pos token.Position) (s string) {
+func (p *PackageView) posText(pos token.Position) (s string) {
 	index := p.posFileIndex(pos)
-	return fmt.Sprintf("%d,%d,%d",index,pos.Line,pos.Column)
+	return fmt.Sprintf("%d,%d,%d", index, pos.Line, pos.Column)
 }
 
 func NewFilePackage(filename string) (*PackageView, os.Error) {
 	p := new(PackageView)
 	p.fset = token.NewFileSet()
-	p.files = append(p.files,filename)
+	p.files = append(p.files, filename)
 	file, err := parser.ParseFile(p.fset, filename, nil, 0)
 	if err != nil {
 		return nil, err
@@ -62,6 +63,23 @@ func NewFilePackage(filename string) (*PackageView, os.Error) {
 	p.pdoc = doc.NewFileDoc(file, true)
 	return p, nil
 }
+
+func NewFilePackageSource(filename string, f *os.File) (*PackageView, os.Error) {
+	src, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	p := new(PackageView)
+	p.fset = token.NewFileSet()
+	p.files = append(p.files, filename)
+	file, err := parser.ParseFile(p.fset, filename, src, 0)
+	if err != nil {
+		return nil, err
+	}
+	p.pdoc = doc.NewFileDoc(file, true)
+	return p, nil
+}
+
 
 func (p *PackageView) PrintFuncs(w io.Writer, funcs []*doc.FuncDoc, level int, tag string, tag_folder string) {
 	if len(tag_folder) > 0 && len(funcs) > 0 {
@@ -121,13 +139,13 @@ func (p *PackageView) PrintTypes(w io.Writer, types []*doc.TypeDoc, level int) {
 func (p *PackageView) PrintHeader(w io.Writer, level int) {
 	fmt.Fprintf(w, "%d,%s,%s", level, tag_package, p.pdoc.PackageName)
 	for i := 0; i < len(p.files); i++ {
-		fmt.Fprintf(w,",%s",p.files[i])
+		fmt.Fprintf(w, ",%s", p.files[i])
 	}
-	fmt.Fprintf(w,"\n")
+	fmt.Fprintf(w, "\n")
 }
 
 func (p *PackageView) PrintPackage(w io.Writer, level int) {
-	p.PrintHeader(w,level)
+	p.PrintHeader(w, level)
 	level++
 	p.PrintVars(w, p.pdoc.Vars, level, tag_value, tag_value_folder)
 	p.PrintVars(w, p.pdoc.Consts, level, tag_const, tag_const_folder)

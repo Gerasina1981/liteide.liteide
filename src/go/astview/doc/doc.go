@@ -35,7 +35,7 @@ type typeDoc struct {
 //
 type docReader struct {
 	doc     *ast.CommentGroup // package documentation, if any
-	showAll	bool
+	showAll bool
 	pkgName string
 	values  []*ast.GenDecl // consts and vars
 	types   map[string]*typeDoc
@@ -194,7 +194,7 @@ func (doc *docReader) addFunc(fun *ast.FuncDecl) {
 	// determine if it should be associated with a type
 	if fun.Recv != nil {
 		// method
-		typ := doc.lookupTypeDoc(baseTypeName(fun.Recv.List[0].Type,doc.showAll))
+		typ := doc.lookupTypeDoc(baseTypeName(fun.Recv.List[0].Type, doc.showAll))
 		if typ != nil {
 			// exported receiver type
 			setFunc(typ.methods, fun)

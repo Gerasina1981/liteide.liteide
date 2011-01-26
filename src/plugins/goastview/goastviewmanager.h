@@ -56,7 +56,7 @@ public:
     QStringList astFiles;
     explicit GoAstViewManager(IApplication *app, QWidget *parent = 0);
     virtual QStringList fileTypes();
-    virtual IAstView *load(const QString &fileName);
+    virtual IAstView *load(const QString &fileName, const QByteArray &data);
 signals:
 
 public slots:

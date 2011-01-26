@@ -21,6 +21,7 @@ public:
     void reload();
     QString currentText() { return curText; }
     bool loadFile(const QString &fileName);
+    QByteArray data() const;
     bool save();
     bool saveAs();
     bool saveFile(const QString &fileName);

@@ -24,8 +24,9 @@ public:
     virtual bool close();
     virtual void reload();
     virtual void activeEditor(QAction *undoAct, QAction *redoAct);
+    virtual QByteArray data() const;
 public slots:
-    void update();
+    void textChanged();
     void setUndoEnabled(bool);
     void setRedoEnabled(bool);
     void  modificationChanged(bool);    

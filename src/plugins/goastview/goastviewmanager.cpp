@@ -140,14 +140,18 @@ QStringList GoAstViewManager::fileTypes()
     return QStringList() << "go";
 }
 
-IAstView *GoAstViewManager::load(const QString &fileName)
+IAstView *GoAstViewManager::load(const QString &fileName, const QByteArray &data)
 {
     static bool b = true;
     if (b) {
         b = false;
         parentDock->show();
     }
-    astView->update(fileName,"");
+    if (fileName.isEmpty()) {
+        astOutput("");
+    } else {
+        astView->update(fileName,data);
+    }
     return astView;
 }
 /*
@@ -170,11 +174,25 @@ const (
 // level:tag:name:source:x:y
 void GoAstViewManager::astOutput(const QByteArray &data)
 {
+    QModelIndex root = model->index(0,0);
+    QStringList expand;
+    if (root.isValid()) {
+        for (int i = 0; i < model->rowCount(root); i++) {
+            QModelIndex r = model->index(i,0,root);
+            if (r.isValid()) {
+                QStandardItem *item = model->itemFromIndex(r);
+                if (item && tree->isExpanded(r)) {
+                    expand.append(item->text());
+                }
+            }
+        }
+    }
+
     model->clear();
     astFiles.clear();
 
     QList<QByteArray> array = data.split('\n');
-    QMap<int,QStandardItem*> items;
+    QMap<int,QStandardItem*> items;   
 
     foreach (QByteArray line, array) {
         QList<QByteArray> info = line.split(',');
@@ -208,8 +226,19 @@ void GoAstViewManager::astOutput(const QByteArray &data)
             model->appendRow(item);
         }
         items[level] = item;
-        if (tag == "s" || tag == "p") {
-            tree->expand(model->indexFromItem(item));
+    }
+
+    root = model->index(0,0);
+    if (root.isValid()) {
+        tree->expand(root);
+        for (int i = 0; i < model->rowCount(root); i++) {
+            QModelIndex r = model->index(i,0,root);
+            if (r.isValid()) {
+                QStandardItem *item = model->itemFromIndex(r);
+                if (item && expand.contains(item->text())) {
+                    tree->expand(r);
+                }
+            }
         }
     }
 }

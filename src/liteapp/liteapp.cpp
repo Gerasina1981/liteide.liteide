@@ -239,12 +239,18 @@ void LiteApp::closeProject()
 
 void LiteApp::loadAstViewEditor(const IEditor *ed)
 {   
+    if (ed == NULL) {
+        foreach (IAstViewFactory *factory, astFactorys) {
+           factory->load("","");
+        }
+        return;
+    }
     QString ext = QFileInfo(ed->filePath()).suffix();
     foreach (IAstViewFactory *factory, astFactorys) {
         if (factory->fileTypes().contains(ext)) {
-            factory->load(ed->filePath());
+            factory->load(ed->filePath(),ed->data());
         } else {
-            factory->load("");
+            factory->load("","");
         }
     }
 }

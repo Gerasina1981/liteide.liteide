@@ -14,7 +14,6 @@ import (
 	"template" // for htmlEscape
 )
 
-
 func isWhitespace(ch byte) bool { return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' }
 
 
