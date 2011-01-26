@@ -1,17 +1,17 @@
 LiteIDE
 
-golang developer editor
+Simple go code edit and build IDE
 
-*) UTF8 file load and save
-*) Syntax Highlighter
-*) Project Manager
-*) Project build and run
-*) No use project, file build and run
-*) gopromake auto build tools
-*) build error can jump to source line
+* UTF8 file load and save
+* Syntax highliter
+* Go source file build and run, if no project
+* Project manager, multi packages support
+* Project auto build tool gopromake
+* Go souce file ast view tool goastview
+* Build error jump to source line 
 
 Developer:  visualfc (visualfc@gmail.com)
-Project : 	   http://code.google.com/p/liteide
+Project :   http://code.google.com/p/liteide
 
 
 FAQ:

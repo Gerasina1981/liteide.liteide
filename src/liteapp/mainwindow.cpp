@@ -432,10 +432,12 @@ void MainWindow::about()
                 QString(tr("<h1 class='title'>LiteIDE </h1>"
                    "<p>Open Source Editor - Copyright (C)2011</p>"
                    "<p></p>"
+                   "<h2> <font color=green>Happy Birthday Lucy!</font></h2>"
+                   "<p></p>"
                    "<table border=0>"
                    "<tr><td>Devoloper:    </td><td>visualfc (visualfc@gmail.com)</td></tr>"
                    "<tr><td>Project:</td><td>http://code.google.com/p/liteide</td></tr>"
-                   "<tr><td>Version:</td><td>0.1.7</td></tr>"
+                   "<tr><td>Version:</td><td>0.1.8</td></tr>"
                    "<tr><td>Build Time:</td><td>%1</td></tr>"
                    "</table>").arg(__DATE__)));
 }
