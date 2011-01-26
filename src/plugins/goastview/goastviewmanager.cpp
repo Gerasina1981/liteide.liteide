@@ -177,7 +177,7 @@ void GoAstViewManager::astOutput(const QByteArray &data)
     QMap<int,QStandardItem*> items;
 
     foreach (QByteArray line, array) {
-        QList<QByteArray> info = line.split(':');
+        QList<QByteArray> info = line.split(',');
         if (info.size() < 3) {
             continue;
         }
@@ -192,7 +192,6 @@ void GoAstViewManager::astOutput(const QByteArray &data)
             for (int i = 3; i < info.size(); i ++) {
                 astFiles.append(info[i]);
             }
-            qDebug() << astFiles;
         }
 
         QStandardItem *item = new QStandardItem(name);
@@ -222,7 +221,7 @@ void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
         return;
     QByteArray line = item->data().toByteArray();
 
-    QList<QByteArray> infos = line.split(':');
+    QList<QByteArray> infos = line.split(',');
     // level:tag:name:source:x:y
     if (infos.size() >= 6) {
         int index = infos[3].toInt();
