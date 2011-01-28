@@ -23,8 +23,14 @@ func main() {
 		if *flagStdin {
 			f = os.Stdin
 		} else {
-			f = os.NewFile(os.O_RDONLY, *flagInputSrc)
+			var err os.Error
+			f,err = os.Open( *flagInputSrc, os.O_RDONLY, 0)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error:%s", err)
+				os.Exit(1)
+			}
 		}
+		defer f.Close()
 		view, err := NewFilePackageSource(*flagInputSrc, f)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error:%s", err)
