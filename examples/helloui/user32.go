@@ -9,6 +9,6 @@ var (
 )
 
 func MessageBoxW(handle uint32, text string, title string) {
-	syscall.Syscall6(uintptr(procMessageBoxW), uintptr(handle), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(title))), 0, 0, 0)
+	syscall.Syscall6(uintptr(procMessageBoxW), 4,uintptr(handle), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(title))), 0, 0, 0)
 	return
 }
