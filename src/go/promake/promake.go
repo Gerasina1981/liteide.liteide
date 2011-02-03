@@ -10,7 +10,6 @@ import (
 	"path"
 	"exec"
 	"syscall"
-	"log"
 )
 
 var (
@@ -236,6 +235,11 @@ var Usage = func() {
 	flag.PrintDefaults()
 }
 
+func exitln(err os.Error) {
+	fmt.Println(err)
+	os.Exit(1)
+}
+
 func main() {
 	flag.Parse()
 	if *showVer == true {
@@ -244,7 +248,7 @@ func main() {
 
 	gobin, err := newGoBin()
 	if err != nil {
-		log.Exitln(err)
+		exitln(err)
 	}
 
 	var pro *Gopro
@@ -252,7 +256,7 @@ func main() {
 	if len(*proFileName) > 0 {
 		pro, err = makePro(*proFileName)
 		if err != nil {
-			log.Exitln(err)
+			exitln(err)
 		}
 	} else if len(*goFileName) > 0 {
 		var input []byte = []byte(*goFileName)
@@ -287,9 +291,9 @@ func main() {
 
 	status, err := pro.MakeTarget(gobin)
 	if err != nil {
-		log.Exitln(err)
+		exitln(err)
 	} else if status.ExitStatus() != 0 {
-		log.Exitln("Error")
+		exitln(os.NewError("Error"))
 	}
 	os.Exit(0)
 }
