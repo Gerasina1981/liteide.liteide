@@ -14,6 +14,7 @@ class LiteApp;
 class QPlainTextEdit;
 class QActionGroup;
 class FindDialog;
+class QStackedWidget;
 
 class PlainTextEditEx : public QPlainTextEdit
 {
@@ -59,6 +60,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void selectedOutputAct(QAction *act);
     void dbclickOutputEdit();
     void findText(const QString&,QTextDocument::FindFlags);
     void find();
@@ -82,6 +84,7 @@ private slots:
 public:
     QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
     void addOutputPage(QWidget *w, const QString &name);
+    void addOutputAction(QWidget *w, const QIcon &icon, const QString &name);
     void addEditor(IEditor *ed);
 private:
     virtual void dropEvent(QDropEvent *event);
@@ -96,10 +99,14 @@ private:
     QDockWidget *outputDock;
     QTabWidget *editTabWidget;
     QTabWidget *outputTabWidget;
+    QStackedWidget *outputStackedWidget;
 
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
     QToolBar *buildToolBar;
+    QToolBar *outputToolBar;
+    QActionGroup *outputActGroup;
+    QMap<QAction*,QWidget*> outputActMap;
 
     QMenu   *fileMenu;
     QMenu   *editMenu;

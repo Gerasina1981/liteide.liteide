@@ -27,6 +27,9 @@
 #include <QTextBlock>
 #include <QRegExp>
 #include <QFileInfo>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QDebug>
 
 MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
@@ -39,13 +42,26 @@ MainWindow::MainWindow(LiteApp *app) :
     this->setWindowTitle("LiteIDE");
     this->setAttribute(Qt::WA_DeleteOnClose);
 
+    QSplitter *mainSplitter = new QSplitter(Qt::Vertical,this);
+
+    outputStackedWidget = new QStackedWidget(this);
+
     editTabWidget = new QTabWidget;
     editTabWidget->setDocumentMode(true);
     editTabWidget->setTabsClosable(true);
 
-
-    setCentralWidget(editTabWidget);
     editTabWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    mainSplitter->addWidget(editTabWidget);
+    mainSplitter->addWidget(outputStackedWidget);
+
+    mainSplitter->setStretchFactor(0,50);
+
+    outputStackedWidget->hide();
+
+    setCentralWidget(mainSplitter);
+
+
 
     connect(editTabWidget,SIGNAL(currentChanged(int)),this,SLOT(editTabChanged(int)));
     connect(editTabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(editTabClose(int)));
@@ -67,6 +83,7 @@ MainWindow::MainWindow(LiteApp *app) :
 
     astTimer = new QTimer(this);
     connect(astTimer,SIGNAL(timeout()),this,SLOT(astUpdate()));
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -255,6 +272,12 @@ void MainWindow::createToolBars()
     buildToolBar->setObjectName("Build");
     buildToolBar->addAction(buildProjectAct);
     buildToolBar->addAction(runTargetAct);
+
+    outputToolBar = new QToolBar("Output Panes",this);
+    outputToolBar->setObjectName("OutputPanes");
+    this->addToolBar(Qt::BottomToolBarArea,outputToolBar);
+    outputActGroup = new QActionGroup(this);
+    connect(outputActGroup,SIGNAL(selected(QAction*)),this,SLOT(selectedOutputAct(QAction*)));
 }
 
 void MainWindow::createStatusBar()
@@ -327,6 +350,19 @@ void MainWindow::addOutputPage(QWidget *w, const QString &name)
     outputTabWidget->addTab(w,name);
 }
 
+void MainWindow::addOutputAction(QWidget *w, const QIcon &icon, const QString &text)
+{
+    static int index = 0;
+    index++;
+    QAction *act = outputActGroup->addAction(icon,QString("%1:%2").arg(index).arg(text));
+    act->setCheckable(true);
+    act->setShortcut(QKeySequence(Qt::ALT+Qt::Key_0+index));
+    act->setToolTip(QString("%1 Alt+%2").arg(text).arg(index));
+    outputToolBar->addAction(act);
+    outputStackedWidget->addWidget(w);
+    outputActMap.insert(act,w);
+}
+
 void MainWindow::createDockWindows()
 {
     //this->setDockOptions(ForceTabbedDocks);
@@ -362,6 +398,9 @@ void MainWindow::createOutputWidget()
     outputTabWidget->addTab(runTargetOutputEdit,tr("Application"));
 
     outputDock->setWidget(outputTabWidget);
+
+    this->addOutputAction(buildOutputEdit,QIcon(),"Complile Output");
+    this->addOutputAction(runTargetOutputEdit,QIcon(),"Application Output");
 }
 
 void MainWindow::saveFile()
@@ -800,5 +839,27 @@ void MainWindow::astUpdate()
     astTimer->stop();
     if (this->activeEditor) {
         liteApp->loadAstViewEditor(this->activeEditor);
+    }
+}
+
+void MainWindow::selectedOutputAct(QAction *act)
+{
+    QWidget *w = outputActMap.value(act,0);
+    if (w == 0)
+        return;
+    static QAction *lastAct = NULL;
+    if (lastAct == act) {
+        act->setChecked(false);
+        lastAct = NULL;
+    } else {
+        lastAct = act;
+    }
+    if (lastAct == NULL) {
+        this->outputStackedWidget->hide();
+    } else  {
+        if (this->outputStackedWidget->isHidden()) {
+            this->outputStackedWidget->show();
+        }
+        this->outputStackedWidget->setCurrentWidget(w);
     }
 }

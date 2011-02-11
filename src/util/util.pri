@@ -1,6 +1,5 @@
 #INCLUDEPATH += $$PWD
-include (../api/api.pri)
-
+#include (../api/api.pri)
 DEPENDPATH += $$PWD
 
 HEADERS += processoutput.h \
