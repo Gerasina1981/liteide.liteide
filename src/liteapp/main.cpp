@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     app.loadPlugins(info.absoluteFilePath());
     app.installPlugins();
 
-    app.mainWindow->show();
+    app._mainWindow->show();
 
     if (argc >= 2) {
         QString fileName = QDir::fromNativeSeparators(argv[1]);

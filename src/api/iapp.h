@@ -18,13 +18,25 @@ class IRunTarget;
 class IRunTargetEvent;
 class IAstView;
 class IAstViewFactory;
+class IMainWindow;
+
+class IMainWindow
+{
+public:
+    virtual ~IMainWindow() {}
+    virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name) = 0;
+    virtual void addOutputPane(QWidget *w, const QIcon &icon, const QString &name) = 0;
+    virtual void setCurrentOutputPane(QWidget *w) = 0;
+    virtual QMenu *fileMenu() = 0;
+    virtual QMenu *viewMenu() = 0;
+    virtual QMenu *editMenu() = 0;
+    virtual QMenu *toolMenu() = 0;
+};
 
 class IApplication
 {
 public:
     virtual ~IApplication() {}
-    virtual QDockWidget *addWorkspacePane(QWidget *w, const QString &name) = 0;
-    virtual void addOutputPane(QWidget *w, const QString &name) = 0;
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
     virtual void addAstViewFactory(IAstViewFactory *astFactory) = 0;
     virtual void addProjectFactory(IProjectFactory *projFactory) = 0;
@@ -40,11 +52,7 @@ public:
     virtual void setRunTarget(IRunTarget *runTarget) = 0;
     virtual IRunTargetEvent *runTargetEvent() = 0;
     virtual QSettings *settings() = 0;
-    virtual QWidget *main() = 0;
-    virtual QMenu *fileMenu() = 0;
-    virtual QMenu *viewMenu() = 0;
-    virtual QMenu *editMenu() = 0;
-    virtual QMenu *toolMenu() = 0;
+    virtual IMainWindow *mainWindow() = 0;
     virtual IEditor *activeEditor() = 0;
     virtual IProject *activeProject() = 0;
     virtual QString applicationPath() = 0;

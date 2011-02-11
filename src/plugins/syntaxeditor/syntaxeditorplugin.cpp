@@ -93,7 +93,7 @@ EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
 {
     configAct = new QAction(tr("SyntaxEditor Config"),this);
     connect(configAct,SIGNAL(triggered()),this,SLOT(config()));
-    liteApp->toolMenu()->addAction(configAct);
+    liteApp->mainWindow()->toolMenu()->addAction(configAct);
 
     editorFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
     editorFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());

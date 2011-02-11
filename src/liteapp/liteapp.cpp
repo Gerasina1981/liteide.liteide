@@ -8,7 +8,7 @@
 LiteApp::LiteApp()
 {
     mainSettings = new QSettings(QSettings::IniFormat,QSettings::UserScope,"liteide","liteapp",this);
-    mainWindow = new MainWindow(this);
+    _mainWindow = new MainWindow(this);
 }
 
 LiteApp::~LiteApp()
@@ -16,14 +16,9 @@ LiteApp::~LiteApp()
     qDeleteAll(plugins);
 }
 
-QDockWidget * LiteApp::addWorkspacePane(QWidget *w, const QString &name)
+IMainWindow *LiteApp::mainWindow()
 {
-    return mainWindow->addWorkspacePane(w,name);
-}
-
-void LiteApp::addOutputPane(QWidget *w, const QString &name)
-{
-    mainWindow->addOutputPane(w,QIcon(),name);
+    return _mainWindow;
 }
 
 void LiteApp::addEditorFactory(IEditorFactory *editFactory)
@@ -44,12 +39,12 @@ void LiteApp::addAstViewFactory(IAstViewFactory *astFactory)
 void LiteApp::addBuild(IBuild *build)
 {
     buildList.append(build);
-    mainWindow->appendBuild(build);
+    _mainWindow->appendBuild(build);
 }
 
 void LiteApp::gotoLine(const QString &fileName, int line, int col)
 {
-    mainWindow->gotoLine(fileName,line,col);
+    _mainWindow->gotoLine(fileName,line,col);
 }
 
 IProject *LiteApp::loadProject(const QString &fileName)
@@ -65,27 +60,22 @@ IProject *LiteApp::loadProject(const QString &fileName)
 
 IEditorEvent *LiteApp::editorEvent()
 {
-    return mainWindow;
+    return _mainWindow;
 }
 
 IProjectEvent *LiteApp::projectEvent()
 {
-    return mainWindow;
+    return _mainWindow;
 }
 
 IBuildEvent *LiteApp::buildEvent()
 {
-    return mainWindow;
+    return _mainWindow;
 }
 
 QSettings *LiteApp::settings()
 {
     return mainSettings;
-}
-
-QWidget *LiteApp::main()
-{
-    return mainWindow;
 }
 
 QString LiteApp::applicationPath()
@@ -102,49 +92,29 @@ QString LiteApp::osExecuteExt()
 #endif
 }
 
-QMenu *LiteApp::fileMenu()
-{
-    return mainWindow->fileMenu;
-}
-
-QMenu *LiteApp::editMenu()
-{
-    return mainWindow->editMenu;
-}
-
-QMenu *LiteApp::viewMenu()
-{
-    return mainWindow->viewMenu;
-}
-
-QMenu *LiteApp::toolMenu()
-{
-    return mainWindow->toolMenu;
-}
-
 IEditor *LiteApp::activeEditor()
 {
-    return mainWindow->activeEditor;
+    return _mainWindow->activeEditor;
 }
 
 IProject *LiteApp::activeProject()
 {
-    return mainWindow->activeProject;
+    return _mainWindow->activeProject;
 }
 
 IRunTarget *LiteApp::activeRunTarget()
 {
-    return mainWindow->activeRunTarget;
+    return _mainWindow->activeRunTarget;
 }
 
 void LiteApp::setRunTarget(IRunTarget *runTarget)
 {
-    mainWindow->activeRunTarget = runTarget;
+    _mainWindow->activeRunTarget = runTarget;
 }
 
 IRunTargetEvent *LiteApp::runTargetEvent()
 {
-    return mainWindow;
+    return _mainWindow;
 }
 
 
@@ -165,8 +135,8 @@ void LiteApp::installPlugins()
         p->install(this);
     }
     if (!buildList.empty()) {
-        mainWindow->activeBuild = buildList.at(0);
-        mainWindow->activeBuild->setActive();
+        _mainWindow->activeBuild = buildList.at(0);
+        _mainWindow->activeBuild->setActive();
     }
 }
 
@@ -190,9 +160,9 @@ QString LiteApp::editorTypeFilter() const
 
 IEditor *LiteApp::loadEditor(const QString &fileName)
 {
-    foreach (IEditor *ed, mainWindow->editors.values()) {
+    foreach (IEditor *ed, _mainWindow->editors.values()) {
         if (ed->filePath() == fileName) {
-            mainWindow->editTabWidget->setCurrentWidget(ed->widget());
+            _mainWindow->editTabWidget->setCurrentWidget(ed->widget());
             return ed;
         }
     }
@@ -212,7 +182,7 @@ IEditor *LiteApp::loadEditor(const QString &fileName)
     }
     IEditor *ed = factory->create(fileName);
     if (ed) {
-        mainWindow->addEditor(ed);
+        _mainWindow->addEditor(ed);
         return ed;
     }
     return NULL;
@@ -232,9 +202,9 @@ IBuild *LiteApp::selectBuild(const QString &name)
 
 void LiteApp::closeProject()
 {
-    if (mainWindow->activeProject)
-        mainWindow->activeProject->close();
-    mainWindow->activeProject = NULL;
+    if (_mainWindow->activeProject)
+        _mainWindow->activeProject->close();
+    _mainWindow->activeProject = NULL;
 }
 
 void LiteApp::loadAstViewEditor(const IEditor *ed)

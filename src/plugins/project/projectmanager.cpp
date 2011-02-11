@@ -28,7 +28,7 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
     setLayout(layout);
 
     liteApp->addProjectFactory(this);
-    parentDock = liteApp->addWorkspacePane(this,"Projects");
+    parentDock = liteApp->mainWindow()->addWorkspacePane(this,"Projects");
     parentDock->hide();
 }
 
@@ -51,7 +51,7 @@ void ProjectManager::createActions()
     closeProjectAct->setToolTip(tr("Close Project"));
     connect(closeProjectAct,SIGNAL(triggered()),this,SLOT(closeProject()));
 
-    QMenu *fileMenu = liteApp->fileMenu();
+    QMenu *fileMenu = liteApp->mainWindow()->fileMenu();
     QAction *seperator = fileMenu->insertSeparator(fileMenu->actions()[0]);
     fileMenu->insertActions(seperator,QList<QAction*>() << newProjectAct
                             << openProjectAct << closeProjectAct);

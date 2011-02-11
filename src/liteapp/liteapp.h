@@ -18,8 +18,7 @@ public:
     void loadAstViewEditor(const IEditor *ed);
     void closeProject();
     IBuild *selectBuild(const QString &name);
-    virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
-    virtual void addOutputPane(QWidget *w, const QString &name);
+    virtual IMainWindow *mainWindow();
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
     virtual void addAstViewFactory(IAstViewFactory *astFactory);
@@ -36,11 +35,6 @@ public:
     virtual void setRunTarget(IRunTarget *runTarget);
     virtual IRunTargetEvent *runTargetEvent();
     virtual QSettings *settings();
-    virtual QMenu *fileMenu();
-    virtual QMenu *editMenu();
-    virtual QMenu *viewMenu();
-    virtual QMenu *toolMenu();
-    virtual QWidget *main();
     virtual QString applicationPath() ;
     virtual QString osExecuteExt();
     void loadPlugins(const QString &dir);
@@ -49,7 +43,7 @@ public:
     QString projectTypeFilter() const;
 public:
     QSettings  *mainSettings;
-    MainWindow * mainWindow;
+    MainWindow * _mainWindow;
     QList<IPlugin*> plugins;
     QList<IBuild*>   buildList;
     QList<IEditorFactory*> editorFactorys;

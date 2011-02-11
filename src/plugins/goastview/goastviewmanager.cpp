@@ -131,7 +131,7 @@ GoAstViewManager::GoAstViewManager(IApplication *app, QWidget *parent) :
 
     setLayout(layout);
     liteApp->addAstViewFactory(this);
-    parentDock = liteApp->addWorkspacePane(this,"AstView");
+    parentDock = liteApp->mainWindow()->addWorkspacePane(this,"AstView");
     parentDock->hide();
 }
 

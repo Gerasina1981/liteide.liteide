@@ -51,14 +51,14 @@ void GolangProPlugin::createGofmt()
 {
     gofmtOutputEdit = new QPlainTextEdit;
     gofmtOutputEdit->setReadOnly(true);
-    liteApp->addOutputPane(gofmtOutputEdit,tr("gofmt"));
+    liteApp->mainWindow()->addOutputPane(gofmtOutputEdit,QIcon(),tr("gofmt"));
 
     gofmtAct = new QAction(tr("gofmt\tAlt+F8"),this);
     gofmtAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F8));
     gofmtAct->setStatusTip(tr("Format go file"));
 
     connect(gofmtAct,SIGNAL(triggered()),this,SLOT(gofmt()));
-    liteApp->toolMenu()->addAction(gofmtAct);
+    liteApp->mainWindow()->toolMenu()->addAction(gofmtAct);
 }
 
 void GolangProPlugin::gofmt()

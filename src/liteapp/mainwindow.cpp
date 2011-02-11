@@ -84,6 +84,27 @@ MainWindow::MainWindow(LiteApp *app) :
 
 }
 
+QMenu *MainWindow::fileMenu()
+{
+    return _fileMenu;
+}
+
+QMenu *MainWindow::viewMenu()
+{
+    return _viewMenu;
+}
+
+QMenu *MainWindow::editMenu()
+{
+    return _editMenu;
+}
+
+QMenu *MainWindow::toolMenu()
+{
+    return _toolMenu;
+}
+
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     int count = editTabWidget->count();
@@ -207,50 +228,50 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
+    _fileMenu = menuBar()->addMenu(tr("&File"));
 
-    fileMenu->addAction(newProjectAct);
-    fileMenu->addAction(openProjectAct);
-    fileMenu->addAction(closeProjectAct);
-    fileMenu->addSeparator();
+    _fileMenu->addAction(newProjectAct);
+    _fileMenu->addAction(openProjectAct);
+    _fileMenu->addAction(closeProjectAct);
+    _fileMenu->addSeparator();
 
-    fileMenu->addAction(newFileAct);
-    fileMenu->addAction(openFileAct);
-    fileMenu->addAction(saveFileAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(saveAllFileAct);
-    fileMenu->addAction(closeAllFileAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(quitAct);
+    _fileMenu->addAction(newFileAct);
+    _fileMenu->addAction(openFileAct);
+    _fileMenu->addAction(saveFileAct);
+    _fileMenu->addSeparator();
+    _fileMenu->addAction(saveAllFileAct);
+    _fileMenu->addAction(closeAllFileAct);
+    _fileMenu->addSeparator();
+    _fileMenu->addAction(quitAct);
 
 
-    editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(undoAct);
-    editMenu->addAction(redoAct);
-    editMenu->addSeparator();
-    editMenu->addAction(findAct);
+    _editMenu = menuBar()->addMenu(tr("&Edit"));
+    _editMenu->addAction(undoAct);
+    _editMenu->addAction(redoAct);
+    _editMenu->addSeparator();
+    _editMenu->addAction(findAct);
 
-    viewMenu = menuBar()->addMenu(tr("&View"));
+    _viewMenu = menuBar()->addMenu(tr("&View"));
 
-    buildMenu = menuBar()->addMenu(tr("&Build"));
-    buildListMenu = buildMenu->addMenu("&Select Build");
+    _buildMenu = menuBar()->addMenu(tr("&Build"));
+    _buildListMenu = _buildMenu->addMenu("&Select Build");
 
-    buildMenu->addSeparator();
-    buildMenu->addAction(buildProjectAct);
-    buildMenu->addSeparator();
-    buildMenu->addAction(cancelBuildAct);
-    buildMenu->addSeparator();
-    buildMenu->addAction(runTargetAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(buildProjectAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(cancelBuildAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(runTargetAct);
 
-    toolMenu = menuBar()->addMenu(tr("&Tools"));
+    _toolMenu = menuBar()->addMenu(tr("&Tools"));
 
     menuBar()->addSeparator();
 
 
-    helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
-    helpMenu->addAction(aboutPluginsAct);
+    _helpMenu = menuBar()->addMenu(tr("&Help"));
+    _helpMenu->addAction(aboutAct);
+    _helpMenu->addAction(aboutQtAct);
+    _helpMenu->addAction(aboutPluginsAct);
 }
 
 void MainWindow::createToolBars()
@@ -284,7 +305,7 @@ QDockWidget *MainWindow::addWorkspacePane(QWidget *w, const QString &name)
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     dock->setWidget(w);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
+    _viewMenu->addAction(dock->toggleViewAction());
     return dock;
 }
 
@@ -581,7 +602,7 @@ void MainWindow::appendBuild(IBuild *build)
     QAction *act = buildActGroup->addAction(build->buildName());
     connect(act,SIGNAL(triggered()),this,SLOT(selectBuild()));
     act->setCheckable(true);
-    buildListMenu->addAction(act);
+    _buildListMenu->addAction(act);
 }
 
 void MainWindow::selectBuild()
@@ -747,35 +768,6 @@ void MainWindow::findText(const QString& text,QTextDocument::FindFlags flags)
             ed->find(text,flags);
         }
     }
-}
-
-void MainWindow::dbclickOutputEdit()
-{
-    QTextCursor cur = buildOutputEdit->textCursor();
-    QRegExp rep("(\\w+[\\\\/])*(\\w+[.]\\w+)+:(\\d+)");
-    int index = rep.indexIn(cur.block().text());
-    if (index < 0)
-        return;
-    QStringList list = rep.capturedTexts();
-    if (list.count() < 3)
-        return;
-
-    QString cap = list.at(0);
-    QStringList capList = cap.split(":");
-    if (capList.count() < 2) {
-        return;
-    }
-    QString fileName = capList[0];
-    QString fileLine = capList[1];
-    bool ok = false;
-    int line = fileLine.toInt(&ok);
-    if (!ok)
-        return;
-
-    cur.select(QTextCursor::LineUnderCursor);
-    buildOutputEdit->setTextCursor(cur);
-
-    this->gotoLine(fileName,line,0);
 }
 
 void MainWindow::loadSettings()

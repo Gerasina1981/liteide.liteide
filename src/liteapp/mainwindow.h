@@ -8,6 +8,7 @@
 #include "../api/iproject.h"
 #include "../api/ibuild.h"
 #include "../api/iruntarget.h"
+#include "../api/iapp.h"
 #include <QTimer>
 
 class LiteApp;
@@ -34,6 +35,7 @@ signals:
 };
 
 class MainWindow : public QMainWindow,
+        public IMainWindow,
         public IEditorEvent,
         public IProjectEvent,
         public IBuildEvent,
@@ -46,6 +48,10 @@ public:
     void loadSettings();
     void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
+    virtual QMenu *fileMenu();
+    virtual QMenu *viewMenu();
+    virtual QMenu *editMenu();
+    virtual QMenu *toolMenu();
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireDocumentSave(IEditor *edit);
     virtual void fireTextChanged(IEditor *edit);
@@ -61,7 +67,6 @@ protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
     void selectedOutputAct(QAction *act);
-    void dbclickOutputEdit();
     void findText(const QString&,QTextDocument::FindFlags);
     void find();
     void closeAllFile();
@@ -82,9 +87,9 @@ private slots:
     void editTabClose(int index);
     void aboutPlugins();
 public:
-    QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
-    void addOutputPane(QWidget *w, const QIcon &icon, const QString &name);
-    void setCurrentOutputPane(QWidget *w);
+    virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
+    virtual void addOutputPane(QWidget *w, const QIcon &icon, const QString &name);
+    virtual void setCurrentOutputPane(QWidget *w);
     void addEditor(IEditor *ed);
 private:
     virtual void dropEvent(QDropEvent *event);
@@ -107,13 +112,13 @@ private:
     QActionGroup *outputActGroup;
     QMap<QAction*,QWidget*> outputActMap;
 
-    QMenu   *fileMenu;
-    QMenu   *editMenu;
-    QMenu   *viewMenu;
-    QMenu   *buildMenu;
-    QMenu   *buildListMenu;
-    QMenu   *toolMenu;
-    QMenu   *helpMenu;
+    QMenu   *_fileMenu;
+    QMenu   *_editMenu;
+    QMenu   *_viewMenu;
+    QMenu   *_buildMenu;
+    QMenu   *_buildListMenu;
+    QMenu   *_toolMenu;
+    QMenu   *_helpMenu;
 
     QAction *newProjectAct;
     QAction *openProjectAct;
