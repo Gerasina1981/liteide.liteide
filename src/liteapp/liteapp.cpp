@@ -23,7 +23,7 @@ QDockWidget * LiteApp::addWorkspacePane(QWidget *w, const QString &name)
 
 void LiteApp::addOutputPane(QWidget *w, const QString &name)
 {
-    mainWindow->addOutputPage(w,name);
+    mainWindow->addOutputPane(w,QIcon(),name);
 }
 
 void LiteApp::addEditorFactory(IEditorFactory *editFactory)

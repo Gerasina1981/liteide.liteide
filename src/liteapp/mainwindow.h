@@ -83,8 +83,8 @@ private slots:
     void aboutPlugins();
 public:
     QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
-    void addOutputPage(QWidget *w, const QString &name);
-    void addOutputAction(QWidget *w, const QIcon &icon, const QString &name);
+    void addOutputPane(QWidget *w, const QIcon &icon, const QString &name);
+    void setCurrentOutputPane(QWidget *w);
     void addEditor(IEditor *ed);
 private:
     virtual void dropEvent(QDropEvent *event);
@@ -96,15 +96,14 @@ private:
     void createDockWindows();
     void createOutputWidget();
 
-    QDockWidget *outputDock;
     QTabWidget *editTabWidget;
-    QTabWidget *outputTabWidget;
-    QStackedWidget *outputStackedWidget;
 
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
     QToolBar *buildToolBar;
+
     QToolBar *outputToolBar;
+    QStackedWidget *outputStackedWidget;
     QActionGroup *outputActGroup;
     QMap<QAction*,QWidget*> outputActMap;
 

@@ -62,7 +62,6 @@ MainWindow::MainWindow(LiteApp *app) :
     setCentralWidget(mainSplitter);
 
 
-
     connect(editTabWidget,SIGNAL(currentChanged(int)),this,SLOT(editTabChanged(int)));
     connect(editTabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(editTabClose(int)));
 
@@ -79,7 +78,6 @@ MainWindow::MainWindow(LiteApp *app) :
 
      //setUnifiedTitleAndToolBarOnMac(true);
     loadSettings();
-    outputDock->hide();
 
     astTimer = new QTimer(this);
     connect(astTimer,SIGNAL(timeout()),this,SLOT(astUpdate()));
@@ -272,12 +270,6 @@ void MainWindow::createToolBars()
     buildToolBar->setObjectName("Build");
     buildToolBar->addAction(buildProjectAct);
     buildToolBar->addAction(runTargetAct);
-
-    outputToolBar = new QToolBar("Output Panes",this);
-    outputToolBar->setObjectName("OutputPanes");
-    this->addToolBar(Qt::BottomToolBarArea,outputToolBar);
-    outputActGroup = new QActionGroup(this);
-    connect(outputActGroup,SIGNAL(selected(QAction*)),this,SLOT(selectedOutputAct(QAction*)));
 }
 
 void MainWindow::createStatusBar()
@@ -345,12 +337,7 @@ void MainWindow::addEditor(IEditor *editor)
     editTabWidget->setCurrentIndex(index);
 }
 
-void MainWindow::addOutputPage(QWidget *w, const QString &name)
-{
-    outputTabWidget->addTab(w,name);
-}
-
-void MainWindow::addOutputAction(QWidget *w, const QIcon &icon, const QString &text)
+void MainWindow::addOutputPane(QWidget *w, const QIcon &icon, const QString &text)
 {
     static int index = 0;
     index++;
@@ -363,6 +350,22 @@ void MainWindow::addOutputAction(QWidget *w, const QIcon &icon, const QString &t
     outputActMap.insert(act,w);
 }
 
+void MainWindow::setCurrentOutputPane(QWidget *w)
+{
+    QMapIterator<QAction*,QWidget*> i(outputActMap);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value() == w) {
+            i.key()->setChecked(true);
+            if (outputStackedWidget->isHidden()) {
+                outputStackedWidget->show();
+            }
+            outputStackedWidget->setCurrentWidget(w);
+            break;
+        }
+    }
+}
+
 void MainWindow::createDockWindows()
 {
     //this->setDockOptions(ForceTabbedDocks);
@@ -370,37 +373,21 @@ void MainWindow::createDockWindows()
 
 void MainWindow::createOutputWidget()
 {
-    outputDock = new QDockWidget(tr("Output"), this);
-    outputDock->setObjectName("outputDock");
-
-    //outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    //outputDock->setFeatures(QDockWidget::DockWidgetClosable);
-    //outputDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-    //outputDock->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    viewMenu->addAction(outputDock->toggleViewAction());
-    addDockWidget(Qt::BottomDockWidgetArea, outputDock);
-
-    outputTabWidget = new QTabWidget;
-    outputTabWidget->setTabPosition(QTabWidget::South);
-    connect(outputTabWidget,SIGNAL(currentChanged(int)),this,SLOT(outputTabChanged(int)));
+    outputToolBar = new QToolBar("Output Panes",this);
+    outputToolBar->setObjectName("OutputPanes");
+    this->addToolBar(Qt::BottomToolBarArea,outputToolBar);
+    outputActGroup = new QActionGroup(this);
+    connect(outputActGroup,SIGNAL(selected(QAction*)),this,SLOT(selectedOutputAct(QAction*)));
 
     buildOutputEdit = new PlainTextEditEx(this);
     buildOutputEdit->setReadOnly(true);
-
     connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
-
-    outputTabWidget->addTab(buildOutputEdit,tr("Build"));
 
     runTargetOutputEdit = new QPlainTextEdit(this);
     runTargetOutputEdit->setReadOnly(true);
-    outputTabWidget->addTab(runTargetOutputEdit,tr("Application"));
 
-    outputDock->setWidget(outputTabWidget);
-
-    this->addOutputAction(buildOutputEdit,QIcon(),"Complile Output");
-    this->addOutputAction(runTargetOutputEdit,QIcon(),"Application Output");
+    this->addOutputPane(buildOutputEdit,QIcon(),"Complile Output");
+    this->addOutputPane(runTargetOutputEdit,QIcon(),"Application Output");
 }
 
 void MainWindow::saveFile()
@@ -538,11 +525,7 @@ void MainWindow::fireBuildStoped(bool success)
 
 void MainWindow::fireBuildOutput(const QString &text, bool stdError)
 {
-    if (outputDock->isHidden()) {
-        outputDock->show();
-    }
-    if (outputTabWidget->currentWidget() != buildOutputEdit)
-        outputTabWidget->setCurrentWidget(buildOutputEdit);
+    setCurrentOutputPane(buildOutputEdit);
 
     QTextCharFormat fmt;
     if (stdError)
@@ -565,11 +548,7 @@ void MainWindow::fireRunTargetStoped(bool success)
 
 void MainWindow::fireRunTargetOutput(const QByteArray &text, bool stdError)
 {
-    if (outputDock->isHidden()) {
-        outputDock->show();
-    }
-    if (outputTabWidget->currentWidget() != runTargetOutputEdit)
-        outputTabWidget->setCurrentWidget(runTargetOutputEdit);
+    setCurrentOutputPane(runTargetOutputEdit);
 
     QTextCharFormat fmt;
     if (stdError)
