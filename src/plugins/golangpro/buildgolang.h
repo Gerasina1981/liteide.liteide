@@ -57,12 +57,14 @@ public:
     QAction *buildProjectAct;
     QAction *buildFileAct;
     QAction *cancelBuildAct;
-    QAction *runTargetAct;
+    QAction *runAct;
+    QAction *stopRunAct;
     QAction *debugAct;
     QToolBar *buildToolBar;
     QMenu *_buildMenu;
 private slots:
-    void runTarget();
+    void run();
+    void stopRun();
     void cancelBuild();
     void buildFile();
     void buildProject();

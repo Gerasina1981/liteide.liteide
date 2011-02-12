@@ -184,6 +184,9 @@ void BuildGolang::startedBuild()
 
 void BuildGolang::finishedRun(int code)
 {
+    stopRunAct->setEnabled(false);
+    runAct->setEnabled(true);
+
     if (code == 0)
         appendRunOutput("---- run finish ----",false);
     else
@@ -192,6 +195,9 @@ void BuildGolang::finishedRun(int code)
 
 void BuildGolang::errorRun(QProcess::ProcessError code)
 {
+    stopRunAct->setEnabled(false);
+    runAct->setEnabled(true);
+
     appendRunOutput("Run error : "+processErrorName(code),true);
 }
 
@@ -209,6 +215,8 @@ void BuildGolang::readStderrRun()
 void BuildGolang::startedRun()
 {
     appendRunOutput("---- run start ----",false);
+    stopRunAct->setEnabled(true);
+    runAct->setEnabled(false);
 }
 
 
@@ -259,10 +267,19 @@ void BuildGolang::createActions()
 
     cancelBuildAct->setEnabled(false);
 
-    runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
-    runTargetAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    runTargetAct->setStatusTip(tr("Run project or file"));
-    connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
+    runAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
+    runAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    runAct->setStatusTip(tr("Run project or file"));    
+
+    connect(runAct, SIGNAL(triggered()),this, SLOT(run()));
+
+    stopRunAct = new QAction(tr("Stop Run"),this);
+    stopRunAct->setStatusTip(tr("Stop run"));
+
+    stopRunAct->setEnabled(false);
+
+    connect(stopRunAct, SIGNAL(triggered()),this, SLOT(stopRun()));
+
 }
 
 void BuildGolang::createMenus()
@@ -274,7 +291,8 @@ void BuildGolang::createMenus()
     _buildMenu->addSeparator();
     _buildMenu->addAction(cancelBuildAct);
     _buildMenu->addSeparator();
-    _buildMenu->addAction(runTargetAct);
+    _buildMenu->addAction(runAct);
+    _buildMenu->addAction(stopRunAct);
 
     liteApp->mainWindow()->widget()->menuBar()->insertMenu(liteApp->mainWindow()->toolMenu()->menuAction(),_buildMenu);
 }
@@ -284,7 +302,7 @@ void BuildGolang::createToolBars()
     buildToolBar = liteApp->mainWindow()->widget()->addToolBar(tr("Build"));
     buildToolBar->setObjectName("Build");
     buildToolBar->addAction(buildProjectAct);
-    buildToolBar->addAction(runTargetAct);
+    buildToolBar->addAction(runAct);
 }
 
 void BuildGolang::buildProject()
@@ -334,7 +352,17 @@ void BuildGolang::runEditor(IEditor *edit)
     runProcess.start(target);
 }
 
-void BuildGolang::runTarget()
+void BuildGolang::stopRun()
+{
+    if (runProcess.state() == QProcess::Starting) {
+        runProcess.waitForStarted(100);
+    } else if (runProcess.state() == runProcess.Running) {
+        runProcess.waitForFinished(100);
+    }
+    runProcess.kill();
+}
+
+void BuildGolang::run()
 {
     runOutputEdit->clear();
     liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
