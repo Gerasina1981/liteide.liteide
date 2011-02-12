@@ -147,21 +147,6 @@ QStringList GoAstViewManager::fileTypes()
     return QStringList() << "go";
 }
 
-IAstView *GoAstViewManager::load(const QString &fileName, const QByteArray &data)
-{
-    return astView;
-    static bool b = true;
-    if (b) {
-        b = false;
-        parentDock->show();
-    }
-    if (fileName.isEmpty()) {
-        astOutput("");
-    } else {
-        astView->update(fileName,data);
-    }
-    return astView;
-}
 /*
 const (
         tag_package = "p"

@@ -50,14 +50,13 @@ protected:
     QIcon   iconMethod;
 };
 
-class GoAstViewManager : public QWidget, public IAstViewFactory
+class GoAstViewManager : public QWidget
 {
     Q_OBJECT
 public:
     QStringList astFiles;
     explicit GoAstViewManager(IApplication *app, QWidget *parent = 0);
     virtual QStringList fileTypes();
-    virtual IAstView *load(const QString &fileName, const QByteArray &data);
 public slots:
     void astUpdateNow();
     void activeEditorTextChanged(IEditor *ed);

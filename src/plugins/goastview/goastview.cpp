@@ -8,26 +8,26 @@
 GoAstView::GoAstView(IApplication *app, QObject *parent):
     liteApp(app), QObject(parent)
 {
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdout()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readStderr()));
-    connect(&process,SIGNAL(started()),this,SLOT(started()));
-    connect(&process,SIGNAL(finished(int)),this,SLOT(finished(int)));
-    connect(&process,SIGNAL(error(QProcess::ProcessError)),this,SLOT(error(QProcess::ProcessError)));
+    connect(&astProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdout()));
+    connect(&astProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderr()));
+    connect(&astProcess,SIGNAL(started()),this,SLOT(started()));
+    connect(&astProcess,SIGNAL(finished(int)),this,SLOT(finished(int)));
+    connect(&astProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(error(QProcess::ProcessError)));
 
 }
 
 GoAstView::~GoAstView()
 {
-    process.waitForFinished(100);
+    astProcess.waitForFinished(100);
 }
 
 void GoAstView::update(const QString &fileName, const QByteArray &data)
 {
-    if (process.state() == QProcess::Running)
+    if (astProcess.state() == QProcess::Running)
         return;
 
     QString projDir = QFileInfo(fileName).absolutePath();
-    process.setWorkingDirectory(projDir);
+    astProcess.setWorkingDirectory(projDir);
 
     srcData = data;
     QStringList args;
@@ -36,26 +36,26 @@ void GoAstView::update(const QString &fileName, const QByteArray &data)
         args << "-stdin=true";
     }
     QString cmd = QFileInfo(liteApp->applicationPath(),"goastview"+liteApp->osExecuteExt()).absoluteFilePath();
-    process.start(cmd,args); 
+    astProcess.start(cmd,args); 
 }
 
 void GoAstView::started()
 {
     if (!srcData.isEmpty()) {
-        process.write(srcData);
-        process.closeWriteChannel();
+        astProcess.write(srcData);
+        astProcess.closeWriteChannel();
     }
 }
 
 void GoAstView::readStderr()
 {
-    QByteArray data = process.readAllStandardError();
+    QByteArray data = astProcess.readAllStandardError();
     qDebug() << data;
 }
 
 void GoAstView::readStdout()
 {
-    QByteArray data = process.readAllStandardOutput();
+    QByteArray data = astProcess.readAllStandardOutput();
     emit astOutput(data);
 }
 

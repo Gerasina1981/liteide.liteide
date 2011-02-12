@@ -3,17 +3,16 @@
 
 #include <QObject>
 #include "../../api/iapp.h"
-#include "../../api/iastview.h"
 #include <QProcess>
 
-class GoAstView : public QObject, public IAstView
+class GoAstView : public QObject
 {
     Q_OBJECT
 public:
     explicit GoAstView(IApplication *app,QObject *parent = 0);
     virtual ~GoAstView();
     virtual void update(const QString &fileName, const QByteArray &data);
-    QProcess process;
+    QProcess astProcess;
 signals:
     void astOutput(const QByteArray &data);
 public slots:
