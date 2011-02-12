@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QModelIndex>
 #include "../../api/iapp.h"
+#include "../../api/ieditor.h"
 #include "../../api/iastview.h"
 
 class QDockWidget;
@@ -57,9 +58,10 @@ public:
     explicit GoAstViewManager(IApplication *app, QWidget *parent = 0);
     virtual QStringList fileTypes();
     virtual IAstView *load(const QString &fileName, const QByteArray &data);
-signals:
-
 public slots:
+    void astUpdateNow();
+    void activeEditorTextChanged(IEditor *ed);
+    void activeEditorChanged(IEditor *ed);
     void doubleClickedTree(const QModelIndex &index);
     void astOutput(const QByteArray &data);
 protected:
@@ -70,6 +72,7 @@ protected:
     GoAstView   *astView;
     GoAstViewIcon   icons;
     GoAstViewIconPriv icons_p;
+    QTimer *astTimer;
 };
 
 #endif // GOASTVIEWMANAGER_H

@@ -6,7 +6,6 @@
 #include "../api/iapp.h"
 #include "../api/iproject.h"
 #include "../api/ibuild.h"
-#include "../api/iastview.h"
 
 class LiteApp : public IApplication
 {
@@ -15,12 +14,10 @@ public:
     LiteApp();
     virtual ~LiteApp();
 public:
-    void loadAstViewEditor(const IEditor *ed);
     void closeProject();
     virtual IMainWindow *mainWindow();
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
-    virtual void addAstViewFactory(IAstViewFactory *astFactory);
     virtual void gotoLine(const QString &fileName, int line, int col);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
@@ -42,7 +39,6 @@ public:
     QList<IBuild*>   buildList;
     QList<IEditorFactory*> editorFactorys;
     QList<IProjectFactory*> projectFactorys;
-    QList<IAstViewFactory*> astFactorys;
 };
 
 #endif // LITEAPP_H

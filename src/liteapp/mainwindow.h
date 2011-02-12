@@ -112,11 +112,7 @@ private:
     IEditor *activeEditor;
     IProject *activeProject;
     LiteApp *liteApp;
-    QMap<QWidget*,IEditor*> editors;
-
-    QTimer *astTimer;
-public slots:
-    void astUpdate();
+    QMap<QWidget*,IEditor*> editors; 
 };
 
 #endif // MAINWINDOW_H

@@ -7,6 +7,9 @@
 #include <QStandardItem>
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QTimer>
+#include <QFileInfo>
+
 /*
 const (
         tag_package = "p"
@@ -130,9 +133,13 @@ GoAstViewManager::GoAstViewManager(IApplication *app, QWidget *parent) :
     layout->setMargin(0);
 
     setLayout(layout);
-    liteApp->addAstViewFactory(this);
     parentDock = liteApp->mainWindow()->addWorkspacePane(this,"AstView");
-    parentDock->hide();
+
+    astTimer = new QTimer(this);
+    connect(astTimer,SIGNAL(timeout()),this,SLOT(astUpdateNow()));
+
+    connect(liteApp,SIGNAL(activeEditorTextChanged(IEditor*)),this,SLOT(activeEditorTextChanged(IEditor*)));
+    connect(liteApp,SIGNAL(activeEditorChanged(IEditor*)),this,SLOT(activeEditorChanged(IEditor*)));
 }
 
 QStringList GoAstViewManager::fileTypes()
@@ -142,6 +149,7 @@ QStringList GoAstViewManager::fileTypes()
 
 IAstView *GoAstViewManager::load(const QString &fileName, const QByteArray &data)
 {
+    return astView;
     static bool b = true;
     if (b) {
         b = false;
@@ -259,5 +267,34 @@ void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
         if (index >= 0 && index < astFiles.size()) {
             liteApp->gotoLine(astFiles[index],x,y);
         }
+    }
+}
+
+void GoAstViewManager::activeEditorChanged(IEditor *ed)
+{
+    astOutput("");
+    if (ed != NULL) {
+        astUpdateNow();
+    }
+}
+
+void GoAstViewManager::activeEditorTextChanged(IEditor *ed)
+{
+    astTimer->stop();
+    astTimer->start(1000);
+}
+
+void GoAstViewManager::astUpdateNow()
+{
+    astTimer->stop();
+    IEditor *ed = liteApp->activeEditor();
+    if (ed) {
+        if (QFileInfo(ed->filePath()).suffix() == "go") {
+            astView->update(ed->filePath(),ed->data());
+        } else {
+            astOutput("");
+        }
+    } else {
+        astOutput("");
     }
 }

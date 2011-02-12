@@ -31,11 +31,6 @@ void LiteApp::addProjectFactory(IProjectFactory *projFactory)
     projectFactorys.append(projFactory);
 }
 
-void LiteApp::addAstViewFactory(IAstViewFactory *astFactory)
-{
-    astFactorys.append(astFactory);
-}
-
 void LiteApp::gotoLine(const QString &fileName, int line, int col)
 {
     _mainWindow->gotoLine(fileName,line,col);
@@ -163,22 +158,4 @@ void LiteApp::closeProject()
     if (_mainWindow->activeProject)
         _mainWindow->activeProject->close();
     _mainWindow->activeProject = NULL;
-}
-
-void LiteApp::loadAstViewEditor(const IEditor *ed)
-{   
-    if (ed == NULL) {
-        foreach (IAstViewFactory *factory, astFactorys) {
-           factory->load("","");
-        }
-        return;
-    }
-    QString ext = QFileInfo(ed->filePath()).suffix();
-    foreach (IAstViewFactory *factory, astFactorys) {
-        if (factory->fileTypes().contains(ext)) {
-            factory->load(ed->filePath(),ed->data());
-        } else {
-            factory->load("","");
-        }
-    }
 }

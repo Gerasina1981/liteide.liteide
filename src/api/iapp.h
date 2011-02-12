@@ -12,8 +12,6 @@ class IEditor;
 class IProject;
 class IProjectFactory;
 class IProjectEvent;
-class IAstView;
-class IAstViewFactory;
 class IMainWindow;
 
 class IMainWindow
@@ -38,12 +36,10 @@ class IApplication : public QObject
 public:
     virtual ~IApplication() {}
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
-    virtual void addAstViewFactory(IAstViewFactory *astFactory) = 0;
     virtual void addProjectFactory(IProjectFactory *projFactory) = 0;
     virtual void gotoLine(const QString &fileName, int line, int col) = 0;
     virtual IProject *loadProject(const QString &fileName) = 0;
     virtual IEditor *loadEditor(const QString &fileName) = 0;
-    virtual void loadAstViewEditor(const IEditor *ed) = 0;
     virtual IEditorEvent *editorEvent() = 0;
     virtual IProjectEvent *projectEvent() = 0;
     virtual QSettings *settings() = 0;
@@ -53,8 +49,18 @@ public:
     virtual QString applicationPath() = 0;
     virtual QString osExecuteExt() = 0;
 signals:
-    void emitActiveEditor(IEditor *ed);
-    void emitActiveProject(IProject *proj);
+    void activeEditorTextChanged(IEditor *ed);
+    void activeEditorChanged(IEditor *ed);
+    void activeProjectChanged(IProject *proj);
+public:
+    void emitActiveEditorTextChanged(IEditor *ed)
+    {
+        emit activeEditorTextChanged(ed);
+    }
+    void emitActiveEditorChanged(IEditor *ed)
+    {
+        emit activeEditorChanged(ed);
+    }
 };
 
 #endif //__LITEAPI_IAPP_H__

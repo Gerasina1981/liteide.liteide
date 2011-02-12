@@ -2,7 +2,6 @@
 #include "liteapp.h"
 #include "aboutpluginsdialog.h"
 #include "finddialog.h"
-#include "../util/texteditoutput.h"
 #include "projectwizard.h"
 
 #include <QApplication>
@@ -78,10 +77,6 @@ MainWindow::MainWindow(LiteApp *app) :
     setUnifiedTitleAndToolBarOnMac(true);
 
     loadSettings();
-
-    astTimer = new QTimer(this);
-    connect(astTimer,SIGNAL(timeout()),this,SLOT(astUpdate()));
-
 }
 
 QMainWindow *MainWindow::widget()
@@ -293,7 +288,7 @@ void MainWindow::editTabClose(int index)
         editors.remove(w);
     }
     if (editors.empty()) {
-        liteApp->loadAstViewEditor(NULL);
+        liteApp->emitActiveEditorChanged(NULL);
     }
 }
 
@@ -314,7 +309,8 @@ void MainWindow::editTabChanged(int index)
     activeEditor = ed;
 
     activeEditor->activeEditor(undoAct,redoAct);
-    liteApp->loadAstViewEditor(activeEditor);
+
+    liteApp->emitActiveEditorChanged(ed);
 }
 
 void MainWindow::addEditor(IEditor *editor)
@@ -464,8 +460,9 @@ void MainWindow::fireDocumentSave(IEditor *edit)
 void MainWindow::fireTextChanged(IEditor *edit)
 {
     if (activeEditor && activeEditor == edit) {
-        astTimer->stop();
-        astTimer->start(2000);
+    //    astTimer->stop();
+    //    astTimer->start(2000);
+        liteApp->emitActiveEditorTextChanged(edit);
     }
 }
 
@@ -576,8 +573,7 @@ void MainWindow::outputTabChanged(int index)
 void MainWindow::closeAllFile()
 {
     this->activeEditor = NULL;
-    liteApp->loadAstViewEditor(NULL);
-    this->astTimer->stop();
+    liteApp->emitActiveEditorChanged(NULL);
     int count = editTabWidget->count();
     while (count--) {
         QWidget *w = editTabWidget->widget(count);
@@ -645,14 +641,6 @@ void MainWindow::gotoLine(const QString &fileName, int line, int col)
             editor->setTextCursor(c);
             break;
         }
-    }
-}
-
-void MainWindow::astUpdate()
-{
-    astTimer->stop();
-    if (this->activeEditor) {
-        liteApp->loadAstViewEditor(this->activeEditor);
     }
 }
 

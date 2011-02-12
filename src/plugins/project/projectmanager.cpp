@@ -29,7 +29,6 @@ ProjectManager::ProjectManager(IApplication *app, QWidget *parent) :
 
     liteApp->addProjectFactory(this);
     parentDock = liteApp->mainWindow()->addWorkspacePane(this,"Projects");
-    parentDock->hide();
 }
 
 ProjectManager::~ProjectManager()
