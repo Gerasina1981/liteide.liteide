@@ -8,7 +8,7 @@
 #include "../api/ibuild.h"
 #include "../api/iastview.h"
 
-class LiteApp : public QObject, public IApplication
+class LiteApp : public IApplication
 {
     Q_OBJECT
 public:

@@ -1,4 +1,4 @@
 #INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
-HEADERS += ieditor.h
+HEADERS += ieditor.h iapp.h

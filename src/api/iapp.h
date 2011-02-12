@@ -32,8 +32,9 @@ public:
     virtual void saveAllFile() = 0;
 };
 
-class IApplication
+class IApplication : public QObject
 {
+    Q_OBJECT
 public:
     virtual ~IApplication() {}
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
@@ -51,6 +52,9 @@ public:
     virtual IProject *activeProject() = 0;
     virtual QString applicationPath() = 0;
     virtual QString osExecuteExt() = 0;
+signals:
+    void emitActiveEditor(IEditor *ed);
+    void emitActiveProject(IProject *proj);
 };
 
 #endif //__LITEAPI_IAPP_H__
