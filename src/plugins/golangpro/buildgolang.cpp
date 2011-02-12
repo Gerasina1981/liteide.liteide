@@ -79,9 +79,6 @@ QString BuildGolang::buildName() const
 bool BuildGolang::buildProject(IProject *proj)
 {
     QString target;
-    this->buildOutputEdit->clear();
-    liteApp->mainWindow()->setCurrentOutputPane(this->buildOutputEdit);
-
     QStringList val = proj->values("TARGET");
     if (!val.isEmpty())
         target = val.at(0);
@@ -157,6 +154,9 @@ void BuildGolang::finishedBuild(int code)
         appendBuildOutput("---- build finish ----",false);
     else
         appendBuildOutput("---- build error ----",false);
+
+    buildProjectAct->setEnabled(true);
+    cancelBuildAct->setEnabled(false);
 }
 
 void BuildGolang::errorBuild(QProcess::ProcessError code)
@@ -178,6 +178,8 @@ void BuildGolang::readStderrBuild()
 void BuildGolang::startedBuild()
 {
     appendBuildOutput("---- build start ----",false);
+    buildProjectAct->setEnabled(false);
+    cancelBuildAct->setEnabled(true);
 }
 
 void BuildGolang::finishedRun(int code)
@@ -255,6 +257,7 @@ void BuildGolang::createActions()
     cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
     connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
 
+    cancelBuildAct->setEnabled(false);
 
     runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
     runTargetAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
@@ -286,6 +289,9 @@ void BuildGolang::createToolBars()
 
 void BuildGolang::buildProject()
 {
+    this->buildOutputEdit->clear();
+    liteApp->mainWindow()->setCurrentOutputPane(this->buildOutputEdit);
+
     liteApp->mainWindow()->saveAllFile();
     IProject *proj = liteApp->activeProject();
     if (proj)  {

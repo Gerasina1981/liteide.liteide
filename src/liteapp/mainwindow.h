@@ -78,6 +78,7 @@ private:
     QToolBar *outputToolBar;
     QStackedWidget *outputStackedWidget;
     QActionGroup *outputActGroup;
+    QAction *lastOutputAct;
     QMap<QAction*,QWidget*> outputActMap;
 
     QMenu   *_fileMenu;

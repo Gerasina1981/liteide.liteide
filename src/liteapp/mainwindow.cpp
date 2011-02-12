@@ -35,7 +35,8 @@ MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
         activeEditor(NULL),
         activeProject(NULL),
-        findDialog(NULL)
+        findDialog(NULL),
+        lastOutputAct(NULL)
 {
     this->setWindowTitle("LiteIDE");
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -74,7 +75,8 @@ MainWindow::MainWindow(LiteApp *app) :
 
     setAcceptDrops(true);
 
-     //setUnifiedTitleAndToolBarOnMac(true);
+    setUnifiedTitleAndToolBarOnMac(true);
+
     loadSettings();
 
     astTimer = new QTimer(this);
@@ -341,6 +343,7 @@ void MainWindow::setCurrentOutputPane(QWidget *w)
     while (i.hasNext()) {
         i.next();
         if (i.value() == w) {
+            lastOutputAct = i.key();
             i.key()->setChecked(true);
             if (outputStackedWidget->isHidden()) {
                 outputStackedWidget->show();
@@ -658,14 +661,13 @@ void MainWindow::selectedOutputAct(QAction *act)
     QWidget *w = outputActMap.value(act,0);
     if (w == 0)
         return;
-    static QAction *lastAct = NULL;
-    if (lastAct == act) {
+    if (lastOutputAct == act) {
         act->setChecked(false);
-        lastAct = NULL;
+        lastOutputAct = NULL;
     } else {
-        lastAct = act;
+        lastOutputAct = act;
     }
-    if (lastAct == NULL) {
+    if (lastOutputAct == NULL) {
         this->outputStackedWidget->hide();
     } else  {
         if (this->outputStackedWidget->isHidden()) {
