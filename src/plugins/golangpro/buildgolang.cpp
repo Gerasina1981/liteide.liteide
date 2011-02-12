@@ -10,6 +10,41 @@
 #include <QToolBar>
 #include <QTextCodec>
 
+/*
+enum ProcessError {
+    FailedToStart, //### file not found, resource error
+    Crashed,
+    Timedout,
+    ReadError,
+    WriteError,
+    UnknownError
+};
+*/
+static QByteArray processErrorName(QProcess::ProcessError code)
+{
+    static QByteArray err;
+    switch (code) {
+    case QProcess::FailedToStart:
+        err = "File not found, resouce error";
+        break;
+    case QProcess::Crashed:
+        err = "Crashed";
+        break;
+    case QProcess::Timedout:
+        err = "Time out";
+        break;
+    case QProcess::ReadError:
+        err = "Read error";
+        break;
+    case QProcess::WriteError:
+        err = "Write error";
+        break;
+    case QProcess::UnknownError:
+    default:
+        err = "Unknown error";
+    }
+    return err;
+}
 
 BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     liteApp(app), QObject(parent)
@@ -126,7 +161,7 @@ void BuildGolang::finishedBuild(int code)
 
 void BuildGolang::errorBuild(QProcess::ProcessError code)
 {
-    appendBuildOutput("build error",true);
+    appendBuildOutput("Build error : "+processErrorName(code),true);
 }
 
 void BuildGolang::readStdoutBuild()
@@ -155,7 +190,7 @@ void BuildGolang::finishedRun(int code)
 
 void BuildGolang::errorRun(QProcess::ProcessError code)
 {
-    appendRunOutput("run error",true);
+    appendRunOutput("Run error : "+processErrorName(code),true);
 }
 
 void BuildGolang::readStdoutRun()
