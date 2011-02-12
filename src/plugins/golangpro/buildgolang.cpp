@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QTextCodec>
 
 
 BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
@@ -16,28 +17,23 @@ BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     createActions();
     createMenus();
     createToolBars();
+    createOutput();
 
-    runApp = new RunTargetApp(app);
+    connect(&buildProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutBuild()));
+    connect(&buildProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrBuild()));
+    connect(&buildProcess,SIGNAL(started()),this,SLOT(startedBuild()));
+    connect(&buildProcess,SIGNAL(finished(int)),this,SLOT(finishedBuild(int)));
+    connect(&buildProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorBuild(QProcess::ProcessError)));
 
-
-    buildOutput = new BuildOutputEdit;
-
-    app->mainWindow()->addOutputPane(buildOutput,QIcon(),tr("Build Output"));
-
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdout()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readStderr()));
-    connect(&process,SIGNAL(started()),this,SLOT(started()));
-    connect(&process,SIGNAL(finished(int)),this,SLOT(finished(int)));
-    connect(&process,SIGNAL(error(QProcess::ProcessError)),this,SLOT(error(QProcess::ProcessError)));
-
-    connect(buildOutput,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
+    connect(&runProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutRun()));
+    connect(&runProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrRun()));
+    connect(&runProcess,SIGNAL(started()),this,SLOT(startedRun()));
+    connect(&runProcess,SIGNAL(finished(int)),this,SLOT(finishedRun(int)));
+    connect(&runProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorRun(QProcess::ProcessError)));
 }
 
 BuildGolang::~BuildGolang()
 {
-    if (runApp) {
-        delete runApp;
-    }
 }
 
 QString BuildGolang::buildName() const
@@ -47,8 +43,9 @@ QString BuildGolang::buildName() const
 
 bool BuildGolang::buildProject(IProject *proj)
 {
-    this->buildOutput->clear();
-    liteApp->mainWindow()->setCurrentOutputPane(this->buildOutput);
+    QString target;
+    this->buildOutputEdit->clear();
+    liteApp->mainWindow()->setCurrentOutputPane(this->buildOutputEdit);
 
     QStringList val = proj->values("TARGET");
     if (!val.isEmpty())
@@ -58,89 +55,129 @@ bool BuildGolang::buildProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
 
-    process.setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
+    buildProcess.setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
 
     QStringList args;
     args  << "-ver=false" << "-gopro" << proj->filePath();
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
-    process.start(cmd,args);
+    buildProcess.start(cmd,args);
 
     return true;
 }
 
 bool BuildGolang::buildFile(const QString &fileName)
 {
-    target = QFileInfo(fileName).baseName();
+    QString target = QFileInfo(fileName).baseName();
     QString projDir = QFileInfo(fileName).absolutePath();
-    process.setWorkingDirectory(projDir);
+    buildProcess.setWorkingDirectory(projDir);
 
     QStringList args;
     args << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
-    process.start(cmd,args);
+    buildProcess.start(cmd,args);
 
     return false;
 }
 
 void BuildGolang::cancelBuild()
 {
-    if (process.state() == QProcess::Starting) {
-        process.waitForStarted(3000);
-    } else if (process.state() == process.Running) {
-        process.waitForFinished(3000);
+    if (buildProcess.state() == QProcess::Starting) {
+        buildProcess.waitForStarted(3000);
+    } else if (buildProcess.state() == buildProcess.Running) {
+        buildProcess.waitForFinished(3000);
     }
 }
 
-void BuildGolang::appendBuildOutput(const QString &text, bool stdError)
+void BuildGolang::appendBuildOutput(const QByteArray &text, bool stdError)
 {
-   // setCurrentOutputPane(buildOutputEdit);
     QTextCharFormat fmt;
     if (stdError)
         fmt.setForeground(Qt::red);
     else
         fmt.setForeground(Qt::black);
 
-    buildOutput->setCurrentCharFormat(fmt);
-    buildOutput->appendPlainText(text);
+    buildOutputEdit->setCurrentCharFormat(fmt);
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    buildOutputEdit->appendPlainText(codec->toUnicode(text));
 }
 
-void BuildGolang::finished(int code)
+void BuildGolang::appendRunOutput(const QByteArray &text, bool stdError)
 {
-   // liteApp->buildEvent()->fireBuildStoped(code == 0);
+    QTextCharFormat fmt;
+    if (stdError)
+        fmt.setForeground(Qt::red);
+    else
+        fmt.setForeground(Qt::black);
+
+    runOutputEdit->setCurrentCharFormat(fmt);
+
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    runOutputEdit->appendPlainText(codec->toUnicode(text));
+}
+
+
+void BuildGolang::finishedBuild(int code)
+{
     if (code == 0)
         appendBuildOutput("---- build finish ----",false);
     else
         appendBuildOutput("---- build error ----",false);
 }
 
-void BuildGolang::error(QProcess::ProcessError code)
+void BuildGolang::errorBuild(QProcess::ProcessError code)
 {
-   // liteApp->buildEvent()->fireBuildStoped(false);
     appendBuildOutput("build error",true);
 }
 
-void BuildGolang::readStdout()
+void BuildGolang::readStdoutBuild()
 {
-    QString text = process.readAllStandardOutput();
-    //liteApp->buildEvent()->fireBuildOutput(text,false);
+    QByteArray text = buildProcess.readAllStandardOutput();
     appendBuildOutput(text,false);
 }
-void BuildGolang::readStderr()
+void BuildGolang::readStderrBuild()
 {
-    QString text = process.readAllStandardError();
-    //liteApp->buildEvent()->fireBuildOutput(text,true);
+    QByteArray text = buildProcess.readAllStandardError();
     appendBuildOutput(text,true);
 }
 
-void BuildGolang::started()
+void BuildGolang::startedBuild()
 {
- //  liteApp->buildEvent()->fireBuildStarted();
     appendBuildOutput("---- build start ----",false);
 }
 
+void BuildGolang::finishedRun(int code)
+{
+    if (code == 0)
+        appendRunOutput("---- run finish ----",false);
+    else
+        appendRunOutput("---- run error ----",false);
+}
+
+void BuildGolang::errorRun(QProcess::ProcessError code)
+{
+    appendRunOutput("run error",true);
+}
+
+void BuildGolang::readStdoutRun()
+{
+    QByteArray text = runProcess.readAllStandardOutput();
+    appendRunOutput(text,false);
+}
+void BuildGolang::readStderrRun()
+{
+    QByteArray text = runProcess.readAllStandardError();
+    appendRunOutput(text,true);
+}
+
+void BuildGolang::startedRun()
+{
+    appendRunOutput("---- run start ----",false);
+}
+
+
 void BuildGolang::dbclickOutputEdit()
 {
-    QTextCursor cur = buildOutput->textCursor();
+    QTextCursor cur = buildOutputEdit->textCursor();
     QRegExp rep("(\\w+[\\\\/])*(\\w+[.]\\w+)+:(\\d+)");
     int index = rep.indexIn(cur.block().text());
     if (index < 0)
@@ -162,7 +199,7 @@ void BuildGolang::dbclickOutputEdit()
         return;
 
     cur.select(QTextCursor::LineUnderCursor);
-    buildOutput->setTextCursor(cur);
+    buildOutputEdit->setTextCursor(cur);
 
     liteApp->gotoLine(fileName,line,0);
 }
@@ -229,15 +266,56 @@ void BuildGolang::buildFile()
 {
 }
 
+void BuildGolang::runProject(IProject *proj)
+{
+    QStringList val = proj->values("TARGET");
+    QString target = proj->displayName();
+    if (!val.isEmpty())
+        target = val.at(0);
+
+    target = QFileInfo(target).baseName();
+    QString projDir = QFileInfo(proj->filePath()).absolutePath();
+    QStringList dest = proj->values("DESTDIR");
+    if (!dest.isEmpty()) {
+        projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
+    }
+    runProcess.setWorkingDirectory(projDir);
+    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
+    runProcess.start(target);
+}
+
+void BuildGolang::runEditor(IEditor *edit)
+{
+    QString target = QFileInfo(edit->filePath()).baseName();
+    QString projDir = QFileInfo(edit->filePath()).absolutePath();
+    runProcess.setWorkingDirectory(projDir);
+    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
+    runProcess.start(target);
+}
+
 void BuildGolang::runTarget()
 {
+    runOutputEdit->clear();
+    liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
+
     IProject *proj = liteApp->activeProject();
     if (proj) {
-        runApp->runProject(proj);
+        runProject(proj);
         return;
     }
     IEditor *edit = liteApp->activeEditor();
     if (edit) {
-        runApp->runEditor(edit);
+        runEditor(edit);
     }
+}
+
+void BuildGolang::createOutput()
+{
+    buildOutputEdit = new BuildOutputEdit;
+    liteApp->mainWindow()->addOutputPane(buildOutputEdit,QIcon(),tr("Build Output"));
+
+    runOutputEdit = new QPlainTextEdit;
+    liteApp->mainWindow()->addOutputPane(runOutputEdit,QIcon(),tr("Run Output"));
+
+    connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
 }

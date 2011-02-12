@@ -11,7 +11,6 @@
 #include "../../api/ieditor.h"
 #include "../../api/iapp.h"
 #include "../../api/ioutput.h"
-#include "../../util/runtargetapp.h"
 
 class BuildOutputEdit : public QPlainTextEdit
 {
@@ -31,10 +30,11 @@ signals:
 };
 
 
-class BuildGolang : public QObject, public IBuild
+class BuildGolang : public QObject//, public IBuild
 {
     Q_OBJECT
 public:
+    void createOutput();
     void createToolBars();
     void createMenus();
     void createActions();
@@ -43,14 +43,17 @@ public:
     virtual QString buildName() const;
     virtual bool buildProject(IProject *proj);
     virtual bool buildFile(const QString &fileName);
+    virtual void runProject(IProject *proj);
+    virtual void runEditor(IEditor *edit);
 
-    void appendBuildOutput(const QString &text, bool stdError);
+    void appendBuildOutput(const QByteArray &text, bool stdError);
+    void appendRunOutput(const QByteArray &text, bool stdError);
 public:
-    QProcess        process;
-    QString         target;
+    QProcess        buildProcess;
+    QProcess        runProcess;
     IApplication    *liteApp;
-    RunTargetApp    *runApp;
-    BuildOutputEdit *buildOutput;
+    BuildOutputEdit *buildOutputEdit;
+    QPlainTextEdit  *runOutputEdit;
     QAction *buildProjectAct;
     QAction *buildFileAct;
     QAction *cancelBuildAct;
@@ -63,11 +66,16 @@ private slots:
     void cancelBuild();
     void buildFile();
     void buildProject();
-    void started();
-    void readStderr();
-    void readStdout();
-    void error(QProcess::ProcessError code);
-    void finished(int code);
+    void startedBuild();
+    void readStderrBuild();
+    void readStdoutBuild();
+    void errorBuild(QProcess::ProcessError code);
+    void finishedBuild(int code);
+    void startedRun();
+    void readStderrRun();
+    void readStdoutRun();
+    void errorRun(QProcess::ProcessError code);
+    void finishedRun(int code);
 public slots:
     void dbclickOutputEdit();
 };
