@@ -5,14 +5,22 @@
 #include <QDebug>
 #include <QTextBlock>
 #include <QTextCursor>
+#include <QMenu>
+#include <QToolBar>
 
 
 BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     liteApp(app), QObject(parent)
 {
-    runTarget = new RunTargetApp(app);
+    createActions();
+    createMenus();
+    createToolBars();
+
+    runApp = new RunTargetApp(app);
+
 
     buildOutput = new BuildOutputEdit;
+
     app->mainWindow()->addOutputPane(buildOutput,QIcon(),tr("Build Output"));
 
     connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdout()));
@@ -26,14 +34,9 @@ BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
 
 BuildGolang::~BuildGolang()
 {
-    if (runTarget) {
-        delete runTarget;
+    if (runApp) {
+        delete runApp;
     }
-}
-
-void BuildGolang::setActive()
-{
-    liteApp->setRunTarget(runTarget);
 }
 
 QString BuildGolang::buildName() const
@@ -161,4 +164,78 @@ void BuildGolang::dbclickOutputEdit()
     buildOutput->setTextCursor(cur);
 
     liteApp->gotoLine(fileName,line,0);
+}
+
+void BuildGolang::createActions()
+{
+    buildProjectAct = new QAction(QIcon(":/images/build.png"),tr("Build Project"),this);
+    buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    buildProjectAct->setStatusTip(tr("Build Project or File"));
+    connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
+
+    buildFileAct = new QAction(QIcon(":/images/build.png"),tr("Build File\tCtrl+B"),this);
+    buildFileAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_B));
+    buildFileAct->setStatusTip(tr("Build File"));
+    connect(buildFileAct,SIGNAL(triggered()),this,SLOT(buildFile()));
+
+    cancelBuildAct = new QAction(tr("Cancel Build"),this);
+ //   cancelBuildAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
+    connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
+
+
+    runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
+    runTargetAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    runTargetAct->setStatusTip(tr("Run project or file"));
+    connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
+}
+
+void BuildGolang::createMenus()
+{
+    QMenu *_buildMenu = liteApp->mainWindow()->buildMenu();
+
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(buildProjectAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(cancelBuildAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(runTargetAct);
+}
+
+void BuildGolang::createToolBars()
+{
+    buildToolBar = liteApp->mainWindow()->widget()->addToolBar(tr("Build"));
+    buildToolBar->setObjectName("Build");
+    buildToolBar->addAction(buildProjectAct);
+    buildToolBar->addAction(runTargetAct);
+}
+
+void BuildGolang::buildProject()
+{
+    liteApp->mainWindow()->saveAllFile();
+    IProject *proj = liteApp->activeProject();
+    if (proj)  {
+        buildProject(proj);
+        return;
+    }
+    IEditor * edit= liteApp->activeEditor();
+    if (edit) {
+        buildFile(edit->filePath());
+    }
+}
+void BuildGolang::buildFile()
+{
+}
+
+void BuildGolang::runTarget()
+{
+    IProject *proj = liteApp->activeProject();
+    if (proj) {
+        runApp->runProject(proj);
+        return;
+    }
+    IEditor *edit = liteApp->activeEditor();
+    if (edit) {
+        runApp->runEditor(edit);
+    }
 }

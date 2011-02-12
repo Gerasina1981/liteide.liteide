@@ -35,8 +35,6 @@ MainWindow::MainWindow(LiteApp *app) :
         liteApp(app),
         activeEditor(NULL),
         activeProject(NULL),
-        activeBuild(NULL),
-        activeRunTarget(NULL),
         findDialog(NULL)
 {
     this->setWindowTitle("LiteIDE");
@@ -68,7 +66,7 @@ MainWindow::MainWindow(LiteApp *app) :
     createActions();
     createMenus();
     createToolBars();
-    createStatusBar();
+    //createStatusBar();
     createDockWindows();
     createOutputWidget();  
 
@@ -84,6 +82,11 @@ MainWindow::MainWindow(LiteApp *app) :
 
 }
 
+QMainWindow *MainWindow::widget()
+{
+    return this;
+}
+
 QMenu *MainWindow::fileMenu()
 {
     return _fileMenu;
@@ -97,6 +100,11 @@ QMenu *MainWindow::viewMenu()
 QMenu *MainWindow::editMenu()
 {
     return _editMenu;
+}
+
+QMenu *MainWindow::buildMenu()
+{
+    return _buildMenu;
 }
 
 QMenu *MainWindow::toolMenu()
@@ -185,29 +193,6 @@ void MainWindow::createActions()
     redoAct->setStatusTip(tr("Redo the last editing action"));
     //connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
-    buildActGroup = new QActionGroup(this);
-
-    buildProjectAct = new QAction(QIcon(":/images/build.png"),tr("Build Project"),this);
-    buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    buildProjectAct->setStatusTip(tr("Build Project or File"));
-    connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
-
-    buildFileAct = new QAction(QIcon(":/images/build.png"),tr("Build File\tCtrl+B"),this);
-    buildFileAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_B));
-    buildFileAct->setStatusTip(tr("Build File"));
-    connect(buildFileAct,SIGNAL(triggered()),this,SLOT(buildFile()));
-
-    cancelBuildAct = new QAction(tr("Cancel Build"),this);
- //   cancelBuildAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
-    connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
-
-
-    runTargetAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
-    runTargetAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    runTargetAct->setStatusTip(tr("Run project or file"));
-    connect(runTargetAct, SIGNAL(triggered()),this, SLOT(runTarget()));
-
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
@@ -254,14 +239,6 @@ void MainWindow::createMenus()
     _viewMenu = menuBar()->addMenu(tr("&View"));
 
     _buildMenu = menuBar()->addMenu(tr("&Build"));
-    _buildListMenu = _buildMenu->addMenu("&Select Build");
-
-    _buildMenu->addSeparator();
-    _buildMenu->addAction(buildProjectAct);
-    _buildMenu->addSeparator();
-    _buildMenu->addAction(cancelBuildAct);
-    _buildMenu->addSeparator();
-    _buildMenu->addAction(runTargetAct);
 
     _toolMenu = menuBar()->addMenu(tr("&Tools"));
 
@@ -286,11 +263,6 @@ void MainWindow::createToolBars()
     editToolBar->setObjectName("Edit");
     editToolBar->addAction(undoAct);
     editToolBar->addAction(redoAct);
-
-    buildToolBar = addToolBar(tr("Build"));
-    buildToolBar->setObjectName("Build");
-    buildToolBar->addAction(buildProjectAct);
-    buildToolBar->addAction(runTargetAct);
 }
 
 void MainWindow::createStatusBar()
@@ -399,16 +371,6 @@ void MainWindow::createOutputWidget()
     this->addToolBar(Qt::BottomToolBarArea,outputToolBar);
     outputActGroup = new QActionGroup(this);
     connect(outputActGroup,SIGNAL(selected(QAction*)),this,SLOT(selectedOutputAct(QAction*)));
-
-    buildOutputEdit = new PlainTextEditEx(this);
-    buildOutputEdit->setReadOnly(true);
-    connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));
-
-    runTargetOutputEdit = new QPlainTextEdit(this);
-    runTargetOutputEdit->setReadOnly(true);
-
-    this->addOutputPane(buildOutputEdit,QIcon(),"Complile Output");
-    this->addOutputPane(runTargetOutputEdit,QIcon(),"Application Output");
 }
 
 void MainWindow::saveFile()
@@ -529,62 +491,6 @@ void MainWindow::fireProjectChanged(IProject *project)
     }
 }
 
-void MainWindow::fireBuildStarted()
-{
-    buildProjectAct->setEnabled(false);
-    cancelBuildAct->setEnabled(true);
-}
-
-void MainWindow::fireBuildStoped(bool success)
-{
-    buildProjectAct->setEnabled(true);
-    cancelBuildAct->setEnabled(false);
-    fireBuildOutput(QString("build exit %1 !")
-                    .arg(success? tr("normal") : tr("error")),
-                    !success);
-}
-
-void MainWindow::fireBuildOutput(const QString &text, bool stdError)
-{
-    setCurrentOutputPane(buildOutputEdit);
-
-    QTextCharFormat fmt;
-    if (stdError)
-        fmt.setForeground(Qt::red);
-    else
-        fmt.setForeground(Qt::black);
-    buildOutputEdit->setCurrentCharFormat(fmt);
-    buildOutputEdit->appendPlainText(text);
-}
-
-void MainWindow::fireRunTargetStarted()
-{
-
-}
-
-void MainWindow::fireRunTargetStoped(bool success)
-{
-
-}
-
-void MainWindow::fireRunTargetOutput(const QByteArray &text, bool stdError)
-{
-    setCurrentOutputPane(runTargetOutputEdit);
-
-    QTextCharFormat fmt;
-    if (stdError)
-        fmt.setForeground(Qt::red);
-    else
-        fmt.setForeground(Qt::black);
-
-    //QTextCodec::fromUnicode()
-    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-
-    runTargetOutputEdit->setCurrentCharFormat(fmt);
-    runTargetOutputEdit->appendPlainText(codec->toUnicode(text));
-}
-
-
 
 void MainWindow::aboutPlugins()
 {
@@ -597,70 +503,12 @@ void MainWindow::aboutPlugins()
     dlg.exec();
 }
 
-void MainWindow::appendBuild(IBuild *build)
-{
-    QAction *act = buildActGroup->addAction(build->buildName());
-    connect(act,SIGNAL(triggered()),this,SLOT(selectBuild()));
-    act->setCheckable(true);
-    _buildListMenu->addAction(act);
-}
-
-void MainWindow::selectBuild()
-{
-    QAction *act = buildActGroup->checkedAction();
-    activeBuild = liteApp->selectBuild(act->text());
-}
-
-void MainWindow::buildProject()
-{
-    if (!activeBuild) {
-        return;
-    }
-
-    saveAllFile();
-
-    buildOutputEdit->moveCursor(QTextCursor::End);
-
-    if (activeProject) {
-        activeBuild->buildProject(activeProject);
-    } else if(activeEditor) {
-        activeBuild->buildFile(activeEditor->filePath());
-    }
-}
-
-void MainWindow::cancelBuild()
-{
-    if (!activeBuild) {
-        return;
-    }
-    activeBuild->cancelBuild();
-}
-
-void MainWindow::runTarget()
-{
-    if (!activeRunTarget) {
-        return;
-    }
-
-    runTargetOutputEdit->moveCursor(QTextCursor::End);
-
-    if (activeProject) {
-        activeRunTarget->runProject(activeProject);
-    } else if (activeEditor) {
-        activeRunTarget->runEditor(activeEditor);
-    }
-}
 
 void MainWindow::saveAllFile()
 {
     foreach(IEditor *ed, editors) {
         ed->save();
     }
-}
-
-void MainWindow::buildFile()
-{
-
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)

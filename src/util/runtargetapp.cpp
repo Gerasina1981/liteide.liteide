@@ -47,31 +47,23 @@ void RunTargetApp::runEditor(IEditor *edit)
 void RunTargetApp::finished(int code)
 {
     QString text = QString("%1 exited with code %2").arg(target).arg(code);
-    liteApp->runTargetEvent()->fireRunTargetOutput(text.toAscii(),false);
-    liteApp->runTargetEvent()->fireRunTargetStoped(code == 0);
 }
 
 void RunTargetApp::error(QProcess::ProcessError code)
 {
     QString text = QString("\nStart %1 faild!").arg(target);
-    liteApp->runTargetEvent()->fireRunTargetOutput(text.toAscii(),true);
-    liteApp->runTargetEvent()->fireRunTargetStoped(false);
 }
 
 void RunTargetApp::readStdout()
 {
     QByteArray text = process.readAllStandardOutput();
-    liteApp->runTargetEvent()->fireRunTargetOutput(text,false);
 }
 void RunTargetApp::readStderr()
 {
     QByteArray text = process.readAllStandardError();
-    liteApp->runTargetEvent()->fireRunTargetOutput(text,true);
 }
 
 void RunTargetApp::started()
 {
     QString text = QString("Starting %1 ...").arg(target);
-    liteApp->runTargetEvent()->fireRunTargetOutput(text.toAscii(),false);
-    liteApp->runTargetEvent()->fireRunTargetStarted();
 }

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QPlainTextEdit>
+#include <QMainWindow>
 
 #include "../../api/ibuild.h"
 #include "../../api/iproject.h"
@@ -34,22 +35,33 @@ class BuildGolang : public QObject, public IBuild
 {
     Q_OBJECT
 public:
+    void createToolBars();
+    void createMenus();
+    void createActions();
     explicit BuildGolang(IApplication *app, QObject *parent = 0);
     virtual ~BuildGolang();
     virtual QString buildName() const;
-    virtual void setActive();
     virtual bool buildProject(IProject *proj);
     virtual bool buildFile(const QString &fileName);
-    virtual void cancelBuild();
 
     void appendBuildOutput(const QString &text, bool stdError);
 public:
     QProcess        process;
     QString         target;
     IApplication    *liteApp;
-    RunTargetApp    *runTarget;
+    RunTargetApp    *runApp;
     BuildOutputEdit *buildOutput;
+    QAction *buildProjectAct;
+    QAction *buildFileAct;
+    QAction *cancelBuildAct;
+    QAction *runTargetAct;
+    QAction *debugAct;
+    QToolBar *buildToolBar;
 private slots:
+    void runTarget();
+    void cancelBuild();
+    void buildFile();
+    void buildProject();
     void started();
     void readStderr();
     void readStdout();

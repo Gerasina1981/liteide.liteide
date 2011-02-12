@@ -17,23 +17,17 @@ public:
 public:
     void loadAstViewEditor(const IEditor *ed);
     void closeProject();
-    IBuild *selectBuild(const QString &name);
     virtual IMainWindow *mainWindow();
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
     virtual void addAstViewFactory(IAstViewFactory *astFactory);
-    virtual void addBuild(IBuild *build);
     virtual void gotoLine(const QString &fileName, int line, int col);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
     virtual IEditorEvent *editorEvent();
     virtual IProjectEvent *projectEvent();
-    virtual IBuildEvent *buildEvent();
     virtual IEditor *activeEditor();
     virtual IProject *activeProject();
-    virtual IRunTarget *activeRunTarget();
-    virtual void setRunTarget(IRunTarget *runTarget);
-    virtual IRunTargetEvent *runTargetEvent();
     virtual QSettings *settings();
     virtual QString applicationPath() ;
     virtual QString osExecuteExt();

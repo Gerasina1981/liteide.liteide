@@ -36,12 +36,6 @@ void LiteApp::addAstViewFactory(IAstViewFactory *astFactory)
     astFactorys.append(astFactory);
 }
 
-void LiteApp::addBuild(IBuild *build)
-{
-    buildList.append(build);
-    _mainWindow->appendBuild(build);
-}
-
 void LiteApp::gotoLine(const QString &fileName, int line, int col)
 {
     _mainWindow->gotoLine(fileName,line,col);
@@ -64,11 +58,6 @@ IEditorEvent *LiteApp::editorEvent()
 }
 
 IProjectEvent *LiteApp::projectEvent()
-{
-    return _mainWindow;
-}
-
-IBuildEvent *LiteApp::buildEvent()
 {
     return _mainWindow;
 }
@@ -102,22 +91,6 @@ IProject *LiteApp::activeProject()
     return _mainWindow->activeProject;
 }
 
-IRunTarget *LiteApp::activeRunTarget()
-{
-    return _mainWindow->activeRunTarget;
-}
-
-void LiteApp::setRunTarget(IRunTarget *runTarget)
-{
-    _mainWindow->activeRunTarget = runTarget;
-}
-
-IRunTargetEvent *LiteApp::runTargetEvent()
-{
-    return _mainWindow;
-}
-
-
 void LiteApp::loadPlugins(const QString &dir)
 {
     QDir pluginsDir = dir;
@@ -133,10 +106,6 @@ void LiteApp::installPlugins()
 {
     foreach(IPlugin *p, plugins) {
         p->install(this);
-    }
-    if (!buildList.empty()) {
-        _mainWindow->activeBuild = buildList.at(0);
-        _mainWindow->activeBuild->setActive();
     }
 }
 
@@ -188,17 +157,6 @@ IEditor *LiteApp::loadEditor(const QString &fileName)
     return NULL;
 }
 
-
-IBuild *LiteApp::selectBuild(const QString &name)
-{
-    foreach(IBuild *build, buildList) {
-        if (build->buildName() == name) {
-            build->setActive();
-            return build;
-        }
-    }
-    return NULL;
-}
 
 void LiteApp::closeProject()
 {

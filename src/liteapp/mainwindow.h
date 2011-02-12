@@ -17,52 +17,28 @@ class QActionGroup;
 class FindDialog;
 class QStackedWidget;
 
-class PlainTextEditEx : public QPlainTextEdit
-{
-    Q_OBJECT
-public:
-    explicit PlainTextEditEx(QWidget *parent = 0) :
-            QPlainTextEdit(parent)
-    {
-    }
-    virtual void mouseDoubleClickEvent(QMouseEvent *e)
-    {
-        QPlainTextEdit::mouseDoubleClickEvent(e);
-        emit dbclickEvent();
-    }
-signals:
-    void dbclickEvent();
-};
-
 class MainWindow : public QMainWindow,
         public IMainWindow,
         public IEditorEvent,
-        public IProjectEvent,
-        public IBuildEvent,
-        public IRunTargetEvent
+        public IProjectEvent
 {
     Q_OBJECT
 public:
     friend class LiteApp;
     void gotoLine(const QString &fileName, int line, int col);
     void loadSettings();
-    void appendBuild(IBuild *build);
     MainWindow(LiteApp *app);
+    virtual QMainWindow *widget();
     virtual QMenu *fileMenu();
     virtual QMenu *viewMenu();
     virtual QMenu *editMenu();
+    virtual QMenu *buildMenu();
     virtual QMenu *toolMenu();
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireDocumentSave(IEditor *edit);
     virtual void fireTextChanged(IEditor *edit);
     virtual void fireProjectChanged(IProject *project);
     virtual void fireProjectClose(IProject *project);
-    virtual void fireBuildStarted();
-    virtual void fireBuildStoped(bool success);
-    virtual void fireBuildOutput(const QString &text, bool stdError);
-    virtual void fireRunTargetStarted();
-    virtual void fireRunTargetStoped(bool success);
-    virtual void fireRunTargetOutput(const QByteArray &text, bool stdError);
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
@@ -74,10 +50,6 @@ private slots:
     void outputTabChanged(int index);
     void newProject();
     void closeProject();
-    void buildFile();
-    void runTarget();
-    void cancelBuild();
-    void buildProject();
     void saveFile();
     void newFile();
     void openFile();
@@ -105,7 +77,6 @@ private:
 
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
-    QToolBar *buildToolBar;
 
     QToolBar *outputToolBar;
     QStackedWidget *outputStackedWidget;
@@ -116,7 +87,6 @@ private:
     QMenu   *_editMenu;
     QMenu   *_viewMenu;
     QMenu   *_buildMenu;
-    QMenu   *_buildListMenu;
     QMenu   *_toolMenu;
     QMenu   *_helpMenu;
 
@@ -135,34 +105,21 @@ private:
     QAction *undoAct;
     QAction *redoAct;
 
-    QActionGroup *buildActGroup;
-    QAction *buildProjectAct;
-    QAction *buildFileAct;
-    QAction *cancelBuildAct;
-    QAction *runTargetAct;
-    QAction *debugAct;
-
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
-    PlainTextEditEx   *buildOutputEdit;
-    QPlainTextEdit   *runTargetOutputEdit;
-
     FindDialog *findDialog;
 
     IEditor *activeEditor;
     IProject *activeProject;
-    IBuild   *activeBuild;
-    IRunTarget *activeRunTarget;
     LiteApp *liteApp;
     QMap<QWidget*,IEditor*> editors;
 
     QTimer *astTimer;
 public slots:
     void astUpdate();
-    void selectBuild();
 };
 
 #endif // MAINWINDOW_H

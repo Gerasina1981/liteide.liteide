@@ -22,7 +22,6 @@ void GolangProPlugin::install(IApplication *app)
 {
     liteApp = app;
     build = new BuildGolang(app);
-    app->addBuild(build);
 
     createGofmt();
 }
