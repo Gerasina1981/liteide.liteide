@@ -6,8 +6,6 @@
 #include <QMap>
 #include "../api/ieditor.h"
 #include "../api/iproject.h"
-#include "../api/ibuild.h"
-#include "../api/iruntarget.h"
 #include "../api/iapp.h"
 #include <QTimer>
 
@@ -32,7 +30,6 @@ public:
     virtual QMenu *fileMenu();
     virtual QMenu *viewMenu();
     virtual QMenu *editMenu();
-    virtual QMenu *buildMenu();
     virtual QMenu *toolMenu();
     virtual void fireDocumentChanged(IEditor *edit, bool b);
     virtual void fireDocumentSave(IEditor *edit);
@@ -86,7 +83,6 @@ private:
     QMenu   *_fileMenu;
     QMenu   *_editMenu;
     QMenu   *_viewMenu;
-    QMenu   *_buildMenu;
     QMenu   *_toolMenu;
     QMenu   *_helpMenu;
 

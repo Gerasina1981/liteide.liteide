@@ -102,11 +102,6 @@ QMenu *MainWindow::editMenu()
     return _editMenu;
 }
 
-QMenu *MainWindow::buildMenu()
-{
-    return _buildMenu;
-}
-
 QMenu *MainWindow::toolMenu()
 {
     return _toolMenu;
@@ -237,9 +232,6 @@ void MainWindow::createMenus()
     _editMenu->addAction(findAct);
 
     _viewMenu = menuBar()->addMenu(tr("&View"));
-
-    _buildMenu = menuBar()->addMenu(tr("&Build"));
-
     _toolMenu = menuBar()->addMenu(tr("&Tools"));
 
     menuBar()->addSeparator();

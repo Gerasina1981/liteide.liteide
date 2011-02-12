@@ -6,6 +6,7 @@
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QMenu>
+#include <QMenuBar>
 #include <QToolBar>
 
 
@@ -179,7 +180,6 @@ void BuildGolang::createActions()
     connect(buildFileAct,SIGNAL(triggered()),this,SLOT(buildFile()));
 
     cancelBuildAct = new QAction(tr("Cancel Build"),this);
- //   cancelBuildAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
     connect(cancelBuildAct,SIGNAL(triggered()),this,SLOT(cancelBuild()));
 
@@ -192,7 +192,7 @@ void BuildGolang::createActions()
 
 void BuildGolang::createMenus()
 {
-    QMenu *_buildMenu = liteApp->mainWindow()->buildMenu();
+    _buildMenu = liteApp->mainWindow()->widget()->menuBar()->addMenu("Build");
 
     _buildMenu->addSeparator();
     _buildMenu->addAction(buildProjectAct);
@@ -200,6 +200,8 @@ void BuildGolang::createMenus()
     _buildMenu->addAction(cancelBuildAct);
     _buildMenu->addSeparator();
     _buildMenu->addAction(runTargetAct);
+
+    liteApp->mainWindow()->widget()->menuBar()->insertMenu(liteApp->mainWindow()->toolMenu()->menuAction(),_buildMenu);
 }
 
 void BuildGolang::createToolBars()

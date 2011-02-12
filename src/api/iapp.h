@@ -12,10 +12,6 @@ class IEditor;
 class IProject;
 class IProjectFactory;
 class IProjectEvent;
-class IBuild;
-class IBuildEvent;
-class IRunTarget;
-class IRunTargetEvent;
 class IAstView;
 class IAstViewFactory;
 class IMainWindow;
@@ -31,7 +27,6 @@ public:
     virtual QMenu *fileMenu() = 0;
     virtual QMenu *viewMenu() = 0;
     virtual QMenu *editMenu() = 0;
-    virtual QMenu *buildMenu() = 0;
     virtual QMenu *toolMenu() = 0;
     virtual void closeAllFile() = 0;
     virtual void saveAllFile() = 0;

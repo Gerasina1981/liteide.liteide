@@ -57,6 +57,7 @@ public:
     QAction *runTargetAct;
     QAction *debugAct;
     QToolBar *buildToolBar;
+    QMenu *_buildMenu;
 private slots:
     void runTarget();
     void cancelBuild();
