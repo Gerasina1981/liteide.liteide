@@ -25,6 +25,7 @@ public:
     virtual void reload();
     virtual void activeEditor(QAction *undoAct, QAction *redoAct);
     virtual QByteArray data() const;
+    virtual void gotoLine(int line, int col);
 public slots:
     void textChanged();
     void setUndoEnabled(bool);

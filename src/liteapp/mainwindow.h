@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow,
     Q_OBJECT
 public:
     friend class LiteApp;
-    void gotoLine(const QString &fileName, int line, int col);
+    virtual void gotoLine(const QString &fileName, int line, int col);
     void loadSettings();
     MainWindow(LiteApp *app);
     virtual QMainWindow *widget();

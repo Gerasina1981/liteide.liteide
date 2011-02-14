@@ -16,6 +16,7 @@ public:
     virtual QWidget *widget() const = 0;
     virtual QIcon icon() const = 0;
     virtual QByteArray data() const = 0;
+    virtual void gotoLine(int line, int col) = 0;
 public slots:
     virtual void save() = 0;
     virtual bool close() = 0;

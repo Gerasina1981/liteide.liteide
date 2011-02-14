@@ -246,7 +246,7 @@ void BuildGolang::dbclickOutputEdit()
     cur.select(QTextCursor::LineUnderCursor);
     buildOutputEdit->setTextCursor(cur);
 
-    liteApp->gotoLine(fileName,line,0);
+    liteApp->mainWindow()->gotoLine(fileName,line,0);
 }
 
 void BuildGolang::createActions()
@@ -381,9 +381,11 @@ void BuildGolang::run()
 void BuildGolang::createOutput()
 {
     buildOutputEdit = new BuildOutputEdit;
+    buildOutputEdit->setReadOnly(true);
     liteApp->mainWindow()->addOutputPane(buildOutputEdit,QIcon(),tr("Build Output"));
 
     runOutputEdit = new QPlainTextEdit;
+    runOutputEdit->setReadOnly(true);
     liteApp->mainWindow()->addOutputPane(runOutputEdit,QIcon(),tr("Run Output"));
 
     connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));

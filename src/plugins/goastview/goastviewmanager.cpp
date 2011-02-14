@@ -118,7 +118,8 @@ GoAstViewManager::GoAstViewManager(IApplication *app, QWidget *parent) :
     liteApp(app), QWidget(parent), astView(NULL)
 {
     astView = new GoAstView(app,this);
-    connect(astView,SIGNAL(astOutput(QByteArray)),this,SLOT(astOutput(QByteArray)));
+    connect(astView,SIGNAL(astOutput(QByteArray)),this,SLOT(astUpdateModel(QByteArray)));
+    connect(astView,SIGNAL(astError(QByteArray)),this,SLOT(astError(QByteArray)));
     tree = new QTreeView;
     model = new QStandardItemModel;
     tree->setModel(model);
@@ -140,6 +141,10 @@ GoAstViewManager::GoAstViewManager(IApplication *app, QWidget *parent) :
 
     connect(liteApp,SIGNAL(activeEditorTextChanged(IEditor*)),this,SLOT(activeEditorTextChanged(IEditor*)));
     connect(liteApp,SIGNAL(activeEditorChanged(IEditor*)),this,SLOT(activeEditorChanged(IEditor*)));
+
+    //create astview output
+    astOutputEdit = new QPlainTextEdit;
+    liteApp->mainWindow()->addOutputPane(astOutputEdit,QIcon(),tr("AstOutput"));;
 }
 
 QStringList GoAstViewManager::fileTypes()
@@ -165,7 +170,7 @@ const (
 */
 
 // level:tag:name:source:x:y
-void GoAstViewManager::astOutput(const QByteArray &data)
+void GoAstViewManager::astUpdateModel(const QByteArray &data)
 {
     QModelIndex root = model->index(0,0);
     QStringList expand;
@@ -236,6 +241,18 @@ void GoAstViewManager::astOutput(const QByteArray &data)
     }
 }
 
+void GoAstViewManager::astClearModel()
+{
+    model->clear();
+    astFiles.clear();
+}
+
+void GoAstViewManager::astError(const QByteArray &data)
+{
+    astOutputEdit->appendPlainText(data);
+}
+
+
 void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
 {
     QStandardItem *item = model->itemFromIndex(index);
@@ -250,15 +267,15 @@ void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
         int x = infos[4].toInt();
         int y = infos[5].toInt();
         if (index >= 0 && index < astFiles.size()) {
-            liteApp->gotoLine(astFiles[index],x,y);
+            liteApp->mainWindow()->gotoLine(astFiles[index],x,y);
         }
     }
 }
 
 void GoAstViewManager::activeEditorChanged(IEditor *ed)
 {
-    astOutput("");
-    if (ed != NULL) {
+    astClearModel();
+    if (ed) {
         astUpdateNow();
     }
 }
@@ -277,9 +294,9 @@ void GoAstViewManager::astUpdateNow()
         if (QFileInfo(ed->filePath()).suffix() == "go") {
             astView->update(ed->filePath(),ed->data());
         } else {
-            astOutput("");
+            astClearModel();
         }
     } else {
-        astOutput("");
+        astClearModel();
     }
 }

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QPlainTextEdit>
 #include "../../api/iapp.h"
 #include "../../api/ieditor.h"
 #include "../../api/iastview.h"
@@ -62,9 +63,12 @@ public slots:
     void activeEditorTextChanged(IEditor *ed);
     void activeEditorChanged(IEditor *ed);
     void doubleClickedTree(const QModelIndex &index);
-    void astOutput(const QByteArray &data);
+    void astUpdateModel(const QByteArray &data);
+    void astClearModel();
+    void astError(const QByteArray &data);
 protected:
     IApplication *liteApp;
+    QPlainTextEdit  *astOutputEdit;
     QDockWidget  *parentDock;
     QStandardItemModel  *model;
     QTreeView            *tree;

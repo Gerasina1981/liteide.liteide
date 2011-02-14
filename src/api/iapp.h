@@ -28,6 +28,7 @@ public:
     virtual QMenu *toolMenu() = 0;
     virtual void closeAllFile() = 0;
     virtual void saveAllFile() = 0;
+    virtual void gotoLine(const QString &fileName, int line, int col) = 0;
 };
 
 class IApplication : public QObject
@@ -37,7 +38,6 @@ public:
     virtual ~IApplication() {}
     virtual void addEditorFactory(IEditorFactory *editFactory) = 0;
     virtual void addProjectFactory(IProjectFactory *projFactory) = 0;
-    virtual void gotoLine(const QString &fileName, int line, int col) = 0;
     virtual IProject *loadProject(const QString &fileName) = 0;
     virtual IEditor *loadEditor(const QString &fileName) = 0;
     virtual IEditorEvent *editorEvent() = 0;

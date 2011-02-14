@@ -31,11 +31,6 @@ void LiteApp::addProjectFactory(IProjectFactory *projFactory)
     projectFactorys.append(projFactory);
 }
 
-void LiteApp::gotoLine(const QString &fileName, int line, int col)
-{
-    _mainWindow->gotoLine(fileName,line,col);
-}
-
 IProject *LiteApp::loadProject(const QString &fileName)
 {
     QString ext = QFileInfo(fileName).suffix();

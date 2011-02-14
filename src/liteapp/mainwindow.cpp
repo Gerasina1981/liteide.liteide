@@ -622,26 +622,19 @@ void MainWindow::gotoLine(const QString &fileName, int line, int col)
         QString projectPath = QFileInfo(activeProject->filePath()).absolutePath();
         QString filePath = QFileInfo(projectPath,fileName).absoluteFilePath();
         ed = liteApp->loadEditor(filePath);
-    } else if (activeEditor && activeEditor->fileName() == fileName) {
-        ed = activeEditor;
+    } else {
+        QMapIterator<QWidget*,IEditor*>  i(editors);
+        while (i.hasNext()) {
+            i.next();
+            while (i.value()->filePath() == fileName) {
+                ed = i.value();
+                break;
+            }
+        }
     }
     if (!ed)
         return;
-    QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(ed->widget());
-    if (!editor)
-        return;
-
-    int count = 1;
-    for ( QTextBlock b = editor->document()->begin(); b.isValid(); b = b.next(), count++ )
-    {
-        if ( count == line )
-        {
-            QTextCursor c = QTextCursor(b);
-            editor->setFocus();
-            editor->setTextCursor(c);
-            break;
-        }
-    }
+    ed->gotoLine(line,col);
 }
 
 void MainWindow::selectedOutputAct(QAction *act)

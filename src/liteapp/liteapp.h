@@ -18,7 +18,6 @@ public:
     virtual IMainWindow *mainWindow();
     virtual void addEditorFactory(IEditorFactory *editFactory);
     virtual void addProjectFactory(IProjectFactory *projFactory);
-    virtual void gotoLine(const QString &fileName, int line, int col);
     virtual IProject *loadProject(const QString &fileName);
     virtual IEditor  *loadEditor(const QString &fileName);
     virtual IEditorEvent *editorEvent();

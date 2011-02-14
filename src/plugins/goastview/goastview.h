@@ -15,6 +15,7 @@ public:
     QProcess astProcess;
 signals:
     void astOutput(const QByteArray &data);
+    void astError(const QByteArray &data);
 public slots:
     void started();
     void readStderr();

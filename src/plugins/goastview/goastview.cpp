@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QFileInfo>
+#include "../../util/processutil.h"
 
 GoAstView::GoAstView(IApplication *app, QObject *parent):
     liteApp(app), QObject(parent)
@@ -13,7 +14,6 @@ GoAstView::GoAstView(IApplication *app, QObject *parent):
     connect(&astProcess,SIGNAL(started()),this,SLOT(started()));
     connect(&astProcess,SIGNAL(finished(int)),this,SLOT(finished(int)));
     connect(&astProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(error(QProcess::ProcessError)));
-
 }
 
 GoAstView::~GoAstView()
@@ -50,7 +50,7 @@ void GoAstView::started()
 void GoAstView::readStderr()
 {
     QByteArray data = astProcess.readAllStandardError();
-    qDebug() << data;
+    emit astError(data);
 }
 
 void GoAstView::readStdout()
@@ -61,9 +61,10 @@ void GoAstView::readStdout()
 
 void GoAstView::error(QProcess::ProcessError code)
 {
-    emit astOutput("");
+    QByteArray data = processErrorName(code);
+    emit astError(data);
 }
 
-void GoAstView::finished(int code)
+void GoAstView::finished(int /*code*/)
 {
 }

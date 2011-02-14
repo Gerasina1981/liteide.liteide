@@ -3,7 +3,8 @@
 DEPENDPATH += $$PWD
 
 HEADERS += processoutput.h \
-        runtargetapp.h
+        runtargetapp.h \
+        processutil.h
 
 SOURCES += \
         runtargetapp.cpp
