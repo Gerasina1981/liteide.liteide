@@ -84,7 +84,8 @@ IProject *LiteApp::activeProject()
 void LiteApp::loadPlugins(const QString &dir)
 {
     QDir pluginsDir = dir;
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    pluginsDir.setFilter(QDir::Files | QDir::NoSymLinks);
+    foreach (QString fileName, pluginsDir.entryList()) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         if (IPlugin *p = qobject_cast<IPlugin*>(loader.instance())) {
             plugins.append(p);

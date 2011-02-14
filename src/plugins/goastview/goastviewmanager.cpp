@@ -186,6 +186,15 @@ void GoAstViewManager::astUpdateModel(const QByteArray &data)
         }
     }
 
+    QString topText;
+    QModelIndex topIndex = tree->indexAt(QPoint(1,1));
+    if (topIndex.isValid()) {
+       QStandardItem *item = model->itemFromIndex(topIndex);
+       if (item) {
+           topText = item->text();
+       }
+    }
+
     model->clear();
     astFiles.clear();
 
@@ -207,7 +216,7 @@ void GoAstViewManager::astUpdateModel(const QByteArray &data)
         if (tag == "p") {
             for (int i = 3; i < info.size(); i ++) {
                 astFiles.append(info[i]);
-            }
+            }            
         }
 
         QStandardItem *item = new QStandardItem(name);
@@ -217,11 +226,13 @@ void GoAstViewManager::astUpdateModel(const QByteArray &data)
         } else {
             item->setIcon(icons.iconFromTag(tag));
         }
-        QStandardItem *parent = items.value(level-1,0);
-        if (parent ) {
-            parent->appendRow(item);
-        } else {
+        if (tag == "p") {
             model->appendRow(item);
+        } else {
+            QStandardItem *parent = items.value(level-1,0);
+            if (parent ) {
+                parent->appendRow(item);
+            }
         }
         items[level] = item;
     }
@@ -229,14 +240,21 @@ void GoAstViewManager::astUpdateModel(const QByteArray &data)
     root = model->index(0,0);
     if (root.isValid()) {
         tree->expand(root);
+        QModelIndex topIndex;
         for (int i = 0; i < model->rowCount(root); i++) {
             QModelIndex r = model->index(i,0,root);
             if (r.isValid()) {
                 QStandardItem *item = model->itemFromIndex(r);
+                if (topText == item->text()) {
+                    topIndex = r;
+                }
                 if (item && expand.contains(item->text())) {
                     tree->expand(r);
                 }
             }
+        }
+        if (topIndex.isValid()) {
+            tree->scrollTo(topIndex,QAbstractItemView::PositionAtTop);
         }
     }
 }

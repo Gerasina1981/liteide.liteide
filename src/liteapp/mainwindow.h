@@ -44,7 +44,6 @@ private slots:
     void find();
     void closeAllFile();
     void saveAllFile();
-    void outputTabChanged(int index);
     void newProject();
     void closeProject();
     void saveFile();

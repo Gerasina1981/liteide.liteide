@@ -25,6 +25,7 @@ public slots:
 public:
     IApplication *liteApp;
     QByteArray  srcData;
+    QByteArray  readData;
 };
 
 #endif // GOASTVIEW_H

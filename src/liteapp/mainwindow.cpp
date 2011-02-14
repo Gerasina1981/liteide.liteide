@@ -564,12 +564,6 @@ void MainWindow::newProject()
     }
 }
 
-void MainWindow::outputTabChanged(int index)
-{
-//    QString text = outputTabWidget->tabText(index);
-//    outputDock->setWindowTitle(QString(tr("Output - %1")).arg(text));
-}
-
 void MainWindow::closeAllFile()
 {
     this->activeEditor = NULL;

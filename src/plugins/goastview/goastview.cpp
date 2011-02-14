@@ -35,6 +35,7 @@ void GoAstView::update(const QString &fileName, const QByteArray &data)
     if (!data.isEmpty()) {
         args << "-stdin=true";
     }
+    readData.clear();
     QString cmd = QFileInfo(liteApp->applicationPath(),"goastview"+liteApp->osExecuteExt()).absoluteFilePath();
     astProcess.start(cmd,args); 
 }
@@ -56,7 +57,7 @@ void GoAstView::readStderr()
 void GoAstView::readStdout()
 {
     QByteArray data = astProcess.readAllStandardOutput();
-    emit astOutput(data);
+    readData.push_back(data);
 }
 
 void GoAstView::error(QProcess::ProcessError code)
@@ -65,6 +66,9 @@ void GoAstView::error(QProcess::ProcessError code)
     emit astError(data);
 }
 
-void GoAstView::finished(int /*code*/)
+void GoAstView::finished(int code)
 {
+    if (code == 0) {
+        emit astOutput(readData);
+    }
 }
