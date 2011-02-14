@@ -7,6 +7,7 @@
 #include "../../api/iplugin.h"
 #include "../../api/iapp.h"
 #include "../../api/iproject.h"
+#include "golanggdb.h"
 
 class /*GODEBUGSHARED_EXPORT */GodebugPlugin : public QObject, public IPlugin
 {
@@ -21,6 +22,6 @@ public:
     virtual QString info() const;
 protected:
     IApplication *liteApp;
-};
+ };
 
 #endif // GODEBUGPLUGIN_H

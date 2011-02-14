@@ -27,6 +27,7 @@ public:
     virtual QSettings *settings();
     virtual QString applicationPath() ;
     virtual QString osExecuteExt();
+    virtual TargetInfo getTargetInfo();
     void loadPlugins(const QString &dir);
     void installPlugins();
     QString editorTypeFilter() const;

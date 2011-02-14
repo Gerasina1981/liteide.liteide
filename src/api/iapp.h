@@ -31,6 +31,12 @@ public:
     virtual void gotoLine(const QString &fileName, int line, int col) = 0;
 };
 
+struct TargetInfo
+{
+    QString workDir;
+    QString fileName;
+};
+
 class IApplication : public QObject
 {
     Q_OBJECT
@@ -48,6 +54,7 @@ public:
     virtual IProject *activeProject() = 0;
     virtual QString applicationPath() = 0;
     virtual QString osExecuteExt() = 0;
+    virtual TargetInfo getTargetInfo() = 0;
 signals:
     void activeEditorTextChanged(IEditor *ed);
     void activeEditorChanged(IEditor *ed);

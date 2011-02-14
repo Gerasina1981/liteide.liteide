@@ -71,6 +71,35 @@ QString LiteApp::osExecuteExt()
 #endif
 }
 
+TargetInfo LiteApp::getTargetInfo()
+{
+    IProject *proj = activeProject();
+    if (proj)    {
+        QStringList val = proj->values("TARGET");
+        QString target = proj->displayName();
+        if (!val.isEmpty())
+            target = val.at(0);
+
+        target = QFileInfo(target).baseName();
+        QString projDir = QFileInfo(proj->filePath()).absolutePath();
+        QStringList dest = proj->values("DESTDIR");
+        if (!dest.isEmpty()) {
+            projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
+        }
+        target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
+        return TargetInfo{projDir, target};
+    } else {
+        IEditor *edit = activeEditor();
+        if (edit) {
+            QString target = QFileInfo(edit->filePath()).baseName();
+            QString projDir = QFileInfo(edit->filePath()).absolutePath();
+            target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
+            return TargetInfo{projDir,target};
+        }
+    }
+    return TargetInfo{"",""};
+}
+
 IEditor *LiteApp::activeEditor()
 {
     return _mainWindow->activeEditor;

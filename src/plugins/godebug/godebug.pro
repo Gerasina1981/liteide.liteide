@@ -12,7 +12,9 @@ DESTDIR = $$IDE_PLGUINS_PATH
 
 DEFINES += GODEBUG_LIBRARY
 
-SOURCES += godebugplugin.cpp
+SOURCES += godebugplugin.cpp \
+    golanggdb.cpp
 
 HEADERS += godebugplugin.h\
-        godebug_global.h
+        godebug_global.h \
+    golanggdb.h

@@ -8,6 +8,7 @@ GodebugPlugin::GodebugPlugin()
 void GodebugPlugin::install(IApplication *app)
 {
     liteApp = app;
+    new GolangGdb(app);
 }
 
 void GodebugPlugin::uninstall()
@@ -17,7 +18,7 @@ void GodebugPlugin::uninstall()
 
 QString GodebugPlugin::name() const
 {
-    return "Godebug";
+    return "GoDebug";
 }
 
 QString GodebugPlugin::anchor() const
