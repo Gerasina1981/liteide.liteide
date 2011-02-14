@@ -74,7 +74,7 @@ MainWindow::MainWindow(LiteApp *app) :
 
     setAcceptDrops(true);
 
-    setUnifiedTitleAndToolBarOnMac(true);
+    //setUnifiedTitleAndToolBarOnMac(true);
 
     loadSettings();
 }
