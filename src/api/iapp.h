@@ -13,6 +13,7 @@ class IProject;
 class IProjectFactory;
 class IProjectEvent;
 class IMainWindow;
+class IOption;
 
 class IMainWindow
 {
@@ -22,6 +23,7 @@ public:
     virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name) = 0;
     virtual void addOutputPane(QWidget *w, const QIcon &icon, const QString &name) = 0;
     virtual void setCurrentOutputPane(QWidget *w) = 0;
+    virtual void addOptionPage(IOption *opt) = 0;
     virtual QMenu *fileMenu() = 0;
     virtual QMenu *viewMenu() = 0;
     virtual QMenu *editMenu() = 0;

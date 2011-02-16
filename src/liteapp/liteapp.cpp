@@ -73,6 +73,7 @@ QString LiteApp::osExecuteExt()
 
 TargetInfo LiteApp::getTargetInfo()
 {
+    TargetInfo info;
     IProject *proj = activeProject();
     if (proj)    {
         QStringList val = proj->values("TARGET");
@@ -87,17 +88,19 @@ TargetInfo LiteApp::getTargetInfo()
             projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
         }
         target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
-        return TargetInfo{projDir, target};
+        info.workDir = projDir;
+        info.fileName = target;
     } else {
         IEditor *edit = activeEditor();
         if (edit) {
             QString target = QFileInfo(edit->filePath()).baseName();
             QString projDir = QFileInfo(edit->filePath()).absolutePath();
             target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
-            return TargetInfo{projDir,target};
+            info.workDir = projDir;
+            info.fileName = target;
         }
     }
-    return TargetInfo{"",""};
+    return info;
 }
 
 IEditor *LiteApp::activeEditor()

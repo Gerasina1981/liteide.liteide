@@ -3,6 +3,7 @@
 #include "aboutpluginsdialog.h"
 #include "finddialog.h"
 #include "projectwizard.h"
+#include "optionsdialog.h"
 
 #include <QApplication>
 #include <QAction>
@@ -67,7 +68,6 @@ MainWindow::MainWindow(LiteApp *app) :
     createMenus();
     createToolBars();
     //createStatusBar();
-    createDockWindows();
     createOutputWidget();  
 
     resize(640,480);
@@ -75,6 +75,8 @@ MainWindow::MainWindow(LiteApp *app) :
     setAcceptDrops(true);
 
     //setUnifiedTitleAndToolBarOnMac(true);
+    optDialog = new OptionsDialog(this);
+    optDialog->setModal(true);
 
     loadSettings();
 }
@@ -185,6 +187,10 @@ void MainWindow::createActions()
     redoAct->setStatusTip(tr("Redo the last editing action"));
     //connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
+    optionsAct = new QAction(QIcon(),tr("&Options..."),this);
+    optionsAct->setStatusTip(tr("Show options dialog"));
+    connect(optionsAct,SIGNAL(triggered()),this,SLOT(options()));
+
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
@@ -229,7 +235,9 @@ void MainWindow::createMenus()
     _editMenu->addAction(findAct);
 
     _viewMenu = menuBar()->addMenu(tr("&View"));
+
     _toolMenu = menuBar()->addMenu(tr("&Tools"));
+    _toolMenu->addAction(optionsAct);
 
     menuBar()->addSeparator();
 
@@ -350,9 +358,9 @@ void MainWindow::setCurrentOutputPane(QWidget *w)
     }
 }
 
-void MainWindow::createDockWindows()
+void MainWindow::addOptionPage(IOption *opt)
 {
-    //this->setDockOptions(ForceTabbedDocks);
+    optDialog->addPage(opt);
 }
 
 void MainWindow::createOutputWidget()
@@ -650,4 +658,9 @@ void MainWindow::selectedOutputAct(QAction *act)
         }
         this->outputStackedWidget->setCurrentWidget(w);
     }
+}
+
+void MainWindow::options()
+{
+    optDialog->show();
 }

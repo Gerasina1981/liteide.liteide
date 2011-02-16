@@ -14,6 +14,7 @@ class QPlainTextEdit;
 class QActionGroup;
 class FindDialog;
 class QStackedWidget;
+class OptionsDialog;
 
 class MainWindow : public QMainWindow,
         public IMainWindow,
@@ -39,6 +40,7 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event);
 private slots:
+    void options();
     void selectedOutputAct(QAction *act);
     void findText(const QString&,QTextDocument::FindFlags);
     void find();
@@ -58,6 +60,7 @@ public:
     virtual QDockWidget * addWorkspacePane(QWidget *w, const QString &name);
     virtual void addOutputPane(QWidget *w, const QIcon &icon, const QString &name);
     virtual void setCurrentOutputPane(QWidget *w);
+    virtual void addOptionPage(IOption *opt);
     void addEditor(IEditor *ed);
 private:
     virtual void dropEvent(QDropEvent *event);
@@ -66,7 +69,6 @@ private:
     void createMenus();
     void createToolBars();
     void createStatusBar();
-    void createDockWindows();
     void createOutputWidget();
 
     QTabWidget *editTabWidget;
@@ -101,12 +103,15 @@ private:
     QAction *undoAct;
     QAction *redoAct;
 
+    QAction *optionsAct;
+
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
     QAction *aboutPluginsAct;
 
     FindDialog *findDialog;
+    OptionsDialog *optDialog;
 
     IEditor *activeEditor;
     IProject *activeProject;

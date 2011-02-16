@@ -17,7 +17,7 @@ ProjectHighlighter::ProjectHighlighter(QTextDocument *document) :
 void ProjectHighlighter::highlightBlock(const QString &text)
 {
     int startPos = 0;
-    int endPos = text.length();
+    //int endPos = text.length();
     foreach (const HighlightingRule &rule, highlightingRules) {
         QRegExp expression(rule.pattern);
         int index = expression.indexIn(text,startPos);
