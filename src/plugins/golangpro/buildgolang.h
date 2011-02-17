@@ -12,6 +12,7 @@
 #include "../../api/iapp.h"
 #include "../../api/ioutput.h"
 
+
 class BuildOutputEdit : public QPlainTextEdit
 {
     Q_OBJECT

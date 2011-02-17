@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QTextCodec>
+#include "golangoption.h"
 
 /*
 enum ProcessError {
@@ -89,8 +90,10 @@ bool BuildGolang::buildProject(IProject *proj)
 
     buildProcess.setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
 
+    QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
+
     QStringList args;
-    args  << "-ver=false" << "-gopro" << proj->filePath();
+    args  << "-ver=false" << "-goroot"<< goroot  << "-gopro" << proj->filePath();
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
     buildProcess.start(cmd,args);
 
@@ -103,8 +106,10 @@ bool BuildGolang::buildFile(const QString &fileName)
     QString projDir = QFileInfo(fileName).absolutePath();
     buildProcess.setWorkingDirectory(projDir);
 
+    QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
+
     QStringList args;
-    args << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
+    args << "-goroot"<< goroot << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
     buildProcess.start(cmd,args);
 

@@ -41,6 +41,7 @@ void GolangOption::load()
 
 void GolangOption::save()
 {
+    liteApp->settings()->setValue("golang/GOROOT",ui->lineEdit->text());
 }
 
 void GolangOption::on_browseButton_clicked()
@@ -48,7 +49,6 @@ void GolangOption::on_browseButton_clicked()
     QString goroot = QFileDialog::getExistingDirectory(this);
     if (!goroot.isEmpty()) {
         ui->lineEdit->setText(goroot);
-        liteApp->settings()->setValue("golang/GOROOT",goroot);
         setupList();
     }
 }
