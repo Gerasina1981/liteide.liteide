@@ -19,6 +19,7 @@ var (
 	printDep     *bool   = flag.Bool("dep", false, "print packages depends ")
 	showVer      *bool   = flag.Bool("ver", true, "print version ")
 	buildLib     *bool   = flag.Bool("lib", false, "build packages as librarys outside main")
+	goroot		 *string = flag.String("goroot",defGoroot(),"default go root")	
 	//	clean		 *bool   = flag.Bool("clean",false,"clean build object")
 )
 
@@ -246,7 +247,7 @@ func main() {
 		fmt.Println("GoproMake 0.2.1: go files auto build tools. make by visualfc@gmail.com.")
 	}
 
-	gobin, err := newGoBin()
+	gobin, err := newGoBin(*goroot)
 	if err != nil {
 		exitln(err)
 	}

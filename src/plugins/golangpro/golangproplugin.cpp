@@ -21,6 +21,8 @@ GolangProPlugin::~GolangProPlugin()
 void GolangProPlugin::install(IApplication *app)
 {
     liteApp = app;
+    opt = new GolangOption(liteApp);
+    liteApp->mainWindow()->addOptionPage(opt);
     build = new BuildGolang(app);
 
     createGofmt();

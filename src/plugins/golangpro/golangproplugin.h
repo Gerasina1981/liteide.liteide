@@ -7,6 +7,7 @@
 #include "../../api/ieditor.h"
 #include "../../util/processoutput.h"
 #include "buildgolang.h"
+#include "golangoption.h"
 
 #include <QObject>
 #include <QtPlugin>
@@ -30,6 +31,7 @@ private:
     IApplication *liteApp;
     BuildGolang *build;
     ProcessOutput gofmtProcess;
+    GolangOption *opt;
     QPlainTextEdit *gofmtOutputEdit;
     QAction *gofmtAct;
 private slots:

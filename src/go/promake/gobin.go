@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"os"
 	"exec"
+	"path"
 )
 
 type GoBin struct {
@@ -17,22 +18,24 @@ type GoBin struct {
 	rm       string
 }
 
-func newGoBin() (p *GoBin, err os.Error) {
+func defGoroot() string {
 	var curos = runtime.GOOS
+	if curos == "windows" {
+		return "c:/go" 
+	}
+	return os.Getenv("HOME")+"/go"
+}
+
+func newGoBin(defgoroot string) (p *GoBin, err os.Error) {
 	goroot := os.Getenv("GOROOT")
+	gobin := os.Getenv("GOBIN")
+	
 	if goroot == "" {
-		path := os.Getenv("PATH")
-		switch curos {
-		case "windows":
-			goroot = "c:/go"
-			path += ";c:/go/bin"
-		default:
-			home := os.Getenv("HOME")
-			goroot = home + "/go"
-			path += ":" + home + "/go/bin"
-		}
-		os.Setenv("GOROOT", goroot)
-		os.Setenv("PATH", path)
+		goroot = defgoroot
+		os.Setenv("GOROOT",defgoroot)
+	}
+	if gobin == "" {
+		gobin = goroot+"/bin"
 	}
 
 	goos := os.Getenv("GOOS")
@@ -79,19 +82,19 @@ func newGoBin() (p *GoBin, err os.Error) {
 	p.pakext = ".a"
 	p.rm = rm
 
-	p.compiler, err = exec.LookPath(p.compiler)
+	p.compiler, err = exec.LookPath(path.Join(gobin,p.compiler))
 	if err != nil {
 		return
 	}
-	p.link, err = exec.LookPath(p.link)
+	p.link, err = exec.LookPath(path.Join(gobin,p.link))
 	if err != nil {
 		return
 	}
-	p.pack, err = exec.LookPath(p.pack)
+	p.pack, err = exec.LookPath(path.Join(gobin,p.pack))
 	if err != nil {
 		return
 	}
-	p.cgo, err = exec.LookPath(p.cgo)
+	p.cgo, err = exec.LookPath(path.Join(gobin,p.cgo))
 	if err != nil {
 		return
 	}
