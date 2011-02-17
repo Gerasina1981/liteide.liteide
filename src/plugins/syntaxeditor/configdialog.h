@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QList>
 #include <QIcon>
+#include "../../api/iapp.h"
 #include "../../api/ioption.h"
 
 namespace Ui {
@@ -13,11 +14,10 @@ namespace Ui {
 class ConfigDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     void save();
     void load();
-    explicit ConfigDialog(QWidget *parent = 0);
+    explicit ConfigDialog(IApplication *app, QWidget *parent = 0);
     ~ConfigDialog();
     void updatePointSizes();
     QList<int> pointSizesForSelectedFont() const;
@@ -28,13 +28,15 @@ public:
     QString fontFamily;
 private:
     Ui::ConfigDialog *ui;
+    IApplication *liteApp;
 };
 
-class SyntaxEditOption : public IOption
+class SyntaxEditOption : public QObject, public IOption
 {
+    Q_OBJECT
 public:
-    SyntaxEditOption() {
-        dlg = new ConfigDialog;
+    SyntaxEditOption(IApplication *app) {
+        dlg = new ConfigDialog(app);
     }
 
     virtual QWidget *widget()
@@ -60,8 +62,11 @@ public:
     virtual void save()
     {
         dlg->save();
+        emit reloadConfig();
     }
     ConfigDialog *dlg;
+signals:
+    void reloadConfig();
 };
 
 #endif // CONFIGDIALOG_H

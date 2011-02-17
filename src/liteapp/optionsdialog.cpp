@@ -46,7 +46,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     mainLayout->addLayout(buttonsLayout);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Config Dialog"));
+    setWindowTitle(tr("LiteIDE Options"));
 
     connect(contentsWidget,
                  SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),

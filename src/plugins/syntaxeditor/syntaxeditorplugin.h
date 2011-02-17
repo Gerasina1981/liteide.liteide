@@ -11,6 +11,7 @@
 #include <QMap>
 #include "syntaxeditor.h"
 
+class SyntaxEditOption;
 class EditorImpl : public IEditor
 {
     Q_OBJECT
@@ -47,12 +48,11 @@ public:
     virtual QStringList fileTypes();
     virtual QString editorTypeFilter();
     virtual IEditor *create(const QString &fileName);
-protected slots:
-    void config();
 protected:
     IApplication *liteApp;
+    QList<SyntaxEditor*>    editors;
     QAction *configAct;
-    QFont    editorFont;
+    SyntaxEditOption *opt;
 };
 
 

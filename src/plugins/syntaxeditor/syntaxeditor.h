@@ -37,6 +37,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *e);
 public:
     int editorAreaWidth();
+public slots:
+    void loadConfig();
 protected slots:
     void highlightCurrentLine();
     void insertCompletion(const QString& completion);
@@ -49,6 +51,7 @@ public:
 
     QString curFile;
     QString curText;
+    QFont   curFont;
 
     bool isUntitled;
     QWidget *editorArea;

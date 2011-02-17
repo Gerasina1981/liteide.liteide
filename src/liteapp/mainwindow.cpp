@@ -292,6 +292,7 @@ void MainWindow::editTabClose(int index)
         return;
     }
     if (ed->close()) {
+        liteApp->emitCloseEditor(ed);
         editTabWidget->removeTab(index);
         editors.remove(w);
     }

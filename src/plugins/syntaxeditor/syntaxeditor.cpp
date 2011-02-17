@@ -407,6 +407,16 @@ void SyntaxEditor::insertCompletion(const QString& completion)
     setTextCursor(tc);
 }
 
+void SyntaxEditor::loadConfig()
+{
+    autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
+    autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
+    curFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
+    curFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
+    setTabStopWidth(curFont.pointSize()*4);
+    setFont(curFont);
+}
+
 void SyntaxEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;

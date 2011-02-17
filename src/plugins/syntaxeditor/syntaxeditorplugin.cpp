@@ -107,14 +107,8 @@ void EditorImpl::modificationChanged(bool b)
 EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
     : QObject(parent), liteApp(app)
 {
-
-    //configAct = new QAction(tr("SyntaxEditor Config"),this);
-    //connect(configAct,SIGNAL(triggered()),this,SLOT(config()));
-    //liteApp->mainWindow()->toolMenu()->addAction(configAct);
-    liteApp->mainWindow()->addOptionPage(new SyntaxEditOption());
-
-    editorFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
-    editorFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
+    opt = new SyntaxEditOption(liteApp);
+    liteApp->mainWindow()->addOptionPage(opt);
 }
 
 QStringList EditorFactoryImpl::fileTypes()
@@ -125,25 +119,6 @@ QStringList EditorFactoryImpl::fileTypes()
 QString EditorFactoryImpl::editorTypeFilter()
 {
     return QObject::tr("Go Files (*.go);;(All Files (*.*)");
-}
-
-void EditorFactoryImpl::config()
-{
-    ConfigDialog dlg;
-    dlg.fontFamily = editorFont.family();
-    dlg.fontSize = editorFont.pointSize();
-    dlg.autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
-    dlg.autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
-    dlg.load();
-    if (dlg.exec() == QDialog::Accepted) {
-        dlg.save();
-        editorFont.setFamily(dlg.fontFamily);
-        editorFont.setPointSize(dlg.fontSize);
-        liteApp->settings()->setValue("editor/family",dlg.fontFamily);
-        liteApp->settings()->setValue("editor/fontsize",dlg.fontSize);
-        liteApp->settings()->setValue("editor/autoindent",dlg.autoIndent);
-        liteApp->settings()->setValue("editor/autoblock",dlg.autoBlock);
-    }
 }
 
 IEditor *EditorFactoryImpl::create(const QString &fileName)
@@ -162,13 +137,14 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
         new ProjectHighlighter(ed->document());
     }
     EditorImpl *impl = new EditorImpl(liteApp,this);
-    ed->setFont(editorFont);
-    ed->setTabStopWidth(editorFont.pointSize()*4);
-    ed->autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
-    ed->autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
+
+    connect(opt,SIGNAL(reloadConfig()),ed,SLOT(loadConfig()));
 
     impl->editor = ed;
     impl->event = liteApp->editorEvent();
+    ed->loadConfig();
+
+    editors.append(ed);
     connect(ed,SIGNAL(textChanged()),impl,SLOT(textChanged()));
     QObject::connect(ed,SIGNAL(modificationChanged(bool)),impl,SLOT(modificationChanged(bool)));
     return impl;
@@ -206,4 +182,3 @@ void SyntaxEditorPlugin::uninstall()
 }
 
 Q_EXPORT_PLUGIN(SyntaxEditorPlugin)
-

@@ -3,8 +3,8 @@
 
 #include <QFontDatabase>
 
-ConfigDialog::ConfigDialog(QWidget *parent) :
-    QDialog(parent),
+ConfigDialog::ConfigDialog(IApplication *app, QWidget *parent) :
+    liteApp(app), QDialog(parent),
     ui(new Ui::ConfigDialog)
 {
     ui->setupUi(this);
@@ -61,6 +61,11 @@ ConfigDialog::~ConfigDialog()
 
 void ConfigDialog::load()
 {
+    fontFamily = liteApp->settings()->value("editor/family","Courier").toString();
+    fontSize = liteApp->settings()->value("editor/fontsize",12).toInt();
+    autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
+    autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
+
     QFontDatabase db;
     const QStringList families = db.families();
     const int idx = families.indexOf(fontFamily);
@@ -87,4 +92,9 @@ void ConfigDialog::save()
      }
     this->autoIndent = ui->autoIndentCheckBox->isChecked();
     this->autoBlock = ui->autoBlockCheckBox->isChecked();
+
+    liteApp->settings()->setValue("editor/family",fontFamily);
+    liteApp->settings()->setValue("editor/fontsize",fontSize);
+    liteApp->settings()->setValue("editor/autoindent",autoIndent);
+    liteApp->settings()->setValue("editor/autoblock",autoBlock);
 }

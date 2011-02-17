@@ -61,6 +61,7 @@ signals:
     void activeEditorTextChanged(IEditor *ed);
     void activeEditorChanged(IEditor *ed);
     void activeProjectChanged(IProject *proj);
+    void closeEditor(IEditor *ed);
 public:
     void emitActiveEditorTextChanged(IEditor *ed)
     {
@@ -69,6 +70,10 @@ public:
     void emitActiveEditorChanged(IEditor *ed)
     {
         emit activeEditorChanged(ed);
+    }
+    void emitCloseEditor(IEditor *ed)
+    {
+        emit closeEditor(ed);
     }
 };
 
