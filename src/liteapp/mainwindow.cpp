@@ -238,6 +238,7 @@ void MainWindow::createMenus()
 
     _toolMenu = menuBar()->addMenu(tr("&Tools"));
     _toolMenu->addAction(optionsAct);
+    _toolMenu->addSeparator();
 
     menuBar()->addSeparator();
 
@@ -498,7 +499,7 @@ void MainWindow::aboutPlugins()
     AboutPluginsDialog dlg(this);
     dlg.resize(450,300);
     foreach (IPlugin *p, liteApp->plugins) {
-        dlg.addPluginInfo(p->name(),p->anchor(),p->info());
+        dlg.addPluginInfo(p->info());
     }
 
     dlg.exec();

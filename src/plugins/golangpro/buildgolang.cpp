@@ -93,7 +93,7 @@ bool BuildGolang::buildProject(IProject *proj)
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
 
     QStringList args;
-    args  << "-ver=false" << "-goroot"<< goroot  << "-gopro" << proj->filePath();
+    args  << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gopro" << proj->filePath();
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
     buildProcess.start(cmd,args);
 
@@ -109,7 +109,7 @@ bool BuildGolang::buildFile(const QString &fileName)
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
 
     QStringList args;
-    args << "-goroot"<< goroot << "-ver=false" << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
+    args << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
     buildProcess.start(cmd,args);
 

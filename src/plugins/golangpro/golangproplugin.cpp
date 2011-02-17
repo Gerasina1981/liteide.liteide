@@ -33,19 +33,14 @@ void GolangProPlugin::uninstall()
 
 }
 
-QString GolangProPlugin::name() const
+const PluginInfo & GolangProPlugin::info() const
 {
-    return "GolangPro";
-}
-
-QString GolangProPlugin::anchor() const
-{
-    return "visualfc";
-}
-
-QString GolangProPlugin::info() const
-{
-    return tr("Golang Project 1.0");
+    static PluginInfo s;
+    s.name = "golangpro";
+    s.anchor = "visualfc";
+    s.info = "Golang Project";
+    s.ver = "1.0";
+    return s;
 }
 
 void GolangProPlugin::createGofmt()

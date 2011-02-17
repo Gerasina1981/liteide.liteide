@@ -154,21 +154,15 @@ SyntaxEditorPlugin::SyntaxEditorPlugin() : liteApp(NULL)
 {
 }
 
-QString SyntaxEditorPlugin::name() const
+const PluginInfo & SyntaxEditorPlugin::info() const
 {
-    return "SyntaxEditor";
+    static PluginInfo s;
+    s.name = "syntaxeditor";
+    s.anchor = "visualfc";
+    s.info = tr("Syntax Editor");
+    s.ver = "1.0";
+    return s;
 }
-
-QString SyntaxEditorPlugin::anchor() const
-{
-    return "visualfc";
-}
-
-QString SyntaxEditorPlugin::info() const
-{
-    return tr("Syntax Editor 1.0");
-}
-
 
 void SyntaxEditorPlugin::install(IApplication *app)
 {

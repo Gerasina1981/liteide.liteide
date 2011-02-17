@@ -17,9 +17,7 @@ public:
     GodebugPlugin();
     virtual void install(IApplication *app);
     virtual void uninstall();
-    virtual QString name() const;
-    virtual QString anchor() const;
-    virtual QString info() const;
+    virtual const PluginInfo &info() const;
 protected:
     IApplication *liteApp;
  };

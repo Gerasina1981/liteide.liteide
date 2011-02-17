@@ -6,22 +6,26 @@
 #include <QHBoxLayout>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QHeaderView>
 
 AboutPluginsDialog::AboutPluginsDialog(QWidget *parent) :
     QDialog(parent)
 {
     setWindowTitle("About Plugins");
 
-    treeModel = new QStandardItemModel(0,3,this);
-    treeModel->setHeaderData(0, Qt::Horizontal, QObject::tr("name"));
-    treeModel->setHeaderData(1, Qt::Horizontal, QObject::tr("anchor"));
-    treeModel->setHeaderData(2, Qt::Horizontal, QObject::tr("info"));
+    treeModel = new QStandardItemModel(0,4,this);
+    treeModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+    treeModel->setHeaderData(1, Qt::Horizontal, QObject::tr("Anchor"));
+    treeModel->setHeaderData(2, Qt::Horizontal, QObject::tr("Info"));
+    treeModel->setHeaderData(3, Qt::Horizontal, QObject::tr("Version"));
+
 
     treeView = new QTreeView(this);
     treeView->setModel(treeModel);
     treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     treeView->setItemsExpandable(true);
     treeView->setRootIsDecorated(false);
+    treeView->header()->setResizeMode(QHeaderView::ResizeToContents);
 
     QPushButton *closeBtn = new QPushButton(tr("close"));
     connect(closeBtn,SIGNAL(clicked()),this,SLOT(accept()));
@@ -37,11 +41,12 @@ AboutPluginsDialog::AboutPluginsDialog(QWidget *parent) :
     setLayout(layout);
 }
 
-void AboutPluginsDialog::addPluginInfo(const QString &name, const QString &anchor, const QString &info)
+void AboutPluginsDialog::addPluginInfo(const PluginInfo &info)
 {
     QList<QStandardItem*> items;
-    items.append(new QStandardItem(name));
-    items.append(new QStandardItem(anchor));
-    items.append(new QStandardItem(info));
+    items.append(new QStandardItem(info.name));
+    items.append(new QStandardItem(info.anchor));
+    items.append(new QStandardItem(info.info));
+    items.append(new QStandardItem(info.ver));
     treeModel->appendRow(items);
 }

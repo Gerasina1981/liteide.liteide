@@ -4,15 +4,21 @@
 #include <QObject>
 
 class IApplication;
+struct PluginInfo
+{
+    QString name;
+    QString anchor;
+    QString info;
+    QString ver;
+};
+
 class IPlugin
 {
 public:
     virtual ~IPlugin() {}
     virtual void install(IApplication *app) = 0;
     virtual void uninstall() = 0;
-    virtual QString name() const = 0;
-    virtual QString anchor() const = 0;
-    virtual QString info() const = 0;
+    virtual const PluginInfo & info() const = 0;
 };
 
 Q_DECLARE_INTERFACE(IPlugin,"lite.IPlugin/1.0")

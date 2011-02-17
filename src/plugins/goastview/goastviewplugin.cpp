@@ -17,19 +17,14 @@ void GoAstViewPlugin::uninstall()
 
 }
 
-QString GoAstViewPlugin::name() const
+const PluginInfo & GoAstViewPlugin::info() const
 {
-    return "GoAstView";
-}
-
-QString GoAstViewPlugin::anchor() const
-{
-    return "visualfc";
-}
-
-QString GoAstViewPlugin::info() const
-{
-    return tr("Golang Ast View 1.0");
+    static PluginInfo s;
+    s.name = "goastview";
+    s.anchor = "visualfc";
+    s.info = "Golang AstView";
+    s.ver = "1.0";
+    return s;
 }
 
 Q_EXPORT_PLUGIN(GoAstViewPlugin)

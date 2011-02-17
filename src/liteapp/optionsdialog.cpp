@@ -11,11 +11,11 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent)
 {
     contentsWidget = new QListWidget;
-    contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(QSize(96, 84));
+    contentsWidget->setViewMode(QListView::ListMode);
+    //contentsWidget->setIconSize(QSize(32, 32));
     contentsWidget->setMovement(QListView::Static);
     contentsWidget->setMaximumWidth(128);
-    contentsWidget->setSpacing(12);
+    contentsWidget->setSpacing(4);
 
     pagesWidget = new QStackedWidget;
     QPushButton *saveButton = new QPushButton(tr("OK"));
@@ -41,8 +41,8 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    mainLayout->addStretch(1);
-    mainLayout->addSpacing(12);
+    //mainLayout->addStretch(1);
+    //mainLayout->addSpacing(12);
     mainLayout->addLayout(buttonsLayout);
     setLayout(mainLayout);
 
@@ -58,7 +58,7 @@ void OptionsDialog::addPage(IOption *opt)
     QListWidgetItem *btn = new QListWidgetItem(contentsWidget);
     btn->setIcon(opt->icon());
     btn->setText(opt->text());
-    btn->setTextAlignment(Qt::AlignHCenter);
+    btn->setTextAlignment(Qt::AlignLeft);// | Qt::AlignHCenter);
     btn->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
     pagesWidget->addWidget(opt->widget());

@@ -16,19 +16,14 @@ void GodebugPlugin::uninstall()
 
 }
 
-QString GodebugPlugin::name() const
+const PluginInfo & GodebugPlugin::info() const
 {
-    return "GoDebug";
-}
-
-QString GodebugPlugin::anchor() const
-{
-    return "visualfc";
-}
-
-QString GodebugPlugin::info() const
-{
-    return tr("Golang Debug 1.0");
+    static PluginInfo s;
+    s.name = "godebug";
+    s.anchor = "visualfc";
+    s.info = "Golang Debug";
+    s.ver = "1.0";
+    return s;
 }
 
 Q_EXPORT_PLUGIN(GodebugPlugin)
