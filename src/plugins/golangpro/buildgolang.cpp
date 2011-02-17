@@ -330,33 +330,6 @@ void BuildGolang::buildFile()
 {
 }
 
-void BuildGolang::runProject(IProject *proj)
-{
-    QStringList val = proj->values("TARGET");
-    QString target = proj->displayName();
-    if (!val.isEmpty())
-        target = val.at(0);
-
-    target = QFileInfo(target).baseName();
-    QString projDir = QFileInfo(proj->filePath()).absolutePath();
-    QStringList dest = proj->values("DESTDIR");
-    if (!dest.isEmpty()) {
-        projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
-    }
-    runProcess.setWorkingDirectory(projDir);
-    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
-    runProcess.start(target);
-}
-
-void BuildGolang::runEditor(IEditor *edit)
-{
-    QString target = QFileInfo(edit->filePath()).baseName();
-    QString projDir = QFileInfo(edit->filePath()).absolutePath();
-    runProcess.setWorkingDirectory(projDir);
-    target = QFileInfo(QDir(projDir),target+liteApp->osExecuteExt()).absoluteFilePath();
-    runProcess.start(target);
-}
-
 void BuildGolang::stopRun()
 {
     if (runProcess.state() == QProcess::Starting) {
@@ -369,17 +342,13 @@ void BuildGolang::stopRun()
 
 void BuildGolang::run()
 {
-    runOutputEdit->clear();
-    liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
+    TargetInfo info = liteApp->getTargetInfo();
 
-    IProject *proj = liteApp->activeProject();
-    if (proj) {
-        runProject(proj);
-        return;
-    }
-    IEditor *edit = liteApp->activeEditor();
-    if (edit) {
-        runEditor(edit);
+    if (!info.fileName.isEmpty()) {
+        runOutputEdit->clear();
+        liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
+        runProcess.setWorkingDirectory(info.workDir);
+        runProcess.start(info.filePath);
     }
 }
 

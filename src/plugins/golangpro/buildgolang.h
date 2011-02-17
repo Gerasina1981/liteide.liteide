@@ -44,8 +44,6 @@ public:
     virtual QString buildName() const;
     virtual bool buildProject(IProject *proj);
     virtual bool buildFile(const QString &fileName);
-    virtual void runProject(IProject *proj);
-    virtual void runEditor(IEditor *edit);
 
     void appendBuildOutput(const QByteArray &text, bool stdError);
     void appendRunOutput(const QByteArray &text, bool stdError);

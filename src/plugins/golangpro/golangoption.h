@@ -14,7 +14,7 @@ inline QString defGOROOT() {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     QString def;
 #ifdef Q_OS_WIN32
-    def =  "c:\go";
+    def =  "c:/go";
 #else
     def = env.value("HOME")+"/go";
 #endif

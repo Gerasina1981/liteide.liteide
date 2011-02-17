@@ -37,6 +37,7 @@ struct TargetInfo
 {
     QString workDir;
     QString fileName;
+    QString filePath;
 };
 
 class IApplication : public QObject

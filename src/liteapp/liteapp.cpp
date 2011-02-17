@@ -75,31 +75,32 @@ TargetInfo LiteApp::getTargetInfo()
 {
     TargetInfo info;
     IProject *proj = activeProject();
+    QString target;
+    QString workDir;
     if (proj)    {
         QStringList val = proj->values("TARGET");
-        QString target = proj->displayName();
+        target = proj->displayName();
         if (!val.isEmpty())
             target = val.at(0);
 
         target = QFileInfo(target).baseName();
-        QString projDir = QFileInfo(proj->filePath()).absolutePath();
+        target += osExecuteExt();
+        workDir = QFileInfo(proj->filePath()).absolutePath();
         QStringList dest = proj->values("DESTDIR");
         if (!dest.isEmpty()) {
-            projDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
+            workDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
         }
-        target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
-        info.workDir = projDir;
-        info.fileName = target;
     } else {
         IEditor *edit = activeEditor();
         if (edit) {
-            QString target = QFileInfo(edit->filePath()).baseName();
-            QString projDir = QFileInfo(edit->filePath()).absolutePath();
-            target = QFileInfo(QDir(projDir),target+osExecuteExt()).absoluteFilePath();
-            info.workDir = projDir;
-            info.fileName = target;
+            target = QFileInfo(edit->filePath()).baseName();
+            workDir = QFileInfo(edit->filePath()).absolutePath();
+            target += osExecuteExt();
         }
     }
+    info.workDir =  workDir;
+    info.fileName = target;
+    info.filePath = QFileInfo(QDir(workDir),target).absoluteFilePath();
     return info;
 }
 
