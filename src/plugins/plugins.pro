@@ -5,4 +5,5 @@ SUBDIRS = project \
           syntaxeditor \
           golangpro \
           goastview \
-          godebug
+          godebug \
+          godoc
