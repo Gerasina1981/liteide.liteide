@@ -4,6 +4,8 @@
 #include <QSyntaxHighlighter>
 #include <QVector>
 #include <QTextCharFormat>
+#include <QSet>
+#include <QSharedPointer>
 
 class QTextDocument;
 
@@ -22,6 +24,8 @@ protected:
     virtual void highlightBlock(const QString &text);
     bool highlightPreBlock(const QString &text, int &startPos, int &endPos);
     int findQuotesEndPos(const QString &text, int startPos, const QChar &endChar);
+public:
+    QSharedPointer< QSet<QString> >   allWords;
 private:
     struct HighlightingRule
     {

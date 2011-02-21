@@ -131,8 +131,11 @@ IEditor *EditorFactoryImpl::create(const QString &fileName)
 
     QString ext = QFileInfo(fileName).suffix();
     if (ext.toLower() == "go") {
-        new GolangHighlighter(ed->document());
-        ed->setCompleter(new GolangCompleter(ed));
+        GolangHighlighter *l = new GolangHighlighter(ed->document());
+        GolangCompleter * c = new GolangCompleter(ed);
+        c->allWords = l->allWords;
+        ed->setCompleter(c);
+        connect(ed,SIGNAL(update()),c,SLOT(updateEditor()));
     } else if (ext.toLower() == "pro") {
         new ProjectHighlighter(ed->document());
     }

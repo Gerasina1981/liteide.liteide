@@ -2,7 +2,7 @@
 #include <QDebug>
 
 GolangHighlighter::GolangHighlighter(QTextDocument* document):
-    QSyntaxHighlighter(document)
+    QSyntaxHighlighter(document), allWords(new QSet<QString>)
 {
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
@@ -18,7 +18,7 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
     singleLineCommentFormat.setForeground(Qt::darkCyan);
     multiLineCommentFormat.setForeground(Qt::darkCyan);
 
-
+    QString word;
     HighlightingRule rule;
     //number
     rule.pattern = QRegExp("(\\b|\\.)([0-9]+|0[xX][0-9a-fA-F]+|0[0-7]+)(\\.[0-9]+)?([eE][+-]?[0-9]+i?)?\\b");
@@ -44,6 +44,14 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
                            "\\b");
     rule.format = identFormat;
     highlightingRules.append(rule);
+    //
+    word = rule.pattern.pattern();
+    word.remove("\\b");
+    word.remove("(");
+    word.remove(")");
+    foreach(QString v, word.split("|")) {
+        allWords->insert(v);
+    }
 
     //keyword
     rule.pattern = QRegExp("\\b"
@@ -55,6 +63,14 @@ GolangHighlighter::GolangHighlighter(QTextDocument* document):
                            "\\b");
     rule.format = keywordFormat;
     highlightingRules.append(rule);
+
+    word = rule.pattern.pattern();
+    word.remove("\\b");
+    word.remove("(");
+    word.remove(")");
+    foreach(QString v, word.split("|")) {
+        allWords->insert(v);
+    }
 
     //quotes and comment
     regexpQuotesAndComment = QRegExp("//|\\\"|'|`|/\\*");
@@ -115,10 +131,11 @@ void GolangHighlighter::highlightBlock(const QString &text)
     foreach (const HighlightingRule &rule, highlightingRules) {
         QRegExp expression(rule.pattern);
         int index = expression.indexIn(text,startPos);
-        while (index >= 0) {
+        while (index >= 0) {            
             int length = expression.matchedLength();
             setFormat(index, length, rule.format);
-            index = expression.indexIn(text, startPos+index + length);
+            allWords->insert(text.mid(index,length));
+            index = expression.indexIn(text, startPos+index + length);            
         }
     }
 

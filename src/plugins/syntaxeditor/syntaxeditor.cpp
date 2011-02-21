@@ -322,8 +322,6 @@ void SyntaxEditor::setCompleter(SyntaxCompleter *completer)
 
     editCompleter->setFileName(this->curFile);
     editCompleter->setWidget(this);
-    editCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    editCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     QObject::connect(editCompleter, SIGNAL(activated(QString)),
                      this, SLOT(insertCompletion(QString)));
 }
