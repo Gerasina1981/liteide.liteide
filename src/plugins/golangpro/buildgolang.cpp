@@ -55,17 +55,20 @@ BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     createToolBars();
     createOutput();
 
-    connect(&buildProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutBuild()));
-    connect(&buildProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrBuild()));
-    connect(&buildProcess,SIGNAL(started()),this,SLOT(startedBuild()));
-    connect(&buildProcess,SIGNAL(finished(int)),this,SLOT(finishedBuild(int)));
-    connect(&buildProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorBuild(QProcess::ProcessError)));
+    buildProcess = new QProcess(this);
+    runProcess = new QProcess(this);
 
-    connect(&runProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutRun()));
-    connect(&runProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrRun()));
-    connect(&runProcess,SIGNAL(started()),this,SLOT(startedRun()));
-    connect(&runProcess,SIGNAL(finished(int)),this,SLOT(finishedRun(int)));
-    connect(&runProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorRun(QProcess::ProcessError)));
+    connect(buildProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutBuild()));
+    connect(buildProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrBuild()));
+    connect(buildProcess,SIGNAL(started()),this,SLOT(startedBuild()));
+    connect(buildProcess,SIGNAL(finished(int)),this,SLOT(finishedBuild(int)));
+    connect(buildProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorBuild(QProcess::ProcessError)));
+
+    connect(runProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutRun()));
+    connect(runProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrRun()));
+    connect(runProcess,SIGNAL(started()),this,SLOT(startedRun()));
+    connect(runProcess,SIGNAL(finished(int)),this,SLOT(finishedRun(int)));
+    connect(runProcess,SIGNAL(error(QProcess::ProcessError)),this,SLOT(errorRun(QProcess::ProcessError)));
 }
 
 BuildGolang::~BuildGolang()
@@ -88,14 +91,14 @@ bool BuildGolang::buildProject(IProject *proj)
 
     target = QFileInfo(target).baseName();
 
-    buildProcess.setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
+    buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
 
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
 
     QStringList args;
     args  << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gopro" << proj->filePath();
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
-    buildProcess.start(cmd,args);
+    buildProcess->start(cmd,args);
 
     return true;
 }
@@ -104,24 +107,24 @@ bool BuildGolang::buildFile(const QString &fileName)
 {
     QString target = QFileInfo(fileName).baseName();
     QString projDir = QFileInfo(fileName).absolutePath();
-    buildProcess.setWorkingDirectory(projDir);
+    buildProcess->setWorkingDirectory(projDir);
 
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
 
     QStringList args;
     args << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
-    buildProcess.start(cmd,args);
+    buildProcess->start(cmd,args);
 
     return false;
 }
 
 void BuildGolang::cancelBuild()
 {
-    if (buildProcess.state() == QProcess::Starting) {
-        buildProcess.waitForStarted(3000);
-    } else if (buildProcess.state() == buildProcess.Running) {
-        buildProcess.waitForFinished(3000);
+    if (buildProcess->state() == QProcess::Starting) {
+        buildProcess->waitForStarted(3000);
+    } else if (buildProcess->state() == QProcess::Running) {
+        buildProcess->waitForFinished(3000);
     }
 }
 
@@ -171,12 +174,12 @@ void BuildGolang::errorBuild(QProcess::ProcessError code)
 
 void BuildGolang::readStdoutBuild()
 {
-    QByteArray text = buildProcess.readAllStandardOutput();
+    QByteArray text = buildProcess->readAllStandardOutput();
     appendBuildOutput(text,false);
 }
 void BuildGolang::readStderrBuild()
 {
-    QByteArray text = buildProcess.readAllStandardError();
+    QByteArray text = buildProcess->readAllStandardError();
     appendBuildOutput(text,true);
 }
 
@@ -208,12 +211,12 @@ void BuildGolang::errorRun(QProcess::ProcessError code)
 
 void BuildGolang::readStdoutRun()
 {
-    QByteArray text = runProcess.readAllStandardOutput();
+    QByteArray text = runProcess->readAllStandardOutput();
     appendRunOutput(text,false);
 }
 void BuildGolang::readStderrRun()
 {
-    QByteArray text = runProcess.readAllStandardError();
+    QByteArray text = runProcess->readAllStandardError();
     appendRunOutput(text,true);
 }
 
@@ -333,24 +336,24 @@ void BuildGolang::buildFile()
 
 void BuildGolang::stopRun()
 {
-    if (runProcess.state() == QProcess::Starting) {
-        runProcess.waitForStarted(100);
-    } else if (runProcess.state() == runProcess.Running) {
-        runProcess.waitForFinished(100);
+    if (runProcess->state() == QProcess::Starting) {
+        runProcess->waitForStarted(100);
+    } else if (runProcess->state() == QProcess::Running) {
+        runProcess->waitForFinished(100);
     }
-    runProcess.kill();
+    runProcess->kill();
 }
 
 void BuildGolang::runOutputKeyEvent(QKeyEvent *e)
 {
-    if (runProcess.isWritable()) {
+    if (runProcess->isWritable()) {
         if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
 #ifdef Q_OS_WIN32
             runWriteString += "\r\n";
 #else
             runWriteString += "\n";
 #endif
-            runProcess.write(runWriteString.toUtf8());
+            runProcess->write(runWriteString.toUtf8());
             runWriteString.clear();
         } else {
             runWriteString += e->text();
@@ -366,8 +369,8 @@ void BuildGolang::run()
     if (!info.fileName.isEmpty()) {
         runOutputEdit->clear();
         liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
-        runProcess.setWorkingDirectory(info.workDir);
-        runProcess.start(info.filePath);
+        runProcess->setWorkingDirectory(info.workDir);
+        runProcess->start(info.filePath);
     }
 }
 

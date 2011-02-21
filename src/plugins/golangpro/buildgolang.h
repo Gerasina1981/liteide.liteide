@@ -68,8 +68,8 @@ public:
     void appendBuildOutput(const QByteArray &text, bool stdError);
     void appendRunOutput(const QByteArray &text, bool stdError);
 public:
-    QProcess        buildProcess;
-    QProcess        runProcess;
+    QProcess        *buildProcess;
+    QProcess        *runProcess;
     IApplication    *liteApp;
     BuildOutputEdit *buildOutputEdit;
     RunOutputEdit   *runOutputEdit;
