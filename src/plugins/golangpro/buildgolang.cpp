@@ -222,6 +222,7 @@ void BuildGolang::startedRun()
     appendRunOutput("---- run start ----",false);
     stopRunAct->setEnabled(true);
     runAct->setEnabled(false);
+    runOutputEdit->setFocus();
 }
 
 
@@ -340,9 +341,27 @@ void BuildGolang::stopRun()
     runProcess.kill();
 }
 
+void BuildGolang::runOutputKeyEvent(QKeyEvent *e)
+{
+    if (runProcess.isWritable()) {
+        if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+#ifdef Q_OS_WIN32
+            runWriteString += "\r\n";
+#else
+            runWriteString += "\n";
+#endif
+            runProcess.write(runWriteString.toUtf8());
+            runWriteString.clear();
+        } else {
+            runWriteString += e->text();
+        }
+    }
+}
+
 void BuildGolang::run()
 {
     TargetInfo info = liteApp->getTargetInfo();
+    runWriteString.clear();
 
     if (!info.fileName.isEmpty()) {
         runOutputEdit->clear();
@@ -358,8 +377,9 @@ void BuildGolang::createOutput()
     buildOutputEdit->setReadOnly(true);
     liteApp->mainWindow()->addOutputPane(buildOutputEdit,QIcon(),tr("Build Output"));
 
-    runOutputEdit = new QPlainTextEdit;
-    runOutputEdit->setReadOnly(true);
+    runOutputEdit = new RunOutputEdit;
+    runOutputEdit->setReadOnly(false);
+    connect(runOutputEdit,SIGNAL(keyEvent(QKeyEvent*)),this,SLOT(runOutputKeyEvent(QKeyEvent*)));
     liteApp->mainWindow()->addOutputPane(runOutputEdit,QIcon(),tr("Run Output"));
 
     connect(buildOutputEdit,SIGNAL(dbclickEvent()),this,SLOT(dbclickOutputEdit()));

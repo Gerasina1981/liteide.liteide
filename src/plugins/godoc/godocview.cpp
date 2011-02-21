@@ -45,7 +45,7 @@ void GodocView::packageDoc()
     QString godoc = QFileInfo(QDir(goroot),"bin/godoc"+liteApp->osExecuteExt()).absoluteFilePath();
     qDebug() << goroot << godoc;
     QStringList args;
-    args << "-html=true" << pack ;
+    args << "-html=true" << "-v=true" << pack ;
     process.start(godoc,args);
 }
 

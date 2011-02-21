@@ -30,6 +30,26 @@ signals:
     void dbclickEvent();
 };
 
+class RunOutputEdit : public QPlainTextEdit
+{
+    Q_OBJECT
+public:
+    explicit RunOutputEdit(QWidget *parent = 0) :
+            QPlainTextEdit(parent)
+    {
+    }
+    virtual void keyPressEvent(QKeyEvent *e)
+    {
+        emit keyEvent(e);
+        if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+            e->ignore();
+            return;
+        }
+        QPlainTextEdit::keyPressEvent(e);
+    }
+signals:
+    void keyEvent(QKeyEvent*);
+};
 
 class BuildGolang : public QObject//, public IBuild
 {
@@ -52,7 +72,7 @@ public:
     QProcess        runProcess;
     IApplication    *liteApp;
     BuildOutputEdit *buildOutputEdit;
-    QPlainTextEdit  *runOutputEdit;
+    RunOutputEdit   *runOutputEdit;
     QAction *buildProjectAct;
     QAction *buildFileAct;
     QAction *cancelBuildAct;
@@ -61,7 +81,9 @@ public:
     QAction *debugAct;
     QToolBar *buildToolBar;
     QMenu *_buildMenu;
+    QString runWriteString;
 private slots:
+    void runOutputKeyEvent(QKeyEvent*);
     void run();
     void stopRun();
     void cancelBuild();
