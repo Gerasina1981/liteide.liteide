@@ -10,6 +10,10 @@ class SyntaxEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
+    void indentText(QTextDocument *doc, QTextCursor cur, bool bIndent);
+    void indentBlock(QTextBlock block, bool bIndent);
+    void indentCursor(QTextCursor cur, bool bIndent);
+    void gotoLine(int line, int column);
     QString textUnderCursor() const;
     void setCompleter(SyntaxCompleter *c);
     SyntaxCompleter *completer() const;

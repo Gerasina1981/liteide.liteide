@@ -239,6 +239,7 @@ void SyntaxEditor::updateEditorArea(const QRect &rect, int dy)
 
 bool SyntaxEditor::event(QEvent *event)
 {
+    return QPlainTextEdit::event(event);
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
@@ -349,48 +350,57 @@ void SyntaxEditor::focusInEvent(QFocusEvent *e)
 void SyntaxEditor::keyPressEvent(QKeyEvent *e)
 {
     if (editCompleter && editCompleter->popup()->isVisible()) {
-          // The following keys are forwarded by the completer to the widget
-         switch (e->key()) {
-         case Qt::Key_Enter:
-         case Qt::Key_Return:
-         case Qt::Key_Escape:
-         case Qt::Key_Tab:
-         case Qt::Key_Backtab:
-              e->ignore();
-              return; // let the completer do default behavior
-         default:
-             break;
-         }
-      }
+        // The following keys are forwarded by the completer to the widget
+        switch (e->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
+            e->ignore();
+            return; // let the completer do default behavior
+        default:
+            break;
+        }
+    }
+    if (e->key() == Qt::Key_Tab) {
+        indentText(document(), textCursor(),true);
+        e->accept();
+        return;
+    } else if (e->key() == Qt::Key_Backtab) {
+        indentText(document(),textCursor(),false);
+        e->accept();
+        return;
+    }
 
-      bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
-      if (!editCompleter || !isShortcut) // do not process the shortcut when we have a completer
-          QPlainTextEdit::keyPressEvent(e);
+    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+    if (!editCompleter || !isShortcut) // do not process the shortcut when we have a completer
+        QPlainTextEdit::keyPressEvent(e);
 
-      const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
-      if (!editCompleter || (ctrlOrShift && e->text().isEmpty()))
-          return;
+    const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!editCompleter || (ctrlOrShift && e->text().isEmpty()))
+        return;
 
-      static QString eow("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-="); // end of word
-      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
-      QString completionPrefix = textUnderCursor();
+    static QString eow("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-="); // end of word
+    bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    QString completionPrefix = textUnderCursor();
 
-      editCompleter->underCursor(this->textCursor(),completionPrefix);
+    editCompleter->underCursor(this->textCursor(),completionPrefix);
 
-      if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
+    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
                         || eow.contains(e->text().right(1)))) {
-          editCompleter->popup()->hide();
-          return;
-      }
+        editCompleter->popup()->hide();
+        return;
+    }
 
-      if (completionPrefix != editCompleter->completionPrefix()) {
-          editCompleter->setCompletionPrefix(completionPrefix);
-          editCompleter->popup()->setCurrentIndex(editCompleter->completionModel()->index(0, 0));
-      }
-      QRect cr = cursorRect();
-      cr.setWidth(editCompleter->popup()->sizeHintForColumn(0)
-                  + editCompleter->popup()->verticalScrollBar()->sizeHint().width());
-      editCompleter->complete(cr); // popup it up!
+    if (completionPrefix != editCompleter->completionPrefix()) {
+        editCompleter->setCompletionPrefix(completionPrefix);
+        editCompleter->popup()->setCurrentIndex(editCompleter->completionModel()->index(0, 0));
+    }
+    QRect cr = cursorRect();
+    cr.setWidth(editCompleter->popup()->sizeHintForColumn(0)
+                + editCompleter->popup()->verticalScrollBar()->sizeHint().width());
+    editCompleter->complete(cr); // popup it up!
 }
 
 void SyntaxEditor::insertCompletion(const QString& completion)
@@ -432,4 +442,76 @@ void SyntaxEditor::highlightCurrentLine()
     }
 
     setExtraSelections(extraSelections);
+}
+
+void SyntaxEditor::gotoLine(int line, int column)
+{
+    const int blockNumber = line - 1;
+    const QTextBlock &block = document()->findBlockByNumber(blockNumber);
+    if (block.isValid()) {
+        QTextCursor cursor(block);
+        if (column > 0) {
+            cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column);
+        } else {
+            int pos = cursor.position();
+            while (document()->characterAt(pos).category() == QChar::Separator_Space) {
+                ++pos;
+            }
+            cursor.setPosition(pos);
+        }
+        setTextCursor(cursor);
+        centerCursor();
+    }
+}
+
+void SyntaxEditor::indentBlock(QTextBlock block, bool bIndent)
+{
+    QTextCursor cursor(block);
+    cursor.beginEditBlock();
+    cursor.movePosition(QTextCursor::StartOfBlock);
+    cursor.removeSelectedText();
+    if (bIndent) {
+        cursor.insertText("\t");
+    } else {
+        QString text = block.text();
+        if (!text.isEmpty() && text.at(0) == '\t' || text.at(0) == ' ') {
+            cursor.deleteChar();
+        }
+    }
+    cursor.endEditBlock();
+}
+
+void SyntaxEditor::indentCursor(QTextCursor cur, bool bIndent)
+{
+    if (bIndent) {
+        cur.insertText("\t");
+    } else {
+        QString text = cur.block().text();
+        int pos = cur.positionInBlock()-1;
+        int count = text.count();
+        if (count > 0 && pos >= 0 && pos < count) {
+            if (text.at(pos) == '\t' || text.at(pos) == ' ') {
+                cur.deletePreviousChar();
+            }
+        }
+    }
+}
+
+void SyntaxEditor::indentText(QTextDocument *doc, QTextCursor cur, bool bIndent)
+{
+    cur.beginEditBlock();
+    if (!cur.hasSelection()) {
+        indentCursor(cur,bIndent);
+    } else {
+        QTextBlock block = doc->findBlock(cur.selectionStart());
+        QTextBlock end = doc->findBlock(cur.selectionEnd());
+        if (!cur.atBlockStart()) {
+            end = end.next();
+        }
+        do {
+            indentBlock(block,bIndent);
+            block = block.next();
+        } while (block.isValid() && block != end);
+    }
+    cur.endEditBlock();
 }

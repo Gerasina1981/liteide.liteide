@@ -24,18 +24,8 @@ QByteArray EditorImpl::data() const
 
 void EditorImpl::gotoLine(int line, int col)
 {
-    int count = 1;
-    for ( QTextBlock b = editor->document()->begin(); b.isValid(); b = b.next(), count++ )
-    {
-        if ( count == line )
-        {
-            QTextCursor c = QTextCursor(b);
-            editor->setFocus();
-            editor->setTextCursor(c);
-            break;
-        }
-    }
-
+    editor->setFocus();
+    editor->gotoLine(line,col);
 }
 
 void EditorImpl::setUndoEnabled(bool b)

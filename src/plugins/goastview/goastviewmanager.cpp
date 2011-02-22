@@ -285,7 +285,7 @@ void GoAstViewManager::doubleClickedTree(const QModelIndex &index)
         int x = infos[4].toInt();
         int y = infos[5].toInt();
         if (index >= 0 && index < astFiles.size()) {
-            liteApp->mainWindow()->gotoLine(astFiles[index],x,y);
+            liteApp->mainWindow()->gotoLine(astFiles[index],x,y-1);
         }
     }
 }
