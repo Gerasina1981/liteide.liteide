@@ -27,5 +27,3 @@ HEADERS += liteapp.h \
     optionsdialog.h
 
 RESOURCES += liteapp.qrc
-
-INSTALLS += target

@@ -23,7 +23,8 @@ HEADERS += golangproplugin.h\
     buildgolang.h \
     golangoption.h
 
-INSTALLS += target
-
 FORMS += \
     golangoption.ui
+
+RESOURCES += \
+    golangpro.qrc

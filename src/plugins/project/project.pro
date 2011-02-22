@@ -20,5 +20,3 @@ HEADERS += projectplugin.h\
         project_global.h \
     projectfile.h \
     projectmanager.h
-
-INSTALLS += target

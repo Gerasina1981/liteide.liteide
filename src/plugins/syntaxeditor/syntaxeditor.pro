@@ -28,7 +28,5 @@ HEADERS += syntaxeditorplugin.h \
     golangcompleter.h \
     syntaxcompleter.h
 
-INSTALLS += target
-
 FORMS += \
     configdialog.ui

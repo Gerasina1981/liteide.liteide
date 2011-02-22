@@ -39,7 +39,8 @@ private:
     IApplication *liteApp;
 
 private slots:
-    void on_browseButton_clicked();
+    void on_browseGdb_clicked();
+    void on_browseGoroot_clicked();
 };
 
 #endif // GOLANGOPTION_H

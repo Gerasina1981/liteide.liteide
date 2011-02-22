@@ -278,13 +278,22 @@ void BuildGolang::createActions()
 
     runAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
     runAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    runAct->setStatusTip(tr("Run project or file"));    
-
+    runAct->setStatusTip(tr("Run project or file"));
     connect(runAct, SIGNAL(triggered()),this, SLOT(run()));
 
-    stopRunAct = new QAction(tr("Stop Run"),this);
-    stopRunAct->setStatusTip(tr("Stop run"));
+    runGdbAct = new QAction(QIcon(":/images/rungdb.png"),tr("Debug"),this);
+    runGdbAct->setShortcut(QKeySequence(Qt::Key_F5));
+    runGdbAct->setStatusTip(tr("Debug project"));
+    connect(runGdbAct,SIGNAL(triggered()),this,SLOT(runGdb()));
 
+    runShellAct = new QAction(QIcon(":/images/runshell.png"),tr("RunShell"),this);
+    runShellAct->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_F5));
+    runShellAct->setStatusTip(tr("Run project in shell"));
+    connect(runShellAct,SIGNAL(triggered()),this,SLOT(runShell()));
+
+
+    stopRunAct = new QAction(QIcon(":/images/stoprun.png"),tr("Stop Run"),this);
+    stopRunAct->setStatusTip(tr("Stop run"));
     stopRunAct->setEnabled(false);
 
     connect(stopRunAct, SIGNAL(triggered()),this, SLOT(stopRun()));
@@ -297,11 +306,13 @@ void BuildGolang::createMenus()
 
     _buildMenu->addSeparator();
     _buildMenu->addAction(buildProjectAct);
-    _buildMenu->addSeparator();
     _buildMenu->addAction(cancelBuildAct);
     _buildMenu->addSeparator();
     _buildMenu->addAction(runAct);
     _buildMenu->addAction(stopRunAct);
+    _buildMenu->addAction(runShellAct);
+    _buildMenu->addSeparator();
+    _buildMenu->addAction(runGdbAct);
 
     liteApp->mainWindow()->widget()->menuBar()->insertMenu(liteApp->mainWindow()->toolMenu()->menuAction(),_buildMenu);
 }
@@ -311,7 +322,12 @@ void BuildGolang::createToolBars()
     buildToolBar = liteApp->mainWindow()->widget()->addToolBar(tr("Build"));
     buildToolBar->setObjectName("Build");
     buildToolBar->addAction(buildProjectAct);
+    buildToolBar->addSeparator();
     buildToolBar->addAction(runAct);
+    buildToolBar->addAction(stopRunAct);
+    buildToolBar->addAction(runShellAct);
+    buildToolBar->addSeparator();
+    buildToolBar->addAction(runGdbAct);
 }
 
 void BuildGolang::buildProject()
@@ -373,6 +389,27 @@ void BuildGolang::run()
         runProcess->start(info.filePath);
     }
 }
+
+void BuildGolang::runShell()
+{
+    TargetInfo info = liteApp->getTargetInfo();
+    if (!info.fileName.isEmpty()) {
+        QStringList args;
+        QProcess::startDetached(info.filePath,args,info.workDir);
+    }
+}
+
+void BuildGolang::runGdb()
+{
+    TargetInfo info = liteApp->getTargetInfo();
+    if (!info.fileName.isEmpty()) {
+        QString cmd = liteApp->settings()->value("golang/gdb","gdb").toString();
+        QStringList args;
+        args << info.filePath;
+        QProcess::startDetached(cmd,args,info.workDir);
+    }
+}
+
 
 void BuildGolang::createOutput()
 {

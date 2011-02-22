@@ -35,25 +35,36 @@ QString GolangOption::text()
 void GolangOption::load()
 {
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
-    ui->lineEdit->setText(QDir::toNativeSeparators(goroot));
+    ui->gorootEdit->setText(QDir::toNativeSeparators(goroot));
+    QString gdb = liteApp->settings()->value("golang/gdb","gdb").toString();
+    ui->gdbEdit->setText(QDir::toNativeSeparators(gdb));
     setupList();
 }
 
 void GolangOption::save()
 {
-    liteApp->settings()->setValue("golang/GOROOT",ui->lineEdit->text());
-}
-
-void GolangOption::on_browseButton_clicked()
-{
-    QString goroot = QFileDialog::getExistingDirectory(this);
-    if (!goroot.isEmpty()) {
-        ui->lineEdit->setText(goroot);
-        setupList();
-    }
+    liteApp->settings()->setValue("golang/GOROOT",ui->gorootEdit->text());
+    liteApp->settings()->setValue("golang/gdb",ui->gdbEdit->text());
 }
 
 void GolangOption::setupList()
 {
-    QString root = ui->lineEdit->text();
+}
+
+void GolangOption::on_browseGoroot_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this);
+    if (!dir.isEmpty()) {
+        ui->gorootEdit->setText(dir);
+        setupList();
+    }
+}
+
+void GolangOption::on_browseGdb_clicked()
+{
+    QString dir = QFileDialog::getOpenFileName(this);
+    if (!dir.isEmpty()) {
+        ui->gdbEdit->setText(dir);
+        setupList();
+    }
 }

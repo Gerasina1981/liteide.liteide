@@ -77,6 +77,8 @@ public:
     QAction *buildFileAct;
     QAction *cancelBuildAct;
     QAction *runAct;
+    QAction *runGdbAct;
+    QAction *runShellAct;
     QAction *stopRunAct;
     QAction *debugAct;
     QToolBar *buildToolBar;
@@ -85,6 +87,8 @@ public:
 private slots:
     void runOutputKeyEvent(QKeyEvent*);
     void run();
+    void runShell();
+    void runGdb();
     void stopRun();
     void cancelBuild();
     void buildFile();
