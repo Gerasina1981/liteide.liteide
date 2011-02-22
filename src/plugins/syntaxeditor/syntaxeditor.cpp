@@ -366,8 +366,8 @@ void SyntaxEditor::loadConfig()
     autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
     curFont.setFamily(liteApp->settings()->value("editor/family","Courier").toString());
     curFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
-    setTabStopWidth(curFont.pointSize()*4);
     setFont(curFont);
+    setTabStopWidth(fontMetrics().width("main"));
 }
 
 void SyntaxEditor::highlightCurrentLine()
