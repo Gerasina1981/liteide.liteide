@@ -10,6 +10,7 @@ class SyntaxEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
+    void indentEnter(QTextCursor cur);
     void indentText(QTextDocument *doc, QTextCursor cur, bool bIndent);
     void indentBlock(QTextBlock block, bool bIndent);
     void indentCursor(QTextCursor cur, bool bIndent);
@@ -36,7 +37,6 @@ signals:
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e);
-    virtual bool event(QEvent *event);
     virtual void closeEvent(QCloseEvent *event);
     virtual void resizeEvent(QResizeEvent *e);
 public:

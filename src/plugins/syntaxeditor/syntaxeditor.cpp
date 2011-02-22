@@ -237,80 +237,6 @@ void SyntaxEditor::updateEditorArea(const QRect &rect, int dy)
     }
 }
 
-bool SyntaxEditor::event(QEvent *event)
-{
-    return QPlainTextEdit::event(event);
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-
-        if ( keyEvent->key() == Qt::Key_Return ||
-          keyEvent->key() == Qt::Key_Enter ) {
-            emit update();
-        }
-
-
-        if (this->autoIndent &&
-            ( keyEvent->key() == Qt::Key_Return ||
-              keyEvent->key() == Qt::Key_Enter) ) {
-
-            QTextCursor cursor(this->textCursor());
-
-            cursor.beginEditBlock();
-            int pos = cursor.positionInBlock();
-            QString text = cursor.block().text();
-            int i = 0;
-            int tab = 0;
-            int space = 0;
-            QString inText = "\n";
-            while (i < text.size()) {
-                if (!text.at(i).isSpace())
-                    break;
-                if (text.at(0) == ' ') {
-                    space++;
-                }
-                else if (text.at(0) == '\t') {
-                    inText += "\t";
-                    tab++;
-                }
-                i++;
-            }
-            text.trimmed();
-            if (!text.isEmpty()) {
-                if (pos >= text.size()) {
-                    const QChar ch = text.at(text.size()-1);
-                    if (ch == '{' || ch == '(') {
-                        inText += "\t";
-                    }
-                } else if (pos == text.size()-1 && text.size() >= 3) {
-                    const QChar l = text.at(text.size()-2);
-                    const QChar r = text.at(text.size()-1);
-                    if ( (l == '{' && r == '}') ||
-                         (l == '(' && r== ')') ) {
-                        cursor.insertText(inText);
-                        int pos = cursor.position();
-                        cursor.insertText(inText);
-                        cursor.setPosition(pos);
-                        this->setTextCursor(cursor);
-                        cursor.insertText("\t");
-                        cursor.endEditBlock();
-                        return true;
-                    }
-                }
-            }
-            cursor.insertText(inText);
-            cursor.endEditBlock();
-            return true;
-        } else if (this->autoBlock && keyEvent->key() == '{') {
-            QTextCursor cursor(this->textCursor());
-            cursor.insertText("{}");
-            cursor.movePosition(QTextCursor::PreviousCharacter);
-            setTextCursor(cursor);
-            return true;
-        }
-    }
-    return QPlainTextEdit::event(event);
-}
-
 void SyntaxEditor::setCompleter(SyntaxCompleter *completer)
 {
     if (editCompleter)
@@ -369,6 +295,25 @@ void SyntaxEditor::keyPressEvent(QKeyEvent *e)
         return;
     } else if (e->key() == Qt::Key_Backtab) {
         indentText(document(),textCursor(),false);
+        e->accept();
+        return;
+    }
+
+    if ( e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return ) {
+        if (this->autoIndent) {
+            indentEnter(textCursor());
+        } else {
+            e->accept();
+        }
+        emit update();
+        return;
+    }
+
+    if (this->autoBlock && e->key() == '{') {
+        QTextCursor cursor(this->textCursor());
+        cursor.insertText("{}");
+        cursor.movePosition(QTextCursor::PreviousCharacter);
+        setTextCursor(cursor);
         e->accept();
         return;
     }
@@ -515,3 +460,53 @@ void SyntaxEditor::indentText(QTextDocument *doc, QTextCursor cur, bool bIndent)
     }
     cur.endEditBlock();
 }
+
+void SyntaxEditor::indentEnter(QTextCursor cursor)
+{
+    cursor.beginEditBlock();
+    int pos = cursor.positionInBlock();
+    QString text = cursor.block().text();
+    int i = 0;
+    int tab = 0;
+    int space = 0;
+    QString inText = "\n";
+    while (i < text.size()) {
+        if (!text.at(i).isSpace())
+            break;
+        if (text.at(0) == ' ') {
+            space++;
+        }
+        else if (text.at(0) == '\t') {
+            inText += "\t";
+            tab++;
+        }
+        i++;
+    }
+    text.trimmed();
+    if (!text.isEmpty()) {
+        if (pos >= text.size()) {
+            const QChar ch = text.at(text.size()-1);
+            if (ch == '{' || ch == '(') {
+                inText += "\t";
+            }
+        } else if (pos == text.size()-1 && text.size() >= 3) {
+            const QChar l = text.at(text.size()-2);
+            const QChar r = text.at(text.size()-1);            
+            if ( (l == '{' && r == '}') ||
+                 (l == '(' && r== ')') ) {
+                cursor.insertText(inText);
+                int pos = cursor.position();
+                cursor.insertText(inText);
+                cursor.setPosition(pos);
+                this->setTextCursor(cursor);
+                cursor.insertText("\t");
+                cursor.endEditBlock();
+                return;
+            }
+        }
+    }
+    cursor.insertText(inText);
+    cursor.endEditBlock();    
+    ensureCursorVisible();
+}
+
