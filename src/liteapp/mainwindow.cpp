@@ -140,6 +140,10 @@ void MainWindow::createActions()
     openProjectAct->setStatusTip(tr("Open Project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
+    loadMakefileAct = new QAction(tr("Load Makefile"),this);
+    loadMakefileAct->setStatusTip("Load Makefile");
+    connect(loadMakefileAct,SIGNAL(triggered()),this, SLOT(loadMakefile()));
+
     closeProjectAct = new QAction(tr("&Close Project"),this);
     closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
     closeProjectAct->setStatusTip(tr("Close Project"));
@@ -215,6 +219,7 @@ void MainWindow::createMenus()
 
     _fileMenu->addAction(newProjectAct);
     _fileMenu->addAction(openProjectAct);
+    _fileMenu->addAction(loadMakefileAct);
     _fileMenu->addAction(closeProjectAct);
     _fileMenu->addSeparator();
 
@@ -415,6 +420,18 @@ void MainWindow::openProject()
 
     fileName = QFileDialog::getOpenFileName(this,
            tr("Open Project"), path, liteApp->projectTypeFilter());
+
+    if (!fileName.isEmpty()) {
+        path = QFileInfo(fileName).absolutePath();
+        liteApp->loadProject(fileName);
+    }
+}
+
+void MainWindow::loadMakefile()
+{
+    static QString path;
+    QString fileName = QFileDialog::getOpenFileName(this,
+           tr("Load Makefile"), "Makefile", "Makefile (*);;");
 
     if (!fileName.isEmpty()) {
         path = QFileInfo(fileName).absolutePath();

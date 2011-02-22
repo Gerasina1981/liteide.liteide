@@ -104,6 +104,9 @@ QByteArray SyntaxEditor::data() const
 
 bool SyntaxEditor::saveFile(const QString &fileName)
 {
+    if (!this->document()->isModified())
+        return true;
+
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
         QMessageBox::warning(this, tr("LiteIDE"),

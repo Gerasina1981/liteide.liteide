@@ -15,6 +15,7 @@ public:
     virtual bool reload() = 0;
     virtual bool open(const QString &filePath) = 0;    
     virtual void close() = 0;
+    virtual bool isMakefile() = 0;
 };
 
 class IProjectFactory

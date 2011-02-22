@@ -15,6 +15,7 @@ public:
     QStringList sourceFiles();
     QStringList headerFiles();
     QStringList goFiles();
+    QStringList cgoFiles();
     virtual void close();
     virtual bool reload();
     QString projectPath() const;
@@ -23,12 +24,14 @@ public:
     virtual QString fileName() const;
     virtual bool open(const QString &fileName);
     virtual QStringList values(const QString &key);
+    virtual bool isMakefile();
 signals:
     void closeProject();
     void reloadProject();
 public:
     QMap<QString,QStringList>   context;
     QString _filePath;
+    bool _isMakefile;
 };
 
 #endif // PROJECTFILE_H

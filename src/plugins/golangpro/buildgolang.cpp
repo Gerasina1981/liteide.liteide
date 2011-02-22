@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QTextCodec>
+#include <QProcessEnvironment>
 #include "golangoption.h"
 
 /*
@@ -55,8 +56,8 @@ BuildGolang::BuildGolang(IApplication *app, QObject *parent) :
     createToolBars();
     createOutput();
 
-    buildProcess = new QProcess(this);
-    runProcess = new QProcess(this);
+    buildProcess = new ProcessEx(this);
+    runProcess = new ProcessEx(this);
 
     connect(buildProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdoutBuild()));
     connect(buildProcess,SIGNAL(readyReadStandardError()),this,SLOT(readStderrBuild()));
@@ -80,31 +81,30 @@ QString BuildGolang::buildName() const
     return tr("BuildGoalng");
 }
 
-bool BuildGolang::buildProject(IProject *proj)
+QString BuildGolang::goroot()
 {
-    QString target;
-    QStringList val = proj->values("TARGET");
-    if (!val.isEmpty())
-        target = val.at(0);
-    else
-        target = proj->displayName();
-
-    target = QFileInfo(target).baseName();
-
-    buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
-
-    QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
-
-    QStringList args;
-    args  << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gopro" << proj->filePath();
-    QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
-    buildProcess->start(cmd,args);
-
-    return true;
+    return liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
 }
 
-bool BuildGolang::buildFile(const QString &fileName)
+QString BuildGolang::gomake()
 {
+    QString def = goroot()+"/bin/gomake";
+    return liteApp->settings()->value("golang/make",def).toString();
+}
+
+void BuildGolang::buildGoproject(IProject *proj)
+{
+    bMakefile = false;
+    buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
+    QStringList args;
+    args  << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot())  << "-gopro" << proj->filePath();
+    QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
+    buildProcess->start(cmd,args);
+}
+
+void BuildGolang::buildFile(const QString &fileName)
+{
+    bMakefile = false;
     QString target = QFileInfo(fileName).baseName();
     QString projDir = QFileInfo(fileName).absolutePath();
     buildProcess->setWorkingDirectory(projDir);
@@ -115,8 +115,6 @@ bool BuildGolang::buildFile(const QString &fileName)
     args << "-ver=false" << "-goroot"<< QDir::fromNativeSeparators(goroot)  << "-gofiles" << QFileInfo(fileName).fileName() << "-o" << target;
     QString cmd = QFileInfo(liteApp->applicationPath(),"gopromake"+liteApp->osExecuteExt()).absoluteFilePath();
     buildProcess->start(cmd,args);
-
-    return false;
 }
 
 void BuildGolang::cancelBuild()
@@ -138,19 +136,16 @@ void BuildGolang::appendBuildOutput(const QByteArray &text, bool stdError)
 
     buildOutputEdit->setCurrentCharFormat(fmt);
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    buildOutputEdit->appendPlainText(codec->toUnicode(text));
+#ifdef Q_OS_WIN32
+    if (bMakefile) {
+        codec = QTextCodec::codecForLocale();
+    }
+#endif
+     buildOutputEdit->appendPlainText(codec->toUnicode(text));
 }
 
-void BuildGolang::appendRunOutput(const QByteArray &text, bool stdError)
+void BuildGolang::appendRunOutput(const QByteArray &text)
 {
-    QTextCharFormat fmt;
-    if (stdError)
-        fmt.setForeground(Qt::red);
-    else
-        fmt.setForeground(Qt::black);
-
-    runOutputEdit->setCurrentCharFormat(fmt);
-
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     runOutputEdit->appendPlainText(codec->toUnicode(text));
 }
@@ -195,10 +190,9 @@ void BuildGolang::finishedRun(int code)
     stopRunAct->setEnabled(false);
     runAct->setEnabled(true);
 
-    if (code == 0)
-        appendRunOutput("---- run finish ----",false);
-    else
-        appendRunOutput("---- run error ----",false);
+    QByteArray out = QString("---- %1 exit with code %2").arg(runProcess->program).arg(code).toLocal8Bit();
+
+    appendRunOutput(out);
 }
 
 void BuildGolang::errorRun(QProcess::ProcessError code)
@@ -206,23 +200,27 @@ void BuildGolang::errorRun(QProcess::ProcessError code)
     stopRunAct->setEnabled(false);
     runAct->setEnabled(true);
 
-    appendRunOutput("Run error : "+processErrorName(code),true);
+    QString err = processErrorName(code);
+    QByteArray out = QString("---- Error run %1 %2").arg(runProcess->program).arg(err).toLocal8Bit();
+
+    appendRunOutput(out);
 }
 
 void BuildGolang::readStdoutRun()
 {
     QByteArray text = runProcess->readAllStandardOutput();
-    appendRunOutput(text,false);
+    appendRunOutput(text);
 }
 void BuildGolang::readStderrRun()
 {
     QByteArray text = runProcess->readAllStandardError();
-    appendRunOutput(text,true);
+    appendRunOutput(text);
 }
 
 void BuildGolang::startedRun()
-{
-    appendRunOutput("---- run start ----",false);
+{    
+    QByteArray out = QString("---- Starting %1 ...").arg(runProcess->program).toLocal8Bit();
+    appendRunOutput(out);
     stopRunAct->setEnabled(true);
     runAct->setEnabled(false);
     runOutputEdit->setFocus();
@@ -264,11 +262,6 @@ void BuildGolang::createActions()
     buildProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     buildProjectAct->setStatusTip(tr("Build Project or File"));
     connect(buildProjectAct,SIGNAL(triggered()),this,SLOT(buildProject()));
-
-    buildFileAct = new QAction(QIcon(":/images/build.png"),tr("Build File\tCtrl+B"),this);
-    buildFileAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_B));
-    buildFileAct->setStatusTip(tr("Build File"));
-    connect(buildFileAct,SIGNAL(triggered()),this,SLOT(buildFile()));
 
     cancelBuildAct = new QAction(tr("Cancel Build"),this);
     cancelBuildAct->setStatusTip(tr("Cancel Build Project"));
@@ -338,7 +331,11 @@ void BuildGolang::buildProject()
     liteApp->mainWindow()->saveAllFile();
     IProject *proj = liteApp->activeProject();
     if (proj)  {
-        buildProject(proj);
+        if (proj->isMakefile()) {
+            buildMakefile(proj);
+        } else {
+            buildGoproject(proj);
+        }
         return;
     }
     IEditor * edit= liteApp->activeEditor();
@@ -346,8 +343,19 @@ void BuildGolang::buildProject()
         buildFile(edit->filePath());
     }
 }
-void BuildGolang::buildFile()
+
+void BuildGolang::buildMakefile(IProject *proj)
 {
+    bMakefile = true;
+    QString cmd = gomake();
+    QStringList args;
+    args << "-f" << proj->fileName();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("GOROOT",goroot());
+
+    buildProcess->setEnvironment(env.toStringList());
+    buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
+    buildProcess->start(cmd,args);
 }
 
 void BuildGolang::stopRun()
@@ -382,11 +390,13 @@ void BuildGolang::run()
     TargetInfo info = liteApp->getTargetInfo();
     runWriteString.clear();
 
-    if (!info.fileName.isEmpty()) {
+    if (!info.fileName.isEmpty()) {        
         runOutputEdit->clear();
+
         liteApp->mainWindow()->setCurrentOutputPane(runOutputEdit);
         runProcess->setWorkingDirectory(info.workDir);
-        runProcess->start(info.filePath);
+        QStringList args;
+        runProcess->start(info.filePath,args);
     }
 }
 

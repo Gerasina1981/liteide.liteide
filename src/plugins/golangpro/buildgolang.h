@@ -12,6 +12,20 @@
 #include "../../api/iapp.h"
 #include "../../api/ioutput.h"
 
+class ProcessEx : public QProcess
+{
+public:
+    ProcessEx(QObject *parent) : QProcess(parent)
+    {
+    }
+public:
+    void start(const QString &program, const QStringList &arguments, OpenMode mode = ReadWrite)
+    {
+        this->program = program;
+        QProcess::start(program,arguments,mode);
+    }
+    QString program;
+};
 
 class BuildOutputEdit : public QPlainTextEdit
 {
@@ -62,19 +76,22 @@ public:
     explicit BuildGolang(IApplication *app, QObject *parent = 0);
     virtual ~BuildGolang();
     virtual QString buildName() const;
-    virtual bool buildProject(IProject *proj);
-    virtual bool buildFile(const QString &fileName);
+    QString goroot();
+    QString gomake();
+    void buildGoproject(IProject *proj);
+    void buildMakefile(IProject *proj);
+    void buildFile(const QString &fileName);
 
     void appendBuildOutput(const QByteArray &text, bool stdError);
-    void appendRunOutput(const QByteArray &text, bool stdError);
+    void appendRunOutput(const QByteArray &text);
 public:
-    QProcess        *buildProcess;
-    QProcess        *runProcess;
+    bool            bMakefile;
+    ProcessEx       *buildProcess;
+    ProcessEx       *runProcess;
     IApplication    *liteApp;
     BuildOutputEdit *buildOutputEdit;
     RunOutputEdit   *runOutputEdit;
     QAction *buildProjectAct;
-    QAction *buildFileAct;
     QAction *cancelBuildAct;
     QAction *runAct;
     QAction *runGdbAct;
@@ -91,7 +108,6 @@ private slots:
     void runGdb();
     void stopRun();
     void cancelBuild();
-    void buildFile();
     void buildProject();
     void startedBuild();
     void readStderrBuild();

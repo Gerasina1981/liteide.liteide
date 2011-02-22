@@ -38,6 +38,8 @@ void GolangOption::load()
     ui->gorootEdit->setText(QDir::toNativeSeparators(goroot));
     QString gdb = liteApp->settings()->value("golang/gdb","gdb").toString();
     ui->gdbEdit->setText(QDir::toNativeSeparators(gdb));
+    QString make = liteApp->settings()->value("golang/make",goroot+"/bin/gomake").toString();
+    ui->makeEdit->setText(QDir::toNativeSeparators(make));
     setupList();
 }
 
@@ -45,6 +47,7 @@ void GolangOption::save()
 {
     liteApp->settings()->setValue("golang/GOROOT",ui->gorootEdit->text());
     liteApp->settings()->setValue("golang/gdb",ui->gdbEdit->text());
+    liteApp->settings()->setValue("golang/make",ui->makeEdit->text());
 }
 
 void GolangOption::setupList()
@@ -65,6 +68,15 @@ void GolangOption::on_browseGdb_clicked()
     QString dir = QFileDialog::getOpenFileName(this);
     if (!dir.isEmpty()) {
         ui->gdbEdit->setText(dir);
+        setupList();
+    }
+}
+
+void GolangOption::on_browseMake_clicked()
+{
+    QString dir = QFileDialog::getOpenFileName(this);
+    if (!dir.isEmpty()) {
+        ui->makeEdit->setText(dir);
         setupList();
     }
 }

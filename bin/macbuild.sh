@@ -3,7 +3,7 @@
 mkdir liteide.app/Contents/MacOS/plugins
 
 cp -R template liteide.app/Contents/MacOS
-cp info.plist liteide.app/Contents/MacOS
+cp Info.plist liteide.app/Contents
 cp goastview liteide.app/Contents/MacOS
 cp gopromake liteide.app/Contents/MacOS
 

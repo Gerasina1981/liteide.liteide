@@ -73,20 +73,17 @@ IProject *ProjectManager::loadProject(const QString &filePath)
         return project;
     }
 
-    QString ext = QFileInfo(filePath).suffix();
-    if (ext.toLower() == "pro") {
-        ProjectFile * file = new ProjectFile(this);
-        if (file->open(filePath)) {
-            closeProject();
-            project = file;
-            connect(project,SIGNAL(closeProject()),this,SLOT(closeProject()));
-            connect(project,SIGNAL(reloadProject()),this,SLOT(reloadProject()));
-            resetProjectTree();
-            liteApp->projectEvent()->fireProjectChanged(project);
-            return project;
-        } else {
-            delete file;
-        }
+    ProjectFile * file = new ProjectFile(this);
+    if (file->open(filePath)) {
+        closeProject();
+        project = file;
+        connect(project,SIGNAL(closeProject()),this,SLOT(closeProject()));
+        connect(project,SIGNAL(reloadProject()),this,SLOT(reloadProject()));
+        resetProjectTree();
+        liteApp->projectEvent()->fireProjectChanged(project);
+        return project;
+    } else {
+        delete file;
     }
     return NULL;
 }

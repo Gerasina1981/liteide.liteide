@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>185</height>
+    <width>551</width>
+    <height>254</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,6 +49,27 @@
      </item>
      <item>
       <widget class="QPushButton" name="browseGdb">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Make:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="makeEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browseMake">
        <property name="text">
         <string>Browse</string>
        </property>

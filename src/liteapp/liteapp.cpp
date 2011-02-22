@@ -34,12 +34,16 @@ void LiteApp::addProjectFactory(IProjectFactory *projFactory)
 IProject *LiteApp::loadProject(const QString &fileName)
 {
     QString ext = QFileInfo(fileName).suffix();
+    IProject *proj = NULL;
     foreach(IProjectFactory *factory, projectFactorys) {
-        if (factory->projectKeys().contains(ext)) {
-            return factory->loadProject(fileName);
+        if (factory->projectKeys().contains(ext) || ext.isEmpty()) {
+            proj = factory->loadProject(fileName);
+            if (proj) {
+                break;
+            }
         }
     }
-    return NULL;
+    return proj;
 }
 
 IEditorEvent *LiteApp::editorEvent()
@@ -78,13 +82,20 @@ TargetInfo LiteApp::getTargetInfo()
     QString target;
     QString workDir;
     if (proj)    {
-        QStringList val = proj->values("TARGET");
         target = proj->displayName();
-        if (!val.isEmpty())
-            target = val.at(0);
+        if (proj->isMakefile()) {
+            QStringList val = proj->values("TARG");
+            if (!val.isEmpty())
+                target = val.at(0);
+        } else {
+            QStringList val = proj->values("TARGET");
+            if (!val.isEmpty()) {
+                target = val.at(0);
+            }
+        }
 
-        target = QFileInfo(target).baseName();
         target += osExecuteExt();
+
         workDir = QFileInfo(proj->filePath()).absolutePath();
         QStringList dest = proj->values("DESTDIR");
         if (!dest.isEmpty()) {
@@ -100,7 +111,7 @@ TargetInfo LiteApp::getTargetInfo()
     }
     info.workDir =  workDir;
     info.fileName = target;
-    info.filePath = QFileInfo(QDir(workDir),target).absoluteFilePath();
+    info.filePath = QFileInfo(QDir(workDir),target).canonicalFilePath();
     return info;
 }
 
