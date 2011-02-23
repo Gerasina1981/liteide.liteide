@@ -1,5 +1,1 @@
-[PROJECT]
-NAME="GoLang Project"
-PATH =golang
-PRO = root.pro
-FILES = root.go
+[PROJECT]NAME="GoLang Project"PATH =golangPRO = root.proFILES = root.go

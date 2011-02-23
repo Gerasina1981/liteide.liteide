@@ -140,9 +140,10 @@ void MainWindow::createActions()
     openProjectAct->setStatusTip(tr("Open Project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
-    loadMakefileAct = new QAction(tr("Load Makefile"),this);
-    loadMakefileAct->setStatusTip("Load Makefile");
-    connect(loadMakefileAct,SIGNAL(triggered()),this, SLOT(loadMakefile()));
+    openMakefileAct = new QAction(tr("Open &Makefile"),this);
+    openMakefileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_M));
+    openMakefileAct->setStatusTip("Open Makefile");
+    connect(openMakefileAct,SIGNAL(triggered()),this, SLOT(openMakefile()));
 
     closeProjectAct = new QAction(tr("&Close Project"),this);
     closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
@@ -219,7 +220,7 @@ void MainWindow::createMenus()
 
     _fileMenu->addAction(newProjectAct);
     _fileMenu->addAction(openProjectAct);
-    _fileMenu->addAction(loadMakefileAct);
+    _fileMenu->addAction(openMakefileAct);
     _fileMenu->addAction(closeProjectAct);
     _fileMenu->addSeparator();
 
@@ -427,11 +428,11 @@ void MainWindow::openProject()
     }
 }
 
-void MainWindow::loadMakefile()
+void MainWindow::openMakefile()
 {
     static QString path;
     QString fileName = QFileDialog::getOpenFileName(this,
-           tr("Load Makefile"), "Makefile", "Makefile (*);;");
+           tr("Open Makefile"), "Makefile", "Makefile (*);;");
 
     if (!fileName.isEmpty()) {
         path = QFileInfo(fileName).absolutePath();
@@ -508,6 +509,7 @@ void MainWindow::fireProjectChanged(IProject *project)
     } else {
         setWindowTitle(tr("LiteIDE"));
     }
+    liteApp->emitActiveProjectChanged(activeProject);
 }
 
 

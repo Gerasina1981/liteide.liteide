@@ -21,10 +21,30 @@ public:
 public:
     void start(const QString &program, const QStringList &arguments, OpenMode mode = ReadWrite)
     {
-        this->program = program;
+        _programName = program;
         QProcess::start(program,arguments,mode);
     }
-    QString program;
+    void start(const QString &program, OpenMode mode = ReadWrite)
+    {
+        _programName = program;
+        QProcess::start(program,mode);
+    }
+
+    void setTaskName(const QString &name)
+    {
+        _taskName = name;
+    }
+    QString taskName() const
+    {
+        return _taskName;
+    }
+    QString programName() const
+    {
+        return _programName;
+    }
+protected:
+    QString _programName;
+    QString _taskName;
 };
 
 class BuildOutputEdit : public QPlainTextEdit
@@ -79,8 +99,11 @@ public:
     QString goroot();
     QString gomake();
     void buildGoproject(IProject *proj);
-    void buildMakefile(IProject *proj);
+    void buildMakefile(IProject *proj, bool force);
     void buildFile(const QString &fileName);
+    void cleanGoproject(IProject *proj);
+    void cleanMakefile(IProject *proj);
+    void cleanFile(const QString &fileName);
 
     void appendBuildOutput(const QByteArray &text, bool stdError);
     void appendRunOutput(const QByteArray &text);
@@ -92,16 +115,19 @@ public:
     BuildOutputEdit *buildOutputEdit;
     RunOutputEdit   *runOutputEdit;
     QAction *buildProjectAct;
+    QAction *rebuildProjectAct;
     QAction *cancelBuildAct;
     QAction *runAct;
     QAction *runGdbAct;
     QAction *runShellAct;
     QAction *stopRunAct;
     QAction *debugAct;
+    QAction *cleanProjectAct;
     QToolBar *buildToolBar;
     QMenu *_buildMenu;
     QString runWriteString;
 private slots:
+    void projectChanged(IProject*);
     void runOutputKeyEvent(QKeyEvent*);
     void run();
     void runShell();
@@ -109,6 +135,8 @@ private slots:
     void stopRun();
     void cancelBuild();
     void buildProject();
+    void rebuildProject();
+    void cleanProject();
     void startedBuild();
     void readStderrBuild();
     void readStdoutBuild();

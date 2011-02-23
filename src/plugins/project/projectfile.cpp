@@ -44,7 +44,6 @@ void ProjectFile::close()
 
 bool ProjectFile::open(const QString &fileName)
 {
-    _isMakefile = true;
     QFile file(fileName);
     file.open(QIODevice::ReadWrite | QIODevice::Text);
     if (!file.isOpen())
@@ -91,7 +90,7 @@ bool ProjectFile::open(const QString &fileName)
                 context[v.at(0).trimmed()].append(v2);
         }
     }
-    return true;
+    return !context.isEmpty();
     /*
     QString all = file.readAll();
     all.replace(QRegExp("\\\\[\\s]*[\n\r]+[\\s]*")," ");

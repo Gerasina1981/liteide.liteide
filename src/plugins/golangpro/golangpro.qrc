@@ -5,5 +5,7 @@
         <file>images/runshell.png</file>
         <file>images/stoprun.png</file>
         <file>images/rungdb.png</file>
+        <file>images/clean.png</file>
+        <file>images/rebuild.png</file>
     </qresource>
 </RCC>

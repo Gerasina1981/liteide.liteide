@@ -76,6 +76,10 @@ public:
     {
         emit closeEditor(ed);
     }
+    void emitActiveProjectChanged(IProject *proj)
+    {
+        emit activeProjectChanged(proj);
+    }
 };
 
 #endif //__LITEAPI_IAPP_H__
