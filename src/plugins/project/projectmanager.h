@@ -23,7 +23,8 @@ public:
     };
 public:
     virtual QStringList projectKeys() const;
-    virtual QString projectTypeFilter() const;
+    virtual QStringList openTypeFilter() const;
+    virtual QStringList openTypeFilterList() const;
     virtual IProject *loadProject(const QString &filePath);
 
     void resetProjectTree();

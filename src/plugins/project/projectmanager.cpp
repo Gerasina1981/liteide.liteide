@@ -56,9 +56,14 @@ void ProjectManager::createActions()
                             << openProjectAct << closeProjectAct);
 }
 
-QString ProjectManager::projectTypeFilter() const
+QStringList ProjectManager::openTypeFilter() const
 {
-    return tr("Project files (*.pro)");
+    return QStringList() << "Project or Makefile (*.pro;Makefile)";
+}
+
+QStringList ProjectManager::openTypeFilterList() const
+{
+    return QStringList() << "*.pro" << "Makefile";
 }
 
 QStringList ProjectManager::projectKeys() const

@@ -130,20 +130,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createActions()
 {
-    newProjectAct = new QAction(tr("&New Project"),this);
+    newProjectAct = new QAction(tr("&New Project Wizard..."),this);
     newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_N));
-    newProjectAct->setStatusTip(tr("Open Project"));
+    newProjectAct->setStatusTip(tr("New Project Wizard"));
     connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
-
-    openProjectAct = new QAction(tr("&Open Project"),this);
-    openProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
-    openProjectAct->setStatusTip(tr("Open Project"));
-    connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
-
-    openMakefileAct = new QAction(tr("Open &Makefile"),this);
-    openMakefileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_M));
-    openMakefileAct->setStatusTip("Open Makefile");
-    connect(openMakefileAct,SIGNAL(triggered()),this, SLOT(openMakefile()));
 
     closeProjectAct = new QAction(tr("&Close Project"),this);
     closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
@@ -171,9 +161,9 @@ void MainWindow::createActions()
     closeAllFileAct->setStatusTip(tr("Close All Files"));
     connect(closeAllFileAct, SIGNAL(triggered()), this, SLOT(closeAllFile()));
 
-    openFileAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
+    openFileAct = new QAction(QIcon(":/images/open.png"), tr("&Open File or Project..."), this);
     openFileAct->setShortcuts(QKeySequence::Open);
-    openFileAct->setStatusTip(tr("Open file"));
+    openFileAct->setStatusTip(tr("Open File or Project"));
     connect(openFileAct, SIGNAL(triggered()), this, SLOT(openFile()));
 
 
@@ -219,16 +209,14 @@ void MainWindow::createMenus()
     _fileMenu = menuBar()->addMenu(tr("&File"));
 
     _fileMenu->addAction(newProjectAct);
-    _fileMenu->addAction(openProjectAct);
-    _fileMenu->addAction(openMakefileAct);
-    _fileMenu->addAction(closeProjectAct);
-    _fileMenu->addSeparator();
-
     _fileMenu->addAction(newFileAct);
     _fileMenu->addAction(openFileAct);
-    _fileMenu->addAction(saveFileAct);
     _fileMenu->addSeparator();
+
+    _fileMenu->addAction(saveFileAct);
     _fileMenu->addAction(saveAllFileAct);
+    _fileMenu->addSeparator();
+    _fileMenu->addAction(closeProjectAct);
     _fileMenu->addAction(closeAllFileAct);
     _fileMenu->addSeparator();
     _fileMenu->addAction(quitAct);
@@ -413,44 +401,20 @@ void MainWindow::newFile()
     }
 }
 
-void MainWindow::openProject()
-{
-    static QString path = liteApp->applicationPath()+"/..";
-
-    QString fileName;
-
-    fileName = QFileDialog::getOpenFileName(this,
-           tr("Open Project"), path, liteApp->projectTypeFilter());
-
-    if (!fileName.isEmpty()) {
-        path = QFileInfo(fileName).absolutePath();
-        liteApp->loadProject(fileName);
-    }
-}
-
-void MainWindow::openMakefile()
-{
-    static QString path;
-    QString fileName = QFileDialog::getOpenFileName(this,
-           tr("Open Makefile"), "Makefile", "Makefile (*);;");
-
-    if (!fileName.isEmpty()) {
-        path = QFileInfo(fileName).absolutePath();
-        liteApp->loadProject(fileName);
-    }
-}
-
 void MainWindow::openFile()
 {
-    static QString path = liteApp->applicationPath()+"/..";
+    QString path = liteApp->settings()->value("main/open").toString();
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(this,
-           tr("Open File"), path, liteApp->editorTypeFilter());
+           tr("Open Project or File"), path, liteApp->openTypeFilter());
 
     if (!fileName.isEmpty()) {
         path = QFileInfo(fileName).absolutePath();
-        liteApp->loadEditor(fileName);
+        liteApp->settings()->setValue("main/open",path);
+        if (!liteApp->loadProject(fileName)) {
+            liteApp->loadEditor(fileName);
+        }
     }
 }
 

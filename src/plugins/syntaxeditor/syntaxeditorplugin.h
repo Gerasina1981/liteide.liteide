@@ -46,7 +46,8 @@ class EditorFactoryImpl : public QObject, public IEditorFactory
 public:
     EditorFactoryImpl(QObject *parent, IApplication *app);
     virtual QStringList fileTypes();
-    virtual QString editorTypeFilter();
+    virtual QStringList openTypeFilter();
+    virtual QStringList openTypeFilterList();
     virtual IEditor *create(const QString &fileName);
 protected:
     IApplication *liteApp;

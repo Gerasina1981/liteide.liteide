@@ -101,12 +101,11 @@ public:
     void buildGoproject(IProject *proj);
     void buildMakefile(IProject *proj, bool force);
     void buildFile(const QString &fileName);
-    void cleanGoproject(IProject *proj);
-    void cleanMakefile(IProject *proj);
-    void cleanFile(const QString &fileName);
-
-    void appendBuildOutput(const QByteArray &text, bool stdError);
-    void appendRunOutput(const QByteArray &text);
+    void RemoveWorkDir(const QString &wordDir, const QStringList &filters);
+    void appendBuildOutputUTF8(const QByteArray &text, bool stdError);
+    void appendBuildOutput(const QString &text, bool stdError);
+    void appendRunOutputUTF8(const QByteArray &text);
+    void appendRunOutput(const QString &text);
 public:
     bool            bMakefile;
     ProcessEx       *buildProcess;
@@ -122,7 +121,8 @@ public:
     QAction *runShellAct;
     QAction *stopRunAct;
     QAction *debugAct;
-    QAction *cleanProjectAct;
+    QAction *cleanProjectTempAct;
+    QAction *cleanProjectAllAct;
     QToolBar *buildToolBar;
     QMenu *_buildMenu;
     QString runWriteString;
@@ -136,7 +136,8 @@ private slots:
     void cancelBuild();
     void buildProject();
     void rebuildProject();
-    void cleanProject();
+    void cleanProjectTemp();
+    void cleanProjectAll();
     void startedBuild();
     void readStderrBuild();
     void readStdoutBuild();

@@ -30,6 +30,7 @@ public:
     virtual TargetInfo getTargetInfo();
     void loadPlugins(const QString &dir);
     void installPlugins();
+    QString openTypeFilter() const;
     QString editorTypeFilter() const;
     QString projectTypeFilter() const;
 public:

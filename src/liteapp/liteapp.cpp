@@ -99,7 +99,7 @@ TargetInfo LiteApp::getTargetInfo()
         workDir = QFileInfo(proj->filePath()).absolutePath();
         QStringList dest = proj->values("DESTDIR");
         if (!dest.isEmpty()) {
-            workDir = QFileInfo(QFileInfo(proj->filePath()).absoluteDir(),dest.at(0)).absoluteFilePath();
+            target = QFileInfo(QDir(dest.at(0)),target).filePath();
         }
     } else {
         IEditor *edit = activeEditor();
@@ -148,16 +148,34 @@ QString LiteApp::projectTypeFilter() const
 {
     QStringList types;
     foreach(IProjectFactory *factory, projectFactorys) {
-        types.append(factory->projectTypeFilter());
+        types.append(factory->openTypeFilter());
     }
     return types.join(";;");
+}
+
+QString LiteApp::openTypeFilter() const
+{
+    QStringList types;
+    QStringList filter;
+    foreach(IProjectFactory *factory, projectFactorys) {
+        types.append(factory->openTypeFilterList());
+        filter.append(factory->openTypeFilter());
+    }
+    foreach(IEditorFactory *factory, editorFactorys) {
+        types.append(factory->openTypeFilterList());
+        filter.append(factory->openTypeFilter());
+    }
+    QString all = QString("All Support File (%1)").arg(types.join(";"));
+    filter.insert(0,all);
+    filter.append("All Files (*)(*.*)");
+    return filter.join(";;");
 }
 
 QString LiteApp::editorTypeFilter() const
 {
     QStringList types;
     foreach(IEditorFactory *factory, editorFactorys) {
-        types.append(factory->editorTypeFilter());
+        types.append(factory->openTypeFilter());
     }
     return types.join(";;");
 }

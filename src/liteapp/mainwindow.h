@@ -51,8 +51,6 @@ private slots:
     void saveFile();
     void newFile();
     void openFile();
-    void openProject();
-    void openMakefile();
     void about();
     void editTabChanged(int index);
     void editTabClose(int index);
@@ -90,8 +88,6 @@ private:
     QMenu   *_helpMenu;
 
     QAction *newProjectAct;
-    QAction *openProjectAct;
-    QAction *openMakefileAct;
     QAction *closeProjectAct;
     QAction *newFileAct;
     QAction *openFileAct;

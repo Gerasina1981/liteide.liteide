@@ -23,7 +23,8 @@ class IProjectFactory
 public:
     virtual ~IProjectFactory() {}
     virtual QStringList projectKeys() const = 0;
-    virtual QString projectTypeFilter() const = 0;
+    virtual QStringList openTypeFilter() const = 0;
+    virtual QStringList openTypeFilterList() const = 0;
     virtual IProject *loadProject(const QString &filePath) = 0;
 };
 

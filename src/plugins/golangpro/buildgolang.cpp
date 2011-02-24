@@ -130,7 +130,7 @@ void BuildGolang::cancelBuild()
     }
 }
 
-void BuildGolang::appendBuildOutput(const QByteArray &text, bool stdError)
+void BuildGolang::appendBuildOutputUTF8(const QByteArray &text, bool stdError)
 {
     QTextCharFormat fmt;
     if (stdError)
@@ -140,18 +140,30 @@ void BuildGolang::appendBuildOutput(const QByteArray &text, bool stdError)
 
     buildOutputEdit->setCurrentCharFormat(fmt);
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-#ifdef Q_OS_WIN32
-    if (bMakefile) {
-        codec = QTextCodec::codecForLocale();
-    }
-#endif
-     buildOutputEdit->appendPlainText(codec->toUnicode(text));
+    buildOutputEdit->appendPlainText(codec->toUnicode(text));
 }
 
-void BuildGolang::appendRunOutput(const QByteArray &text)
+void BuildGolang::appendBuildOutput(const QString &text, bool stdError)
+{
+    QTextCharFormat fmt;
+    if (stdError)
+        fmt.setForeground(Qt::red);
+    else
+        fmt.setForeground(Qt::black);
+
+    buildOutputEdit->setCurrentCharFormat(fmt);
+     buildOutputEdit->appendPlainText(text);
+}
+
+void BuildGolang::appendRunOutputUTF8(const QByteArray &text)
 {
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     runOutputEdit->appendPlainText(codec->toUnicode(text));
+}
+
+void BuildGolang::appendRunOutput(const QString &text)
+{
+    runOutputEdit->appendPlainText(text);
 }
 
 
@@ -159,7 +171,7 @@ void BuildGolang::finishedBuild(int code)
 {
     QString out = QString("---- %1 exited with code %2").arg(buildProcess->taskName()).arg(code);
 
-    appendBuildOutput(out.toLocal8Bit(),bool(code != 0));
+    appendBuildOutput(out,bool(code != 0));
 
     buildProjectAct->setEnabled(true);
     cancelBuildAct->setEnabled(false);
@@ -168,24 +180,32 @@ void BuildGolang::finishedBuild(int code)
 void BuildGolang::errorBuild(QProcess::ProcessError code)
 {
     QString out = QString("---- %1 error with code %2").arg(buildProcess->taskName()).arg(processErrorName(code));
-    appendBuildOutput(out.toLocal8Bit(),true);
+    appendBuildOutput(out,true);
 }
 
 void BuildGolang::readStdoutBuild()
 {
     QByteArray text = buildProcess->readAllStandardOutput();
-    appendBuildOutput(text,false);
+    if (this->bMakefile) {
+        appendBuildOutput(QTextCodec::codecForLocale()->toUnicode(text),false);
+    } else {
+        appendBuildOutputUTF8(text,false);
+    }
 }
 void BuildGolang::readStderrBuild()
 {
     QByteArray text = buildProcess->readAllStandardError();
-    appendBuildOutput(text,true);
+    if (this->bMakefile) {
+        appendBuildOutput(QTextCodec::codecForLocale()->toUnicode(text),true);
+    } else {
+        appendBuildOutputUTF8(text,true);
+    }
 }
 
 void BuildGolang::startedBuild()
 {
     QString out = QString("---- %1 start ...").arg(buildProcess->taskName());
-    appendBuildOutput(out.toLocal8Bit(),false);
+    appendBuildOutput(out,false);
     buildProjectAct->setEnabled(false);
     cancelBuildAct->setEnabled(true);
 }
@@ -197,7 +217,7 @@ void BuildGolang::finishedRun(int code)
 
     QString out = QString("---- Program exited with code %1 ").arg(code);
 
-    appendRunOutput(out.toLocal8Bit());
+    appendRunOutput(out);
 }
 
 void BuildGolang::errorRun(QProcess::ProcessError code)
@@ -208,24 +228,24 @@ void BuildGolang::errorRun(QProcess::ProcessError code)
     QString err = processErrorName(code);
     QString out = QString("---- Error run %1 with code %2").arg(runProcess->programName()).arg(err);
 
-    appendRunOutput(out.toLocal8Bit());
+    appendRunOutput(out);
 }
 
 void BuildGolang::readStdoutRun()
 {
     QByteArray text = runProcess->readAllStandardOutput();
-    appendRunOutput(text);
+    appendRunOutputUTF8(text);
 }
 void BuildGolang::readStderrRun()
 {
     QByteArray text = runProcess->readAllStandardError();
-    appendRunOutput(text);
+    appendRunOutputUTF8(text);
 }
 
 void BuildGolang::startedRun()
 {    
     QString out = QString("---- Starting %1 ...").arg(runProcess->programName());
-    appendRunOutput(out.toLocal8Bit());
+    appendRunOutput(out);
     stopRunAct->setEnabled(true);
     runAct->setEnabled(false);
     runOutputEdit->setFocus();
@@ -279,9 +299,13 @@ void BuildGolang::createActions()
 
     cancelBuildAct->setEnabled(false);
 
-    cleanProjectAct = new QAction(QIcon(":/images/clean.png"),tr("Clean Project"),this);
-    cleanProjectAct->setStatusTip(tr("Clean Project"));
-    connect(cleanProjectAct,SIGNAL(triggered()),this,SLOT(cleanProject()));
+    cleanProjectTempAct = new QAction(QIcon(":/images/clean.png"),tr("Clean TempFiles"),this);
+    cleanProjectTempAct->setStatusTip(tr("Clean Temp Files"));
+    connect(cleanProjectTempAct,SIGNAL(triggered()),this,SLOT(cleanProjectTemp()));
+
+    cleanProjectAllAct = new QAction(QIcon(":/images/clean.png"),tr("Clean AllFiles"),this);
+    cleanProjectAllAct->setStatusTip(tr("Clean All Files"));
+    connect(cleanProjectAllAct,SIGNAL(triggered()),this,SLOT(cleanProjectAll()));
 
 
     runAct = new QAction(QIcon(":/images/run.png"),tr("Run"),this);
@@ -316,7 +340,8 @@ void BuildGolang::createMenus()
     _buildMenu->addAction(buildProjectAct);
     _buildMenu->addAction(rebuildProjectAct);
     _buildMenu->addAction(cancelBuildAct);
-    _buildMenu->addAction(cleanProjectAct);
+    _buildMenu->addAction(cleanProjectTempAct);
+    _buildMenu->addAction(cleanProjectAllAct);
     _buildMenu->addSeparator();
     _buildMenu->addAction(runAct);
     _buildMenu->addAction(stopRunAct);
@@ -361,25 +386,62 @@ void BuildGolang::rebuildProject()
     }
 }
 
-void BuildGolang::cleanProject()
+void BuildGolang::cleanProjectTemp()
 {
+    TargetInfo info = liteApp->getTargetInfo();
+    if (info.workDir.isEmpty())
+        return;
+
     this->buildOutputEdit->clear();
     liteApp->mainWindow()->setCurrentOutputPane(this->buildOutputEdit);
 
-    liteApp->mainWindow()->saveAllFile();
-    IProject *proj = liteApp->activeProject();
-    if (proj)  {
-        if (proj->isMakefile()) {
-            cleanMakefile(proj);
-        } else {
-            cleanGoproject(proj);
+    this->buildOutputEdit->appendPlainText("---- Start clean temp");
+
+
+    if (!info.workDir.isEmpty()) {
+        QStringList filter;
+        if (liteApp->activeProject()) {
+            filter << "*.8" << "*.5" << "*.6";
+        } else if (liteApp->activeEditor()) {
+            QString base = QFileInfo(info.fileName).baseName();
+            filter << base+"_go_.8" << base+"_go_.5" << base+"_go_.6";
         }
+        this->RemoveWorkDir(info.workDir,filter);
+    }
+
+    this->buildOutputEdit->appendPlainText("---- End clean temp");
+}
+
+void BuildGolang::cleanProjectAll()
+{
+    TargetInfo info = liteApp->getTargetInfo();
+    if (info.workDir.isEmpty())
         return;
+
+    this->buildOutputEdit->clear();
+    liteApp->mainWindow()->setCurrentOutputPane(this->buildOutputEdit);
+
+    this->buildOutputEdit->appendPlainText("---- Start clean all");
+
+    if (!info.workDir.isEmpty()) {
+        QStringList filter;
+        if (liteApp->activeProject()) {
+            filter << "*.8" << "*.5" << "*.6";
+        } else if (liteApp->activeEditor()) {
+            QString base = QFileInfo(info.fileName).baseName();
+            filter << base+"_go_.8" << base+"_go_.5" << base+"_go_.6";
+        }
+        this->RemoveWorkDir(info.workDir,filter);
     }
-    IEditor * edit= liteApp->activeEditor();
-    if (edit) {
-        cleanFile(edit->filePath());
+
+    if (QFile::exists(info.filePath)) {
+        bool b = QFile::remove(info.filePath);
+        QString out = QString("remove %1 %2").arg(info.fileName).arg(b?"true":"false");
+        this->buildOutputEdit->appendPlainText(out);
     }
+
+    this->buildOutputEdit->appendPlainText("---- End clean all");
+
 }
 
 
@@ -426,29 +488,25 @@ void BuildGolang::buildMakefile(IProject *proj, bool force)
     buildProcess->start(cmd,args);
 }
 
-void BuildGolang::cleanGoproject(IProject *proj)
+void BuildGolang::RemoveWorkDir(const QString &workDir, const QStringList &filters)
 {
+    QDir dir(workDir);
+    if (!dir.exists())
+        return;
+
+    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    foreach (QFileInfo d, dirs) {
+        RemoveWorkDir(d.filePath(),filters);
+    }
+
+    QFileInfoList files = dir.entryInfoList(filters,QDir::Files);
+    foreach (QFileInfo f, files) {
+        bool b = QFile::remove(f.filePath());
+        QString out = QString("remove %1 %2").arg(f.fileName()).arg(b?"true":"false");
+        buildOutputEdit->appendPlainText(out);
+    }
 }
-
-void BuildGolang::cleanMakefile(IProject *proj)
-{
-    bMakefile = true;
-    QString cmd = gomake();
-    QStringList args;
-    args << "-f" << proj->fileName() << "clean";
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("GOROOT",goroot());
-
-    buildProcess->setEnvironment(env.toStringList());
-    buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
-    buildProcess->setTaskName("Clean Makefile");
-    buildProcess->start(cmd,args);
-}
-
-void BuildGolang::cleanFile(const QString &fileName)
-{
-}
-
 
 void BuildGolang::stopRun()
 {
@@ -480,6 +538,7 @@ void BuildGolang::runOutputKeyEvent(QKeyEvent *e)
 void BuildGolang::run()
 {
     TargetInfo info = liteApp->getTargetInfo();
+
     runWriteString.clear();
 
     if (!info.fileName.isEmpty()) {        
@@ -532,6 +591,6 @@ void BuildGolang::projectChanged(IProject *proj)
     if (proj == NULL) {
         return;
     }
-    this->rebuildProjectAct->setEnabled(proj->isMakefile());
-    this->cleanProjectAct->setEnabled(proj->isMakefile());
+//    this->rebuildProjectAct->setEnabled(proj->isMakefile());
+//    this->cleanProjectAct->setEnabled(proj->isMakefile());
 }

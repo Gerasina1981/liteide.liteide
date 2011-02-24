@@ -103,12 +103,17 @@ EditorFactoryImpl::EditorFactoryImpl(QObject *parent,IApplication *app)
 
 QStringList EditorFactoryImpl::fileTypes()
 {
-    return QStringList() << "go" << "h" << "cpp" << "pro";
+    return QStringList() << "go" << "cgo";
 }
 
-QString EditorFactoryImpl::editorTypeFilter()
+QStringList EditorFactoryImpl::openTypeFilter()
 {
-    return QObject::tr("Go Files (*.go);;(All Files (*.*)");
+    return QStringList() << "Go Files (*.go;*.goc)";
+}
+
+QStringList EditorFactoryImpl::openTypeFilterList()
+{
+    return QStringList() << "*.go" << "*.goc";
 }
 
 IEditor *EditorFactoryImpl::create(const QString &fileName)
