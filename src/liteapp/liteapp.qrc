@@ -8,5 +8,6 @@
         <file>images/save.png</file>
         <file>images/undo.png</file>
         <file>images/redo.png</file>
+        <file>images/newproj.png</file>
     </qresource>
 </RCC>

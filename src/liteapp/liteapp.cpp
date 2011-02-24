@@ -180,6 +180,16 @@ QString LiteApp::editorTypeFilter() const
     return types.join(";;");
 }
 
+QString LiteApp::editorNewTypeFilter() const
+{
+    QStringList types;
+    foreach(IEditorFactory *factory, editorFactorys) {
+        types.append(factory->newTypeFilter());
+    }
+    return types.join(";;");
+
+}
+
 IEditor *LiteApp::loadEditor(const QString &fileName)
 {
     foreach (IEditor *ed, _mainWindow->editors.values()) {

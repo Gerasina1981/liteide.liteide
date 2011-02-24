@@ -111,6 +111,12 @@ QStringList EditorFactoryImpl::openTypeFilter()
     return QStringList() << "Go Files (*.go;*.goc)";
 }
 
+QStringList EditorFactoryImpl::newTypeFilter()
+{
+    return QStringList() << "Go Files (*.go)" << "All Files (*)";
+}
+
+
 QStringList EditorFactoryImpl::openTypeFilterList()
 {
     return QStringList() << "*.go" << "*.goc";
@@ -119,12 +125,11 @@ QStringList EditorFactoryImpl::openTypeFilterList()
 IEditor *EditorFactoryImpl::create(const QString &fileName)
 {
     SyntaxEditor *ed = new SyntaxEditor(liteApp);
+    QString ext = QFileInfo(fileName).suffix();
     if (!ed->loadFile(fileName)) {
         delete ed;
         return NULL;
     }
-
-    QString ext = QFileInfo(fileName).suffix();
     if (ext.toLower() == "go") {
         GolangHighlighter *l = new GolangHighlighter(ed->document());
         GolangCompleter * c = new GolangCompleter(ed);

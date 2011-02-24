@@ -91,6 +91,10 @@ QString BuildGolang::goroot()
 QString BuildGolang::gomake()
 {
     QString def = goroot()+"/bin/gomake";
+    bool usegomake = liteApp->settings()->value("golang/usegomake").toBool();
+    if (usegomake) {
+        return def;
+    }
     return liteApp->settings()->value("golang/make",def).toString();
 }
 

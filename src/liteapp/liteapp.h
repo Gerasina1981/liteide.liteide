@@ -32,6 +32,7 @@ public:
     void installPlugins();
     QString openTypeFilter() const;
     QString editorTypeFilter() const;
+    QString editorNewTypeFilter() const;
     QString projectTypeFilter() const;
 public:
     QSettings  *mainSettings;

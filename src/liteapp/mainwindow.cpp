@@ -130,26 +130,32 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createActions()
 {
-    newProjectAct = new QAction(tr("&New Project Wizard..."),this);
+    newProjectAct = new QAction(QIcon(":/images/newproj.png"),tr("New Project..."),this);
     newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_N));
-    newProjectAct->setStatusTip(tr("New Project Wizard"));
+    newProjectAct->setStatusTip(tr("New Project"));
     connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
 
-    closeProjectAct = new QAction(tr("&Close Project"),this);
+    closeProjectAct = new QAction(tr("Close Project"),this);
     closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
     closeProjectAct->setStatusTip(tr("Close Project"));
     connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(closeProject()));
 
 
-    newFileAct = new QAction(QIcon(":/images/new.png"), tr("&New File"),this);
+    newFileAct = new QAction(QIcon(":/images/new.png"), tr("New File..."),this);
     newFileAct->setShortcuts(QKeySequence::New);
     newFileAct->setStatusTip(tr("Create a new file"));
     connect(newFileAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    saveFileAct = new QAction(QIcon(":/images/save.png"), tr("&Save..."), this);
+    saveFileAct = new QAction(QIcon(":/images/save.png"), tr("&Save File"), this);
     saveFileAct->setShortcuts(QKeySequence::Save);
     saveFileAct->setStatusTip(tr("Save file"));
     connect(saveFileAct, SIGNAL(triggered()), this, SLOT(saveFile()));
+
+    saveFileAsAct = new QAction(tr("&Save File As..."), this);
+    saveFileAsAct->setShortcuts(QKeySequence::SaveAs);
+    saveFileAsAct->setStatusTip(tr("Save File As"));
+    connect(saveFileAsAct, SIGNAL(triggered()), this, SLOT(saveFileAs()));
+
 
     saveAllFileAct = new QAction(tr("Save All"), this);
     saveAllFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
@@ -214,6 +220,7 @@ void MainWindow::createMenus()
     _fileMenu->addSeparator();
 
     _fileMenu->addAction(saveFileAct);
+    _fileMenu->addAction(saveFileAsAct);
     _fileMenu->addAction(saveAllFileAct);
     _fileMenu->addSeparator();
     _fileMenu->addAction(closeProjectAct);
@@ -247,9 +254,10 @@ void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar(tr("File"));
     fileToolBar->setObjectName("File");
+    fileToolBar->addAction(newProjectAct);
     fileToolBar->addAction(newFileAct);
-    fileToolBar->addAction(saveFileAct);
     fileToolBar->addAction(openFileAct);
+    fileToolBar->addAction(saveFileAct);
 
     editToolBar = addToolBar(tr("Edit"));
     editToolBar->setObjectName("Edit");
@@ -368,6 +376,26 @@ void MainWindow::createOutputWidget()
     connect(outputActGroup,SIGNAL(selected(QAction*)),this,SLOT(selectedOutputAct(QAction*)));
 }
 
+void MainWindow::saveFileAs()
+{
+    if (activeEditor) {
+        QString path = liteApp->settings()->value("main/open").toString();
+        QString fileName = QFileDialog::getSaveFileName(this,
+               tr("Save File As"), path, liteApp->editorNewTypeFilter());
+
+        if (!fileName.isEmpty()) {
+            QFile file(fileName);
+            if (file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                file.write(activeEditor->data());
+                file.close();
+                path = QFileInfo(fileName).absolutePath();
+                liteApp->settings()->setValue("main/open",path);
+                liteApp->loadEditor(fileName);
+            }
+        }
+    }
+}
+
 void MainWindow::saveFile()
 {
     if (activeEditor) {
@@ -377,7 +405,7 @@ void MainWindow::saveFile()
 
 void MainWindow::newFile()
 {
-    static QString path = liteApp->applicationPath()+"/..";
+    QString path = liteApp->settings()->value("main/open").toString();
 
     if (activeProject) {
         path = QFileInfo(this->activeProject->filePath()).absolutePath();
@@ -386,7 +414,7 @@ void MainWindow::newFile()
     QString fileName;
 
     fileName = QFileDialog::getSaveFileName(this,
-           tr("Save New File"), path, liteApp->editorTypeFilter());
+           tr("Save New File"), path, liteApp->editorNewTypeFilter());
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -396,6 +424,7 @@ void MainWindow::newFile()
             }
             file.close();
             path = QFileInfo(fileName).absolutePath();
+            liteApp->settings()->setValue("main/open",path);
             liteApp->loadEditor(fileName);
         }
     }
@@ -538,7 +567,7 @@ void MainWindow::closeProject()
 void MainWindow::newProject()
 {
     ProjectWizard wiz(this);
-    static QString path = liteApp->applicationPath()+"/..";
+    QString path = liteApp->settings()->value("main/open").toString();
     QString location = liteApp->settings()->value("PROJECT_LOCATION",path).toString();
     wiz.setField("PROJECT_LOCATION",QDir::toNativeSeparators(location));
     if (wiz.exec() == QDialog::Accepted) {

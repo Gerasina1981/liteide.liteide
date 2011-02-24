@@ -39,6 +39,7 @@ private:
     IApplication *liteApp;
 
 private slots:
+    void on_useGoMakeCheck_toggled(bool checked);
     void on_browseMake_clicked();
     void on_browseGdb_clicked();
     void on_browseGoroot_clicked();

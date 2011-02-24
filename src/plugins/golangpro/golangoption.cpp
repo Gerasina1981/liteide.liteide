@@ -40,6 +40,8 @@ void GolangOption::load()
     ui->gdbEdit->setText(QDir::toNativeSeparators(gdb));
     QString make = liteApp->settings()->value("golang/make",goroot+"/bin/gomake").toString();
     ui->makeEdit->setText(QDir::toNativeSeparators(make));
+    bool useGomake = liteApp->settings()->value("golang/usegomake",true).toBool();
+    ui->useGoMakeCheck->setChecked(useGomake);
     setupList();
 }
 
@@ -48,6 +50,7 @@ void GolangOption::save()
     liteApp->settings()->setValue("golang/GOROOT",ui->gorootEdit->text());
     liteApp->settings()->setValue("golang/gdb",ui->gdbEdit->text());
     liteApp->settings()->setValue("golang/make",ui->makeEdit->text());
+    liteApp->settings()->setValue("golang/usegomake",ui->useGoMakeCheck->isChecked());
 }
 
 void GolangOption::setupList()
@@ -79,4 +82,10 @@ void GolangOption::on_browseMake_clicked()
         ui->makeEdit->setText(dir);
         setupList();
     }
+}
+
+void GolangOption::on_useGoMakeCheck_toggled(bool checked)
+{
+    ui->makeEdit->setEnabled(!checked);
+    ui->browseMake->setEnabled(!checked);
 }

@@ -47,6 +47,7 @@ public:
     EditorFactoryImpl(QObject *parent, IApplication *app);
     virtual QStringList fileTypes();
     virtual QStringList openTypeFilter();
+    virtual QStringList newTypeFilter();
     virtual QStringList openTypeFilterList();
     virtual IEditor *create(const QString &fileName);
 protected:

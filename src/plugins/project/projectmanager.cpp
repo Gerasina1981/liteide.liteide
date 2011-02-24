@@ -112,7 +112,8 @@ void ProjectManager::resetProjectTree()
     root->appendRow(item);
 
     QMap<QString,QString> fileMap;
-    fileMap.insert("GOFILES",tr("Gofiles"));
+    fileMap.insert("GOFILES",tr("GOFILES"));
+    fileMap.insert("CGOFILES",tr("CGOFILES"));
     fileMap.insert("HEADERS",tr("Headers"));
     fileMap.insert("SOURCES",tr("Sources"));
 

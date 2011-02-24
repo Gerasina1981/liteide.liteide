@@ -29,6 +29,7 @@ class IEditorFactory
 public:
     virtual  ~IEditorFactory() {}
     virtual QStringList fileTypes() = 0;
+    virtual QStringList newTypeFilter() = 0;
     virtual QStringList openTypeFilter() = 0;
     virtual QStringList openTypeFilterList() = 0;
     virtual IEditor *create(const QString &fileName) = 0;

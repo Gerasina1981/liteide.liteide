@@ -49,6 +49,7 @@ private slots:
     void newProject();
     void closeProject();
     void saveFile();
+    void saveFileAs();
     void newFile();
     void openFile();
     void about();
@@ -92,6 +93,7 @@ private:
     QAction *newFileAct;
     QAction *openFileAct;
     QAction *saveFileAct;
+    QAction *saveFileAsAct;
     QAction *closeFileAct;
     QAction *saveAllFileAct;
     QAction *closeAllFileAct;
