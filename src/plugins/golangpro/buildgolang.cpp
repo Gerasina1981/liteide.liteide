@@ -303,11 +303,11 @@ void BuildGolang::createActions()
 
     cancelBuildAct->setEnabled(false);
 
-    cleanProjectTempAct = new QAction(QIcon(":/images/clean.png"),tr("Clean TempFiles"),this);
+    cleanProjectTempAct = new QAction(QIcon(":/images/cleantmp.png"),tr("Clean Temp Files"),this);
     cleanProjectTempAct->setStatusTip(tr("Clean Temp Files"));
     connect(cleanProjectTempAct,SIGNAL(triggered()),this,SLOT(cleanProjectTemp()));
 
-    cleanProjectAllAct = new QAction(QIcon(":/images/clean.png"),tr("Clean AllFiles"),this);
+    cleanProjectAllAct = new QAction(QIcon(":/images/cleanall.png"),tr("Clean All Files"),this);
     cleanProjectAllAct->setStatusTip(tr("Clean All Files"));
     connect(cleanProjectAllAct,SIGNAL(triggered()),this,SLOT(cleanProjectAll()));
 

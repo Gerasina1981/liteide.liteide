@@ -39,12 +39,13 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 	pro.Name = name
 	pro.Values = make(map[string][]string)
 
-	pre, e := regexp.Compile("\\\\[^a-z|A-Z|0-9|_|=]*[\n\r]+[^a-z|A-Z|0-9|_]*")
+	pre, e := regexp.Compile("\\\\[\t| ]*[\r|\n]+[\t| ]*")//("\\\\[^a-z|A-Z|0-9|_|\r|\n]*[\r|\n]+[^a-z|A-Z|0-9|_|\r|\n]*")
 	if e != nil {
 		err = e
 		return
 	}
 	all := pre.ReplaceAll(buf[:], []byte(" "))
+	fmt.Printf("%s\n",all)
 	all = bytes.Replace(all, []byte("\r\n"), []byte("\n"), -1)
 	lines := bytes.Split(all, []byte("\n"), -1)
 
