@@ -1,4 +1,8 @@
-TARGET=$ROOT$
+TARGET = $ROOT$
+DESTDIR =
+
+GCOPT =
+GLOPT =
 
 GOFILES = \
 	$ROOT$.go

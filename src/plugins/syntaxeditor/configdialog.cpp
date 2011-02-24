@@ -65,6 +65,7 @@ void ConfigDialog::load()
     fontSize = liteApp->settings()->value("editor/fontsize",12).toInt();
     autoIndent = liteApp->settings()->value("editor/autoindent",true).toBool();
     autoBlock = liteApp->settings()->value("editor/autoblock",true).toBool();
+    autoWord = liteApp->settings()->value("editor/autoword",false).toBool();
 
     QFontDatabase db;
     const QStringList families = db.families();
@@ -75,6 +76,7 @@ void ConfigDialog::load()
     updatePointSizes();
     ui->autoIndentCheckBox->setChecked(this->autoIndent);
     ui->autoBlockCheckBox->setChecked(this->autoBlock);
+    ui->autoWordCheckBox->setChecked(this->autoWord);
 }
 
 void ConfigDialog::save()
@@ -92,9 +94,11 @@ void ConfigDialog::save()
      }
     this->autoIndent = ui->autoIndentCheckBox->isChecked();
     this->autoBlock = ui->autoBlockCheckBox->isChecked();
+    this->autoWord = ui->autoWordCheckBox->isChecked();
 
     liteApp->settings()->setValue("editor/family",fontFamily);
     liteApp->settings()->setValue("editor/fontsize",fontSize);
     liteApp->settings()->setValue("editor/autoindent",autoIndent);
     liteApp->settings()->setValue("editor/autoblock",autoBlock);
+    liteApp->settings()->setValue("editor/autoword",autoWord);
 }

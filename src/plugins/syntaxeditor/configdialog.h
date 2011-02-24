@@ -24,6 +24,7 @@ public:
 public:
     bool autoIndent;
     bool autoBlock;
+    bool autoWord;
     int fontSize;
     QString fontFamily;
 private:

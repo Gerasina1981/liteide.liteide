@@ -20,6 +20,7 @@ public:
     SyntaxCompleter *completer() const;
     bool autoIndent;
     bool autoBlock;
+    bool autoWord;
     void areaPaintEvent(QPaintEvent *event);
     SyntaxEditor(IApplication *app, QWidget *parent = 0);
     void newFile();

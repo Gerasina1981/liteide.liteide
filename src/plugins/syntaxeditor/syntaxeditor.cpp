@@ -20,6 +20,9 @@ SyntaxEditor::SyntaxEditor(IApplication *app, QWidget *parent) :
 
     updateAreaWidth(0);
     highlightCurrentLine();
+    this->autoBlock = true;
+    this->autoIndent = true;
+    this->autoWord = false;
 }
 
 void SyntaxEditor::reload()
@@ -321,6 +324,11 @@ void SyntaxEditor::keyPressEvent(QKeyEvent *e)
         return;
     }
 
+    if (!this->autoWord) {
+        QPlainTextEdit::keyPressEvent(e);
+        return;
+    }
+
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
     if (!editCompleter || !isShortcut) // do not process the shortcut when we have a completer
         QPlainTextEdit::keyPressEvent(e);
@@ -371,6 +379,7 @@ void SyntaxEditor::loadConfig()
     curFont.setPointSize(liteApp->settings()->value("editor/fontsize",12).toInt());
     setFont(curFont);
     setTabStopWidth(fontMetrics().width("main"));
+    autoWord = liteApp->settings()->value("editor/autoword",false).toBool();
 }
 
 void SyntaxEditor::highlightCurrentLine()

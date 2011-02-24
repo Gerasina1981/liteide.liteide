@@ -63,6 +63,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="autoWordCheckBox">
+        <property name="text">
+         <string>Enable word auto complete</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
