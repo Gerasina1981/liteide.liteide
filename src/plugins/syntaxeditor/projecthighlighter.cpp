@@ -8,7 +8,7 @@ ProjectHighlighter::ProjectHighlighter(QTextDocument *document) :
     HighlightingRule rule;
     //keyword
     rule.pattern = QRegExp("\\b"
-                           "(TARGET|DESTDIR|GOFILES|CGOFILES)"
+                           "(TARGET|DESTDIR|GOFILES|CGOFILES|GCOPT|GLOPT)"
                            "\\b");
     rule.format = keywordFormat;
     highlightingRules.append(rule);

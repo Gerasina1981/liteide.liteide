@@ -45,7 +45,6 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 		return
 	}
 	all := pre.ReplaceAll(buf[:], []byte(" "))
-	fmt.Printf("%s\n",all)
 	all = bytes.Replace(all, []byte("\r\n"), []byte("\n"), -1)
 	lines := bytes.Split(all, []byte("\n"), -1)
 
@@ -123,8 +122,11 @@ func (file *Gopro) ProjectDir() (dir string) {
 	return
 }
 
-func build(gcfile string, proFileName string, files []string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
+func build(gcfile string, opts []string, proFileName string, files []string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
 	arg := []string{gcfile, "-o", proFileName}
+	for _,v := range opts {
+		arg = append(arg,v)
+	}
 	for _, v := range files {
 		arg = append(arg, string(v))
 	}
@@ -146,8 +148,12 @@ func build(gcfile string, proFileName string, files []string, envv []string, dir
 	return
 }
 
-func link(glfile string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
-	arg := []string{glfile, "-o", target, ofile}
+func link(glfile string, opts []string, target string, ofile string, envv []string, dir string) (status syscall.WaitStatus, err os.Error) {
+	arg := []string{glfile, "-o", target}
+	for _,v := range opts {
+		arg = append(arg,v)
+	}	
+	arg = append(arg,ofile)
 	fmt.Println("\t", arg)
 	var cmd *exec.Cmd
 	cmd, err = exec.Run(glfile, arg[:], envv[:], dir, 0, 1, 2)
@@ -199,8 +205,8 @@ func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.E
 		if v == "main" {
 			target = file.TargetName()
 			ofile = target + "_go_" + gobin.objext
-		}
-		status, err = build(gobin.compiler, ofile, file.PackageFiles(v), os.Environ(), file.ProjectDir())
+		}	
+		status, err = build(gobin.compiler, file.Values["GCOPT"], ofile, file.PackageFiles(v), os.Environ(), file.ProjectDir())
 		if err != nil || status.ExitStatus() != 0 {
 			return
 		}
@@ -213,7 +219,7 @@ func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.E
 		}
 		if string(v) == "main" {
 			target = target + gobin.exeext
-			status, err = link(gobin.link, target, ofile, os.Environ(), file.ProjectDir())
+			status, err = link(gobin.link, file.Values["GLOPT"],target, ofile, os.Environ(), file.ProjectDir())
 			if err != nil || status.ExitStatus() != 0 {
 				return
 			}

@@ -11,7 +11,7 @@ usage: gopromake.exe -gopro   example.pro
 
 .pro files
 
-key: TARGET DESTDIR GOFILES
+key: TARGET DESTDIR GOFILES GCOPT GLOPT
 
 Build Example:
 
@@ -23,6 +23,8 @@ GOFILES = \
 	hello.go \
 	user32.go
 
+GCOPT += -I _obj
+GLOPT += -L _obj
 
 Build A:
 gopromake -gopro hello.pro
