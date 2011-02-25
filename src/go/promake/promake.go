@@ -20,7 +20,6 @@ var (
 	showVer      *bool   = flag.Bool("ver", true, "print version ")
 	buildLib     *bool   = flag.Bool("lib", false, "build packages as librarys outside main")
 	goroot		 *string = flag.String("goroot",defGoroot(),"default go root")	
-	//	clean		 *bool   = flag.Bool("clean",false,"clean build object")
 )
 
 type Gopro struct {

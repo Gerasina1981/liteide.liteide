@@ -163,7 +163,7 @@ const PluginInfo & SyntaxEditorPlugin::info() const
     s.name = "syntaxeditor";
     s.anchor = "visualfc";
     s.info = tr("Syntax Editor");
-    s.ver = "1.0";
+    s.ver = "0.2.1";
     return s;
 }
 

@@ -39,7 +39,7 @@ const PluginInfo & GolangProPlugin::info() const
     s.name = "golangpro";
     s.anchor = "visualfc";
     s.info = "Golang Project";
-    s.ver = "1.0";
+    s.ver = "0.2.1";
     return s;
 }
 

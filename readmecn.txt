@@ -1,14 +1,14 @@
-﻿LiteIDE
+LiteIDE
 
 go语言开发工具
 
+*) 项目.pro/Makefile管理
+*) 项目/Makefile/Go源文件的编译和清理
+*) 项目文件.pro支持多个package
+*) 工具 gopromake 支持项目/文件的编译
+*) 工具 goastview 支持Go语法解析显示
 *) UTF8文件读写
 *) GO语法高亮
-*) 项目管理
-*) 支持.pro项目编译
-*) 支持无项目单独文件编译
-*) gopromake自动编译工具
-*) Go source AstView
 *) 可以从编译错误中定位到源码
 
 
@@ -23,6 +23,8 @@ FAQ:
 2.项目文件编写举例
 TARGET=hello
 DESTDIR=./bin
+GCOPT=
+GLOPT=
 GOFILES = \
 	hello.go \
 	user32.go

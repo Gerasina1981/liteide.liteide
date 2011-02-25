@@ -23,7 +23,7 @@ const PluginInfo & GoAstViewPlugin::info() const
     s.name = "goastview";
     s.anchor = "visualfc";
     s.info = "Golang AstView";
-    s.ver = "1.0";
+    s.ver = "0.2.1";
     return s;
 }
 

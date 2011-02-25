@@ -25,7 +25,7 @@ const PluginInfo & ProjectPlugin::info() const
     s.name = "project";
     s.anchor = "visualfc";
     s.info = tr("Project Manager");
-    s.ver = tr("1.0");
+    s.ver = tr("0.2.1");
     return s;
 }
 

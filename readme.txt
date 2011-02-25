@@ -2,16 +2,22 @@ LiteIDE
 
 Simple go code edit and build IDE
 
+* Project or Makefile manage
+* Project/Makefile/Gofile build and clean
+* Project multi packages build
+* Tools gopromake - project or file build
+* Tools goastview - go source file ast view
 * UTF8 file load and save
-* Syntax highliter
-* Go source file build and run, if no project
-* Project manager, multi packages support
-* Project auto build tool gopromake
-* Go souce file ast view tool goastview
+* Syntax highlighter
 * Build error jump to source line 
 
+OS: 
+     Windows
+     Linux x86_64 
+     MacOSX 10.6
+
 Developer:  visualfc (visualfc@gmail.com)
-Project :   http://code.google.com/p/liteide
+Project :   http://code.google.com/p/golang
 
 
 FAQ:
@@ -23,6 +29,8 @@ FAQ:
 
 TARGET=hello
 DESTDIR=./bin
+GCOPT=
+GLOPT=
 GOFILES = \
 	hello.go \
 	user32.go
