@@ -1,0 +1,4 @@
+[PROJECT]
+NAME = "GoLang Project (Empty)"
+PATH = golangempty
+PRO = root.pro

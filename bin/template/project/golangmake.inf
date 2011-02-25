@@ -1,0 +1,5 @@
+[PROJECT]
+NAME = "GoLang Project (Makefile)"
+PATH = golangmake
+PRO = Makefile
+FILES = main.go doc.go

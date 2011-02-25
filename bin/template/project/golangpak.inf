@@ -1,0 +1,5 @@
+[PROJECT]
+NAME = "GoLang Project (Package)"
+PATH = golangpak
+PRO = root.pro
+FILES = root.go doc.go

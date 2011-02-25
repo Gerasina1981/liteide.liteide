@@ -1,3 +1,4 @@
+// $ROOT$ project main.go
 package main
 
 import (
