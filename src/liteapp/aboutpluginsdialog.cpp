@@ -27,7 +27,7 @@ AboutPluginsDialog::AboutPluginsDialog(QWidget *parent) :
     treeView->setRootIsDecorated(false);
     treeView->header()->setResizeMode(QHeaderView::ResizeToContents);
 
-    QPushButton *closeBtn = new QPushButton(tr("close"));
+    QPushButton *closeBtn = new QPushButton(tr("Close"));
     connect(closeBtn,SIGNAL(clicked()),this,SLOT(accept()));
 
     QVBoxLayout *layout = new QVBoxLayout;

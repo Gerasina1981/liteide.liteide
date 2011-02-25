@@ -4,6 +4,7 @@
 #include "finddialog.h"
 #include "projectwizard.h"
 #include "optionsdialog.h"
+#include "aboutdialog.h"
 
 #include <QApplication>
 #include <QAction>
@@ -131,12 +132,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::createActions()
 {
     newProjectAct = new QAction(QIcon(":/images/newproj.png"),tr("New Project..."),this);
-    newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_N));
+    newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
     newProjectAct->setStatusTip(tr("New Project"));
     connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
 
     closeProjectAct = new QAction(tr("Close Project"),this);
-    closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_C));
+    //closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
     closeProjectAct->setStatusTip(tr("Close Project"));
     connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(closeProject()));
 
@@ -161,6 +162,11 @@ void MainWindow::createActions()
     saveAllFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
     saveAllFileAct->setStatusTip(tr("Save All Files"));
     connect(saveAllFileAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
+
+    closeFileAct = new QAction(tr("Close File"), this);
+    closeFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
+    closeFileAct->setStatusTip(tr("Close Active File"));
+    connect(closeFileAct, SIGNAL(triggered()), this, SLOT(closeFile()));
 
     closeAllFileAct = new QAction(tr("Close All"), this);
     closeAllFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
@@ -192,16 +198,16 @@ void MainWindow::createActions()
     optionsAct->setStatusTip(tr("Show options dialog"));
     connect(optionsAct,SIGNAL(triggered()),this,SLOT(options()));
 
-    quitAct = new QAction(tr("&Quit"), this);
-    quitAct->setShortcuts(QKeySequence::Quit);
+    quitAct = new QAction(tr("Quit"), this);
+    quitAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     quitAct->setStatusTip(tr("Quit the application"));
     connect(quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-    aboutAct = new QAction(tr("&About"), this);
+    aboutAct = new QAction(tr("About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    aboutQtAct = new QAction(tr("About &Qt"), this);
+    aboutQtAct = new QAction(tr("About Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
@@ -218,12 +224,13 @@ void MainWindow::createMenus()
     _fileMenu->addAction(newFileAct);
     _fileMenu->addAction(openFileAct);
     _fileMenu->addSeparator();
-
+    _fileMenu->addAction(closeProjectAct);
+    _fileMenu->addSeparator();
     _fileMenu->addAction(saveFileAct);
     _fileMenu->addAction(saveFileAsAct);
     _fileMenu->addAction(saveAllFileAct);
     _fileMenu->addSeparator();
-    _fileMenu->addAction(closeProjectAct);
+    _fileMenu->addAction(closeFileAct);
     _fileMenu->addAction(closeAllFileAct);
     _fileMenu->addSeparator();
     _fileMenu->addAction(quitAct);
@@ -449,18 +456,8 @@ void MainWindow::openFile()
 
 void MainWindow::about()
 {
-     QMessageBox::about(this, tr("About LiteIDE"),
-                QString(tr("<h1 class='title'>LiteIDE </h1>"
-                   "<p>Open Source Editor - Copyright (C)2011</p>"
-                   "<p></p>"
-                   "<h2> <font color=green>Happy Birthday Lucy!</font></h2>"
-                   "<p></p>"
-                   "<table border=0>"
-                   "<tr><td>Devoloper:    </td><td>visualfc (visualfc@gmail.com)</td></tr>"
-                   "<tr><td>Project:</td><td>http://code.google.com/p/liteide</td></tr>"
-                   "<tr><td>Version:</td><td>0.2.0</td></tr>"
-                   "<tr><td>Build Time:</td><td>%1</td></tr>"
-                   "</table>").arg(__DATE__)));
+    AboutDialog * dlg = new AboutDialog(this);
+    dlg->exec();
 }
 
 void MainWindow::fireDocumentChanged(IEditor *edit, bool b)
@@ -584,6 +581,19 @@ void MainWindow::newProject()
             liteApp->loadProject(wiz.projectFileName);
         }
     }
+}
+
+void MainWindow::closeFile()
+{
+    if (!activeEditor) {
+        return;
+    }
+    QWidget *w = editors.key(activeEditor);
+    if (!w) {
+        return;
+    }
+    int index = editTabWidget->indexOf(w);
+    editTabClose(index);
 }
 
 void MainWindow::closeAllFile()

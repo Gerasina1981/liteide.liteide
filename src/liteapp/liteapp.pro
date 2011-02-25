@@ -17,13 +17,18 @@ SOURCES += main.cpp \
     aboutpluginsdialog.cpp \
     projectwizard.cpp \
     finddialog.cpp \
-    optionsdialog.cpp
+    optionsdialog.cpp \
+    aboutdialog.cpp
 
 HEADERS += liteapp.h \
     mainwindow.h \
     aboutpluginsdialog.h \
     projectwizard.h \
     finddialog.h \
-    optionsdialog.h
+    optionsdialog.h \
+    aboutdialog.h
 
 RESOURCES += liteapp.qrc
+
+FORMS += \
+    aboutdialog.ui

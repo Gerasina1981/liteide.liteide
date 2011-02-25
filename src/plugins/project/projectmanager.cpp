@@ -58,7 +58,7 @@ void ProjectManager::createActions()
 
 QStringList ProjectManager::openTypeFilter() const
 {
-    return QStringList() << "Project or Makefile (*.pro;Makefile)";
+    return QStringList() << "Project or Makefile (*.pro Makefile)";
 }
 
 QStringList ProjectManager::openTypeFilterList() const

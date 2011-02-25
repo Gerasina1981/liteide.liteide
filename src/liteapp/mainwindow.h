@@ -44,6 +44,7 @@ private slots:
     void selectedOutputAct(QAction *act);
     void findText(const QString&,QTextDocument::FindFlags);
     void find();
+    void closeFile();
     void closeAllFile();
     void saveAllFile();
     void newProject();

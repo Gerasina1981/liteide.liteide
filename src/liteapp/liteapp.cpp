@@ -165,9 +165,9 @@ QString LiteApp::openTypeFilter() const
         types.append(factory->openTypeFilterList());
         filter.append(factory->openTypeFilter());
     }
-    QString all = QString("All Support File (%1)").arg(types.join(";"));
+    QString all = QString("All Support File (%1)").arg(types.join(" "));
     filter.insert(0,all);
-    filter.append("All Files (*)(*.*)");
+    filter.append("All Files (*)");
     return filter.join(";;");
 }
 

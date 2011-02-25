@@ -47,10 +47,10 @@ void GolangProPlugin::createGofmt()
 {
     gofmtOutputEdit = new QPlainTextEdit;
     gofmtOutputEdit->setReadOnly(true);
-    liteApp->mainWindow()->addOutputPane(gofmtOutputEdit,QIcon(),tr("gofmt"));
+    liteApp->mainWindow()->addOutputPane(gofmtOutputEdit,QIcon(),tr("Gofmt Output"));
 
-    gofmtAct = new QAction(tr("gofmt\tAlt+F8"),this);
-    gofmtAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F8));
+    gofmtAct = new QAction(tr("Gofmt"),this);
+    gofmtAct->setShortcut(QKeySequence(Qt::CTRL+Qt::SHIFT + Qt::Key_I));
     gofmtAct->setStatusTip(tr("Format go file"));
 
     connect(gofmtAct,SIGNAL(triggered()),this,SLOT(gofmt()));
@@ -76,15 +76,7 @@ void GolangProPlugin::gofmt()
     connect(&gofmtProcess,SIGNAL(outputText(QString,bool)),gofmtOutputEdit,SLOT(appendPlainText(QString)));
     connect(&gofmtProcess,SIGNAL(processSuccess()),ed,SLOT(reload()));
 
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    QString goroot = env.value("GOROOT");
-    if (goroot.isEmpty()) {
-#ifdef Q_OS_WIN32
-        goroot = "c:/go";
-#else
-        goroot = env.value("HOME")+"/go";
-#endif
-    }
+    QString goroot = build->goroot();
     QString projDir = QFileInfo(path).absolutePath();
     gofmtProcess.setWorkingDirectory(projDir);
 

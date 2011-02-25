@@ -108,7 +108,7 @@ QStringList EditorFactoryImpl::fileTypes()
 
 QStringList EditorFactoryImpl::openTypeFilter()
 {
-    return QStringList() << "Go Files (*.go;*.goc)";
+    return QStringList() << "Go Files (*.go *.goc)";
 }
 
 QStringList EditorFactoryImpl::newTypeFilter()
