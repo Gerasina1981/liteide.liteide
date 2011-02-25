@@ -1,3 +1,4 @@
+// hello_make project main.go
 package main
 
 import (

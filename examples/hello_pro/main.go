@@ -1,9 +1,10 @@
+// hello_pro project main.go
 package main
 
 import (
 	"fmt"
 )
 
-func print_hello() {
+func main() {
 	fmt.Println("Hello World!")
 }

@@ -75,6 +75,8 @@ bool ProjectFile::open(const QString &fileName)
 
     context.clear();
     foreach (QString line, list) {
+        if (line.size() >= 1 && line.at(0) == '#')
+            continue;
         QStringList v = line.split(QRegExp("\\+="),QString::SkipEmptyParts);
         if (v.count() == 1) {
             v = line.split(QRegExp("="),QString::SkipEmptyParts);

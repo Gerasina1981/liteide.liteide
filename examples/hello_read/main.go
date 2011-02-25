@@ -1,3 +1,4 @@
+// hello_read project main.go
 package main
 
 import (
@@ -12,7 +13,7 @@ func main() {
 		n, e := os.Stdin.Read(s[:])
 		if e != nil || string(s[0:4]) == "quit" {
 			break
-		} 
+		}
 		fmt.Println(s[0:n])
 	}
 }

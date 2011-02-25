@@ -51,6 +51,9 @@ func makePro(name string) (pro *Gopro, err os.Error) {
 	for _, line := range lines {
 		offset := 2
 		line = bytes.Replace(line, []byte("\t"), []byte(" "), -1)
+		if len(line) >= 1 && line[0] == '#' {
+			continue
+		}
 		find := bytes.Index(line, []byte("+="))
 		if find == -1 {
 			offset = 1
@@ -199,13 +202,16 @@ func (file *Gopro) IsEmpty() bool {
 func (file *Gopro) MakeTarget(gobin *GoBin) (status syscall.WaitStatus, err os.Error) {
 	all := file.AllPackage()
 	for _, v := range all {
+		if v == "documentation" {
+			continue
+		}			
 		fmt.Printf("build package %s:\n", v)
 		target := v
 		ofile := target + gobin.objext
 		if v == "main" {
 			target = file.TargetName()
 			ofile = target + "_go_" + gobin.objext
-		}	
+		} 
 		status, err = build(gobin.compiler, file.Values["GCOPT"], ofile, file.PackageFiles(v), os.Environ(), file.ProjectDir())
 		if err != nil || status.ExitStatus() != 0 {
 			return

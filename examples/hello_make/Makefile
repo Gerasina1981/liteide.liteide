@@ -2,6 +2,6 @@ include $(GOROOT)/src/Make.inc
 
 TARG=hello_make
 GOFILES=\
-	hello_make.go \
+	main.go \
 
 include $(GOROOT)/src/Make.cmd

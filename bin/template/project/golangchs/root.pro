@@ -1,3 +1,5 @@
+# $ROOT$ project file
+
 TARGET = $ROOT$
 DESTDIR =
 
@@ -5,4 +7,5 @@ GCOPT =
 GLOPT =
 
 GOFILES = \
-	$ROOT$.go
+	main.go \
+	doc.go

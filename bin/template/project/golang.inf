@@ -2,4 +2,4 @@
 NAME = "GoLang Project"
 PATH = golang
 PRO = root.pro
-FILES = root.go
+FILES = main.go doc.go

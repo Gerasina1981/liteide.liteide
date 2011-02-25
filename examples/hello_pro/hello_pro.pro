@@ -1,6 +1,6 @@
-# $ROOT$ project file
+# hello_pro project file
 
-TARGET = $ROOT$
+TARGET = hello_pro
 DESTDIR =
 
 GCOPT =

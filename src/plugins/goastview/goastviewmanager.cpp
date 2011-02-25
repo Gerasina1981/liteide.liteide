@@ -144,6 +144,7 @@ GoAstViewManager::GoAstViewManager(IApplication *app, QWidget *parent) :
 
     //create astview output
     astOutputEdit = new QPlainTextEdit;
+    astOutputEdit->setReadOnly(true);
     liteApp->mainWindow()->addOutputPane(astOutputEdit,QIcon(),tr("AstOutput"));;
 }
 
