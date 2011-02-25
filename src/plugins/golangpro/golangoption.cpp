@@ -36,9 +36,9 @@ void GolangOption::load()
 {
     QString goroot = liteApp->settings()->value("golang/GOROOT",defGOROOT()).toString();
     ui->gorootEdit->setText(QDir::toNativeSeparators(goroot));
-    QString gdb = liteApp->settings()->value("golang/gdb","gdb").toString();
+    QString gdb = liteApp->settings()->value("golang/gdb","/usr/bin/gdb").toString();
     ui->gdbEdit->setText(QDir::toNativeSeparators(gdb));
-    QString make = liteApp->settings()->value("golang/make",goroot+"/bin/gomake").toString();
+    QString make = liteApp->settings()->value("golang/make","/usr/bin/make").toString();
     ui->makeEdit->setText(QDir::toNativeSeparators(make));
     bool useGomake = liteApp->settings()->value("golang/usegomake",true).toBool();
     ui->useGoMakeCheck->setChecked(useGomake);

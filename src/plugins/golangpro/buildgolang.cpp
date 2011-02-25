@@ -90,12 +90,11 @@ QString BuildGolang::goroot()
 
 QString BuildGolang::gomake()
 {
-    QString def = goroot()+"/bin/gomake";
     bool usegomake = liteApp->settings()->value("golang/usegomake").toBool();
     if (usegomake) {
-        return def;
+        return QFileInfo(QDir(goroot()),"bin/gomake").filePath();
     }
-    return liteApp->settings()->value("golang/make",def).toString();
+    return liteApp->settings()->value("golang/make","/usr/bin/make").toString();
 }
 
 void BuildGolang::buildGoproject(IProject *proj)
@@ -578,7 +577,7 @@ void BuildGolang::runGdb()
     if (!info.fileName.isEmpty()) {
         this->runOutputEdit->clear();
         liteApp->mainWindow()->setCurrentOutputPane(this->runOutputEdit);
-        QString cmd = liteApp->settings()->value("golang/gdb","gdb").toString();
+        QString cmd = liteApp->settings()->value("golang/gdb","/usr/bin/gdb").toString();
         QStringList args;
         args << info.filePath;
         runProcess->setWorkingDirectory(info.workDir);
