@@ -482,6 +482,14 @@ void BuildGolang::buildMakefile(IProject *proj, bool force)
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("GOROOT",goroot());
 
+    QString path = env.value("PATH");
+#ifdef Q_OS_WIN32
+    path += ";"+goroot()+"/bin";
+#else
+    path += ":"+goroot()+"/bin";
+#endif
+    env.insert("PATH",path);
+
     buildProcess->setEnvironment(env.toStringList());
     buildProcess->setWorkingDirectory(QFileInfo(proj->filePath()).absolutePath());
     if (force) {
@@ -568,10 +576,13 @@ void BuildGolang::runGdb()
 {
     TargetInfo info = liteApp->getTargetInfo();
     if (!info.fileName.isEmpty()) {
+        this->runOutputEdit->clear();
+        liteApp->mainWindow()->setCurrentOutputPane(this->runOutputEdit);
         QString cmd = liteApp->settings()->value("golang/gdb","gdb").toString();
         QStringList args;
         args << info.filePath;
-        QProcess::startDetached(cmd,args,info.workDir);
+        runProcess->setWorkingDirectory(info.workDir);
+        runProcess->start(cmd,args);
     }
 }
 

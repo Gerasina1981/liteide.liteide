@@ -1,4 +1,4 @@
-LiteIDE
+﻿LiteIDE
 
 go语言开发工具
 
@@ -11,9 +11,14 @@ go语言开发工具
 *) GO语法高亮
 *) 可以从编译错误中定位到源码
 
+平台支持: 
+     Windows
+     Linux x86_64 
+     MacOSX 10.6
+
 
 开发者:    visualfc (visualfc@gmail.com)
-项目主页: http://code.google.com/p/liteide
+项目主页: http://code.google.com/p/golangide
 
 FAQ:
 

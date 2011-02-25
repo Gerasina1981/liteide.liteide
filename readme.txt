@@ -17,7 +17,7 @@ OS:
      MacOSX 10.6
 
 Developer:  visualfc (visualfc@gmail.com)
-Project :   http://code.google.com/p/golang
+Project :   http://code.google.com/p/golangide
 
 
 FAQ:
