@@ -1,0 +1,102 @@
+Install LiteIDE
+
+Lates document http://code.google.com/p/golangide/wiki/GettingStarted
+
+Install golang, if needed
+
+http://golang.org/doc/install.html
+Install LiteIDE
+Install windows
+
+    * Download liteide-win32-bin-0.2.1.zip and extract to c:\ 
+
+Ver 0.2.1
+
+    * Load on gui c:\liteide\bin\liteide.exe
+    * Setup GOROOT MAKE GDB
+
+          liteide menu: tools->options->golang 
+
+Ver 0.1.8
+
+    * Load liteide on gui, If golang root is c:\go
+
+      c:\liteide\bin\liteide.exe
+
+    * Load liteide on cmd shell
+
+      >set GOROOT=c:\go
+      >set GOARCH=386
+      >set GOOS=windows
+      >cd\liteide\bin
+      >liteide.exe
+
+Install Linux x86_64
+
+    * Download liteide-linux-x86_64-bin-0.2.1.tar.bz2 and extract to $HOME/
+    * Download qtlib-linux-x86-64-4.7.0.tar.bz2 and extract $HOME/liteide/bin 
+
+Ver 0.2.1
+
+    * Load on gui $HOME/liteide/bin/liteide.sh
+    * Setup GOROOT MAKE GDB
+
+          liteide menu: tools->options->golang 
+
+Ver 0.1.8
+
+    * Load liteide on gui, If golang root is $HOME/go
+
+      HOME/liteide/bin/liteide.sh
+
+    * Load liteide on shell (ver 0.1.8 and low)
+
+      $export GOROOT=$HOME/go
+      $export GOARCH=amd64
+      $export GOOS=linux
+      $cd/liteide/bin
+      $liteide.sh
+
+Install MacOSX 10.6
+
+    * Download liteide-macosx10.6-bin-0.2.1.dmg and extract to $HOME/ 
+
+Ver 0.2.1
+
+    * Load on gui $HOME/liteide/bin/liteide.sh
+    * Setup GOROOT MAKE GDB
+
+          liteide menu: liteide->preferences->golang 
+
+Install Source
+
+    * Install QT4.7, if needed
+    * Fetch the repository
+
+      hg clone https://liteide.googlecode.com/hg/ liteide 
+
+    * build gopromake and goastview, if GOROOT is $HOME/go
+
+      $ cd liteide/src
+      $ ./makegotool.sh
+
+    * build gopromake and goastview, if GOROOT not $HOME/go
+
+      $ cd liteide/src/promake
+      $ gomake
+
+      $ cd liteide/src/astview
+      $ ../../../bin/gopromake -goroot /Users/my/go -gopro astview.pro
+
+    * build liteide
+
+      $ cd liteide/src
+      $ qmake 
+      $ make release
+
+    * deploy on macosx
+
+      $ cd liteide/bin
+      $ ./macbuild.sh
+
+
