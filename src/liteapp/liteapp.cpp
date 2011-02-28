@@ -75,6 +75,11 @@ QString LiteApp::osExecuteExt()
 #endif
 }
 
+QIcon LiteApp::appIcon() const
+{
+    return QIcon(":/images/liteide.png");
+}
+
 TargetInfo LiteApp::getTargetInfo()
 {
     TargetInfo info;

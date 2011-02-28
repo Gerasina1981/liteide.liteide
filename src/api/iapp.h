@@ -58,6 +58,7 @@ public:
     virtual QString applicationPath() = 0;
     virtual QString osExecuteExt() = 0;
     virtual TargetInfo getTargetInfo() = 0;
+    virtual QIcon appIcon() const = 0;
 signals:
     void activeEditorTextChanged(IEditor *ed);
     void activeEditorChanged(IEditor *ed);

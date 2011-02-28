@@ -40,6 +40,7 @@ MainWindow::MainWindow(LiteApp *app) :
         lastOutputAct(NULL)
 {
     this->setWindowTitle("LiteIDE");
+    this->setWindowIcon(liteApp->appIcon());
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     QSplitter *mainSplitter = new QSplitter(Qt::Vertical,this);

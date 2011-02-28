@@ -28,6 +28,7 @@ public:
     virtual QString applicationPath() ;
     virtual QString osExecuteExt();
     virtual TargetInfo getTargetInfo();
+    virtual QIcon appIcon() const;
     void loadPlugins(const QString &dir);
     void installPlugins();
     QString openTypeFilter() const;
